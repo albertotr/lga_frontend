@@ -14,38 +14,9 @@
       <CIcon name="logo" height="48" alt="Logo"/>
     </CHeaderBrand>
     <CHeaderNav class="d-md-down-none mr-auto">
-      <CHeaderNavItem class="px-3">
-        <CHeaderNavLink to="/dashboard">
-          Dashboard
-        </CHeaderNavLink>
-      </CHeaderNavItem>
-      <CHeaderNavItem class="px-3">
-        <CHeaderNavLink to="/users" exact>
-          Users
-        </CHeaderNavLink>
-      </CHeaderNavItem>
-      <CHeaderNavItem class="px-3">
-        <CHeaderNavLink>
-          Settings
-        </CHeaderNavLink>
-      </CHeaderNavItem>
+      
     </CHeaderNav>
-    <CHeaderNav class="mr-4">
-      <CHeaderNavItem class="d-md-down-none mx-2">
-        <CHeaderNavLink>
-          <CIcon name="cil-bell"/>
-        </CHeaderNavLink>
-      </CHeaderNavItem>
-      <CHeaderNavItem class="d-md-down-none mx-2">
-        <CHeaderNavLink>
-          <CIcon name="cil-list"/>
-        </CHeaderNavLink>
-      </CHeaderNavItem>
-      <CHeaderNavItem class="d-md-down-none mx-2">
-        <CHeaderNavLink>
-          <CIcon name="cil-envelope-open"/>
-        </CHeaderNavLink>
-      </CHeaderNavItem>
+    <CHeaderNav class="mr-4">      
       <TheHeaderDropdownAccnt/>
     </CHeaderNav>
     <CSubheader class="px-3">
@@ -61,6 +32,9 @@ export default {
   name: 'TheHeader',
   components: {
     TheHeaderDropdownAccnt
-  }
+  },
+  methods: {
+    
+  },
 }
 </script>

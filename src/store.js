@@ -1,6 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import axios from "axios";
+import router from "./router";
 
 Vue.use(Vuex);
 
@@ -68,9 +69,33 @@ const actions = {
     });
   },
 
-  async signOut({ dispatch }) {
-    await axios.post("/logout");
-    return dispatch("me");
+  checkToken({ dispatch }) {
+    return new Promise((resolve, reject) => {
+      const token = localStorage.getItem("token");
+      dispatch("me", token)
+        .then((retorno) => resolve(retorno))
+        .catch((err) => reject(err));
+    });
+  },
+
+  signOut({ commit }) {
+    commit("SET_AUTHENTICATED", false);
+    commit("SET_TOKEN", null);
+    commit("SET_USER", null);
+    const token = localStorage.getItem("token");
+    localStorage.removeItem("token");
+
+    var postOptions = {
+      method: "post",
+      url: "/api/logout/",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    axios(postOptions).then(()=>{
+      router.push('/pages/login');
+    });
   },
 
   me({ commit }, token) {
@@ -88,12 +113,14 @@ const actions = {
           commit("SET_AUTHENTICATED", true);
           commit("SET_TOKEN", token);
           commit("SET_USER", response.data);
+          localStorage.setItem("token", token);
           resolve(true);
         })
         .catch((err) => {
           commit("SET_AUTHENTICATED", false);
           commit("SET_TOKEN", null);
           commit("SET_USER", null);
+          localStorage.removeItem("token");
           reject(err);
         });
     });

@@ -14,6 +14,26 @@ Vue.prototype.$log = console.log.bind(console);
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = "http://localhost:8000";
 
+axios.interceptors.response.use(
+  function(response) {
+    return response;
+  },
+  function(error) {
+    if (error.response.status === 401) {
+      console.info("auth token expired");
+      localStorage.clear();
+      sessionStorage.clear();
+      router.push("/pages/login");
+      Promise.reject(error);
+    } else if (error.response.status === 403) {
+      router.push("/pages/login");
+      Promise.reject(error);
+    } else {
+      return Promise.reject(error);
+    }
+  }
+);
+
 new Vue({
   el: "#app",
   router,

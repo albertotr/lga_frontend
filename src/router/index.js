@@ -65,15 +65,21 @@ const router = new Router({
   mode: "history",
   linkActiveClass: "active",
   scrollBehavior: () => ({ y: 0 }),
-  routes: configRoutes()
+  routes: configRoutes(),
 });
 
 router.beforeEach((to, from, next) => {
   if (to.path != "/pages/login" && !store.getters.authenticated) {
-    next({
-      path: "/pages/login",
-      params: { nextUrl: to.fullPath }
-    });
+    
+    if (localStorage.getItem("token")) {
+      store.dispatch("checkToken").then(() => next());
+    }else{
+      next({
+        path: "/pages/login",
+        params: { nextUrl: to.fullPath },
+      });
+    }
+
   } else {
     next();
   }
@@ -90,7 +96,7 @@ function configRoutes() {
         {
           path: "dashboard",
           name: "Dashboard",
-          component: Dashboard
+          component: Dashboard,
         },
         {
           path: "theme",
@@ -99,56 +105,56 @@ function configRoutes() {
           component: {
             render(c) {
               return c("router-view");
-            }
+            },
           },
           children: [
             {
               path: "colors",
               name: "Colors",
-              component: Colors
+              component: Colors,
             },
             {
               path: "typography",
               name: "Typography",
-              component: Typography
-            }
-          ]
+              component: Typography,
+            },
+          ],
         },
         {
           path: "charts",
           name: "Charts",
-          component: Charts
+          component: Charts,
         },
         {
           path: "widgets",
           name: "Widgets",
-          component: Widgets
+          component: Widgets,
         },
         {
           path: "users",
           meta: {
-            label: "Users"
+            label: "Users",
           },
           component: {
             render(c) {
               return c("router-view");
-            }
+            },
           },
           children: [
             {
               path: "",
               name: "Users",
-              component: Users
+              component: Users,
             },
             {
               path: ":id",
               meta: {
-                label: "User Details"
+                label: "User Details",
               },
               name: "User",
-              component: User
-            }
-          ]
+              component: User,
+            },
+          ],
         },
         {
           path: "base",
@@ -157,90 +163,90 @@ function configRoutes() {
           component: {
             render(c) {
               return c("router-view");
-            }
+            },
           },
           children: [
             {
               path: "cards",
               name: "Cards",
-              component: Cards
+              component: Cards,
             },
             {
               path: "forms",
               name: "Forms",
-              component: Forms
+              component: Forms,
             },
             {
               path: "switches",
               name: "Switches",
-              component: Switches
+              component: Switches,
             },
             {
               path: "tables",
               name: "Tables",
-              component: Tables
+              component: Tables,
             },
             {
               path: "tabs",
               name: "Tabs",
-              component: Tabs
+              component: Tabs,
             },
             {
               path: "breadcrumbs",
               name: "Breadcrumbs",
-              component: Breadcrumbs
+              component: Breadcrumbs,
             },
             {
               path: "carousels",
               name: "Carousels",
-              component: Carousels
+              component: Carousels,
             },
             {
               path: "collapses",
               name: "Collapses",
-              component: Collapses
+              component: Collapses,
             },
             {
               path: "jumbotrons",
               name: "Jumbotrons",
-              component: Jumbotrons
+              component: Jumbotrons,
             },
             {
               path: "list-groups",
               name: "List Groups",
-              component: ListGroups
+              component: ListGroups,
             },
             {
               path: "navs",
               name: "Navs",
-              component: Navs
+              component: Navs,
             },
             {
               path: "navbars",
               name: "Navbars",
-              component: Navbars
+              component: Navbars,
             },
             {
               path: "paginations",
               name: "Paginations",
-              component: Paginations
+              component: Paginations,
             },
             {
               path: "popovers",
               name: "Popovers",
-              component: Popovers
+              component: Popovers,
             },
             {
               path: "progress-bars",
               name: "Progress Bars",
-              component: ProgressBars
+              component: ProgressBars,
             },
             {
               path: "tooltips",
               name: "Tooltips",
-              component: Tooltips
-            }
-          ]
+              component: Tooltips,
+            },
+          ],
         },
         {
           path: "buttons",
@@ -249,30 +255,30 @@ function configRoutes() {
           component: {
             render(c) {
               return c("router-view");
-            }
+            },
           },
           children: [
             {
               path: "standard-buttons",
               name: "Standard Buttons",
-              component: StandardButtons
+              component: StandardButtons,
             },
             {
               path: "button-groups",
               name: "Button Groups",
-              component: ButtonGroups
+              component: ButtonGroups,
             },
             {
               path: "dropdowns",
               name: "Dropdowns",
-              component: Dropdowns
+              component: Dropdowns,
             },
             {
               path: "brand-buttons",
               name: "Brand Buttons",
-              component: BrandButtons
-            }
-          ]
+              component: BrandButtons,
+            },
+          ],
         },
         {
           path: "icons",
@@ -281,25 +287,25 @@ function configRoutes() {
           component: {
             render(c) {
               return c("router-view");
-            }
+            },
           },
           children: [
             {
               path: "coreui-icons",
               name: "Icons library",
-              component: CoreUIIcons
+              component: CoreUIIcons,
             },
             {
               path: "brands",
               name: "Brands",
-              component: Brands
+              component: Brands,
             },
             {
               path: "flags",
               name: "Flags",
-              component: Flags
-            }
-          ]
+              component: Flags,
+            },
+          ],
         },
         {
           path: "notifications",
@@ -308,27 +314,27 @@ function configRoutes() {
           component: {
             render(c) {
               return c("router-view");
-            }
+            },
           },
           children: [
             {
               path: "alerts",
               name: "Alerts",
-              component: Alerts
+              component: Alerts,
             },
             {
               path: "badges",
               name: "Badges",
-              component: Badges
+              component: Badges,
             },
             {
               path: "modals",
               name: "Modals",
-              component: Modals
-            }
-          ]
-        }
-      ]
+              component: Modals,
+            },
+          ],
+        },
+      ],
     },
     {
       path: "/pages",
@@ -337,31 +343,31 @@ function configRoutes() {
       component: {
         render(c) {
           return c("router-view");
-        }
+        },
       },
       children: [
         {
           path: "404",
           name: "Page404",
-          component: Page404
+          component: Page404,
         },
         {
           path: "500",
           name: "Page500",
-          component: Page500
+          component: Page500,
         },
         {
           path: "login",
           name: "Login",
-          component: Login
+          component: Login,
         },
         {
           path: "register",
           name: "Register",
-          component: Register
-        }
-      ]
-    }
+          component: Register,
+        },
+      ],
+    },
   ];
 }
 
