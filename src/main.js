@@ -12,7 +12,7 @@ Vue.use(CoreuiVue);
 Vue.prototype.$log = console.log.bind(console);
 
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = "http://localhost:8000";
+axios.defaults.baseURL = process.env.VUE_APP_API_URL;
 
 axios.interceptors.response.use(
   function(response) {
