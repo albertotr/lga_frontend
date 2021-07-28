@@ -1,15 +1,15 @@
-import "core-js/stable";
-import Vue from "vue";
-import App from "./App";
-import router from "./router";
-import CoreuiVue from "@coreui/vue";
-import { iconsSet as icons } from "./assets/icons/icons.js";
+import Vue from 'vue'
+import router from './router'
 import store from "./store";
-import axios from "axios";
 
-Vue.config.performance = true;
-Vue.use(CoreuiVue);
-Vue.prototype.$log = console.log.bind(console);
+import BootstrapVue from "bootstrap-vue"
+
+import App from './App'
+
+import Default from './Layout/Wrappers/baseLayout.vue';
+import Pages from './Layout/Wrappers/pagesLayout.vue';
+
+import axios from "axios";
 
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = process.env.VUE_APP_API_URL;
@@ -20,13 +20,12 @@ axios.interceptors.response.use(
   },
   function(error) {
     if (error.response.status === 401) {
-      console.info("auth token expired");
       localStorage.clear();
       sessionStorage.clear();
-      router.push("/pages/login");
+      router.push("/pages/login-boxed");
       Promise.reject(error);
     } else if (error.response.status === 403) {
-      router.push("/pages/login");
+      router.push("/pages/login-boxed");
       Promise.reject(error);
     } else {
       return Promise.reject(error);
@@ -34,13 +33,17 @@ axios.interceptors.response.use(
   }
 );
 
+Vue.config.productionTip = false;
+
+Vue.use(BootstrapVue);
+
+Vue.component('default-layout', Default);
+Vue.component('userpages-layout', Pages);
+
 new Vue({
-  el: "#app",
+  el: '#app',
   router,
   store,
-  icons,
-  template: "<App/>",
-  components: {
-    App,
-  },
+  template: '<App/>',
+  components: { App }
 });

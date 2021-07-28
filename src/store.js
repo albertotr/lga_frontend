@@ -94,7 +94,7 @@ const actions = {
     };
 
     axios(postOptions).then(()=>{
-      router.push('/pages/login');
+      router.push('/login');
     });
   },
 
@@ -113,7 +113,7 @@ const actions = {
           commit("SET_AUTHENTICATED", true);
           commit("SET_TOKEN", token);
           commit("SET_USER", response.data);
-          localStorage.setItem("token", token);
+          localStorage.setItem('token', token);
           resolve(true);
         })
         .catch((err) => {
