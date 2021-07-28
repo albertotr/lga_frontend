@@ -20,8 +20,8 @@
       </div>
     </div>
     <div class="app-sidebar-content">
-      <VuePerfectScrollbar class="app-sidebar-scroll" v-once>
-        <sidebar-menu showOneChild :menu="menu" />
+      <VuePerfectScrollbar class="app-sidebar-scroll" v-once v-if="user">
+        <sidebar-menu showOneChild :menu="getMenu()" />
       </VuePerfectScrollbar>
     </div>
   </div>
@@ -30,7 +30,7 @@
 <script>
 import { SidebarMenu } from "vue-sidebar-menu";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-
+import { mapGetters } from "vuex";
 export default {
   components: {
     SidebarMenu,
@@ -40,7 +40,6 @@ export default {
     return {
       isOpen: false,
       sidebarActive: false,
-
       menu: [
         {
           header: true,
@@ -224,6 +223,24 @@ export default {
     sidebarbg: String,
   },
   methods: {
+    getMenu() {
+      var menu = [];
+
+      if (this.user.role.level == 0) {
+        menu.push(
+          {
+            header: true,
+            title: "Administrativo",
+          },
+          {
+            title: "Usuario",
+            icon: "pe-7s-users",
+            href: "/admin/users",
+          }
+        );
+      }
+      return menu;
+    },
     toggleBodyClass(className) {
       const el = document.body;
       this.isOpen = !this.isOpen;
@@ -253,7 +270,7 @@ export default {
 
       this.windowWidth = document.documentElement.clientWidth;
 
-      if (this.windowWidth < "1350") {
+      if (this.windowWidth < "1024") {
         el.classList.add("closed-sidebar", "closed-sidebar-md");
       } else {
         el.classList.remove("closed-sidebar", "closed-sidebar-md");
@@ -271,6 +288,9 @@ export default {
 
   beforeDestroy() {
     window.removeEventListener("resize", this.getWindowWidth);
+  },
+  computed: {
+    ...mapGetters(["user"]),
   },
 };
 </script>

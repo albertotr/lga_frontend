@@ -14,44 +14,50 @@ const state = {
 };
 
 const getters = {
-  authenticated(state) {
+  authenticated (state) {
     return state.authenticated;
   },
 
-  user(state) {
+  user (state) {
     return state.user;
   },
 
-  token(state) {
+  token (state) {
     return state.token;
   },
+
+  permissions (state) {
+    if (state.user) return state.user.role.permissions.map(permission => permission.name);
+    else return [];
+  }
+
 };
 
 const mutations = {
-  toggleSidebarDesktop(state) {
+  toggleSidebarDesktop (state) {
     const sidebarOpened = [true, "responsive"].includes(state.sidebarShow);
     state.sidebarShow = sidebarOpened ? false : "responsive";
   },
-  toggleSidebarMobile(state) {
+  toggleSidebarMobile (state) {
     const sidebarClosed = [false, "responsive"].includes(state.sidebarShow);
     state.sidebarShow = sidebarClosed ? true : "responsive";
   },
-  set(state, [variable, value]) {
+  set (state, [variable, value]) {
     state[variable] = value;
   },
-  SET_AUTHENTICATED(state, value) {
+  SET_AUTHENTICATED (state, value) {
     state.authenticated = value;
   },
-  SET_TOKEN(state, value) {
+  SET_TOKEN (state, value) {
     state.token = value;
   },
-  SET_USER(state, value) {
+  SET_USER (state, value) {
     state.user = value;
   },
 };
 
 const actions = {
-  signIn({ dispatch }, credentials) {
+  signIn ({ dispatch }, credentials) {
     return new Promise((resolve, reject) => {
       axios
         .get("/sanctum/csrf-cookie")
@@ -69,7 +75,7 @@ const actions = {
     });
   },
 
-  checkToken({ dispatch }) {
+  checkToken ({ dispatch }) {
     return new Promise((resolve, reject) => {
       const token = localStorage.getItem("token");
       dispatch("me", token)
@@ -78,7 +84,7 @@ const actions = {
     });
   },
 
-  signOut({ commit }) {
+  signOut ({ commit }) {
     commit("SET_AUTHENTICATED", false);
     commit("SET_TOKEN", null);
     commit("SET_USER", null);
@@ -93,12 +99,12 @@ const actions = {
       },
     };
 
-    axios(postOptions).then(()=>{
+    axios(postOptions).then(() => {
       router.push('/login');
     });
   },
 
-  me({ commit }, token) {
+  me ({ commit }, token) {
     var getOptions = {
       method: "get",
       url: "/api/user/",

@@ -25,20 +25,9 @@
               </button>
             </b-dropdown>
           </div>
-          <div class="widget-content-left  ml-3 header-user-info">
-            <div class="widget-heading">Alina Mclourd</div>
-            <div class="widget-subheading">VP People Manager</div>
-          </div>
-          <div class="widget-content-right header-user-info ml-3">
-            <b-btn
-              v-b-tooltip.hover
-              title="Tooltip Example"
-              class="btn-shadow p-1"
-              size="sm"
-              variant="info"
-            >
-              <font-awesome-icon icon="calendar-alt" class="mr-1 ml-1" />
-            </b-btn>
+          <div class="widget-content-left  ml-3 header-user-info" v-if="user">
+            <div class="widget-heading">{{ user.name }}</div>
+            <div class="widget-subheading">{{ user.role.name }}</div>
           </div>
         </div>
       </div>
@@ -48,7 +37,7 @@
 
 <script>
 // import VuePerfectScrollbar from 'vue-perfect-scrollbar'
-
+import { mapGetters } from "vuex";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
   faAngleDown,
@@ -62,7 +51,7 @@ import {
   faFileArchive,
   faEllipsisH,
 } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+// import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 library.add(
   faAngleDown,
@@ -77,10 +66,10 @@ library.add(
   faEllipsisH
 );
 
-import store from '../../../store';
+import store from "../../../store";
 export default {
   components: {
-    "font-awesome-icon": FontAwesomeIcon,
+    // "font-awesome-icon": FontAwesomeIcon,
   },
   data: () => ({}),
 
@@ -88,6 +77,9 @@ export default {
     logout() {
       store.dispatch("signOut");
     },
+  },
+  computed: {
+    ...mapGetters(["user"]),
   },
 };
 </script>

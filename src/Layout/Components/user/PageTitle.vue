@@ -16,6 +16,7 @@
         <button
           type="button"
           class="btn-shadow d-inline-flex align-items-center btn btn-success text-white"
+          @click="onCreate()"
         >
           <font-awesome-icon class="mr-2" icon="plus" />
           Adicionar
@@ -40,6 +41,12 @@ export default {
     icon: String,
     heading: String,
     subheading: String,
+    showForm: Boolean,
+  },
+  methods: {
+    onCreate() {
+      this.$emit("update:showForm", true);
+    },
   },
 };
 </script>

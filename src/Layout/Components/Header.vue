@@ -1,9 +1,6 @@
 <template>
   <div class="app-header header-shadow">
     <div class="app-header__content">
-      <div class="app-header-right" v-if="user">
-        <h4>{{user.name}} - {{user.role.name}}</h4>
-      </div>
       <div class="app-header-right">
         <UserArea />
       </div>
@@ -47,8 +44,6 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
-import { mapGetters } from "vuex";
-
 library.add(faEllipsisV);
 export default {
   name: "Header",
@@ -86,11 +81,6 @@ export default {
         el.classList.remove(className);
       }
     },
-  },
-  computed:{
-    ...mapGetters([
-      'user',
-    ])
   },
 };
 </script>

@@ -15,17 +15,17 @@ axios.defaults.withCredentials = true;
 axios.defaults.baseURL = process.env.VUE_APP_API_URL;
 
 axios.interceptors.response.use(
-  function(response) {
+  function (response) {
     return response;
   },
-  function(error) {
+  function (error) {
     if (error.response.status === 401) {
       localStorage.clear();
       sessionStorage.clear();
-      router.push("/pages/login-boxed");
+      router.push("/login");
       Promise.reject(error);
     } else if (error.response.status === 403) {
-      router.push("/pages/login-boxed");
+      router.push("/login");
       Promise.reject(error);
     } else {
       return Promise.reject(error);
