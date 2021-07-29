@@ -28,7 +28,7 @@ axios.interceptors.response.use(
       router.push("/login");
       Promise.reject(error);
     } else {
-      return Promise.reject(error);
+      return error;
     }
   }
 );

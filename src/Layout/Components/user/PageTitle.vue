@@ -45,7 +45,7 @@ export default {
   },
   methods: {
     onCreate() {
-      this.$emit("update:showForm", true);
+      this.$emit("clearForm");
     },
   },
 };

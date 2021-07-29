@@ -84,7 +84,27 @@ export default {
   },
   methods: {
     onSubmit() {
-      console.log("aqui");
+      const token = localStorage.getItem("token");
+
+      let method = 'POST';
+      if(this.form.id) method = 'PUT';
+
+      var Options = {
+        method: method,
+        url: "/api/users/",
+        data: this.form,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+      axios(Options)
+        .then((response) => {
+          this.$emit("updateDataTable", response.data);
+          this.$emit("update:showForm", false);
+        })
+        .catch(() => {
+          this.$emit("updateDataTable", false);
+        });
     },
     onCancel() {
       this.$emit("update:showForm", false);
@@ -103,11 +123,14 @@ export default {
       this.roles = response.data;
     });
 
-    this.form = {
-      name: this.user.name,
-      email: this.user.email,
-      role: this.user.role.id,
-    };
+    if (this.user) {
+      this.form = {
+        id: this.user.id,
+        name: this.user.name,
+        email: this.user.email,
+        role: this.user.role.id,
+      };
+    }
   },
   watch: {
     user(value) {
