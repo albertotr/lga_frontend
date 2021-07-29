@@ -7,7 +7,7 @@ import Users from "../Pages/Admin/Users";
 Vue.use(Router);
 
 const router = new Router({
-  scrollBehavior() {
+  scrollBehavior () {
     return window.scrollTo({ top: 0, behavior: "smooth" });
   },
   mode: "history",
@@ -15,7 +15,7 @@ const router = new Router({
 });
 
 router.beforeEach((to, from, next) => {
-  if (to.path != "/login" && !store.getters.authenticated) {
+  if (to.path != "/login" && to.path != '/forgot-password' && !store.getters.authenticated) {
     if (localStorage.getItem("token")) {
       store.dispatch("checkToken").then(() => next());
     } else {
@@ -29,7 +29,7 @@ router.beforeEach((to, from, next) => {
   }
 });
 
-function configRoutes() {
+function configRoutes () {
   return [
     // Admin pages
     {
@@ -53,12 +53,6 @@ function configRoutes() {
       name: "login",
       meta: { layout: "userpages" },
       component: () => import("../Pages/UserPages/Login.vue"),
-    },
-    {
-      path: "/register",
-      name: "register",
-      meta: { layout: "userpages" },
-      component: () => import("../Pages/UserPages/Register.vue"),
     },
     {
       path: "/forgot-password",

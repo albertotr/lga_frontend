@@ -2,22 +2,39 @@
   <div>
     <div class="h-100 bg-plum-plate bg-animation">
       <div class="d-flex h-100 justify-content-center align-items-center">
-        <b-col md="8" class="mx-auto app-login-box">
-          <div class="app-logo-inverse mx-auto mb-3" />
-
+        <b-col md="10" class="mx-auto app-login-box">
           <div class="modal-dialog w-100 mx-auto">
             <div class="modal-content">
+              <div class="modal-title">
+                <b-alert
+                  :show="dismissCountDown"
+                  variant="danger"
+                  dismissible
+                  @dismissed="dismissCountDown = 0"
+                  @dismiss-count-down="countDownChanged"
+                >
+                  <font-awesome-icon
+                    icon="exclamation-triangle"
+                    size="1x"
+                    class="text-danger"
+                  />
+                  {{ message }}
+                </b-alert>
+              </div>
               <div class="modal-body">
                 <div class="h5 modal-title text-center">
                   <h4 class="mt-2">
-                    <div>Welcome back,</div>
-                    <span>Please sign in to your account below.</span>
+                    <div>LGA Sistemas</div>
+                    <span
+                      >Olá, informe suas credenciais abaixo para entrar no
+                      sistema.</span
+                    >
                   </h4>
                 </div>
                 <b-form-group
                   id="exampleInputGroup1"
                   label-for="exampleInput1"
-                  description="We'll never share your email with anyone else."
+                  description="Nunca compartilhe suas credenciais."
                 >
                   <b-form-input
                     id="exampleInput1"
@@ -38,26 +55,16 @@
                   >
                   </b-form-input>
                 </b-form-group>
-                <b-form-checkbox name="check" id="exampleCheck">
-                  Keep me logged in
-                </b-form-checkbox>
-                <div class="divider" />
-                <h6 class="mb-0">
-                  No account?
-                  <a href="javascript:void(0);" class="text-primary"
-                    >Sign up now</a
-                  >
-                </h6>
               </div>
               <div class="modal-footer clearfix">
                 <div class="float-left">
-                  <a href="javascript:void(0);" class="btn-lg btn btn-link"
-                    >Recover Password</a
+                  <a href="/forgot-password" class="btn-lg btn btn-link"
+                    >Recuperar senha</a
                   >
                 </div>
                 <div class="float-right">
                   <b-button variant="primary" size="lg" @click="onSignin"
-                    >Login to Dashboard</b-button
+                    >Autenticar</b-button
                   >
                 </div>
               </div>
@@ -74,33 +81,54 @@
 
 <script>
 import { mapActions } from "vuex";
+
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { faExclamationTriangle } from "@fortawesome/free-solid-svg-icons";
+import { library } from "@fortawesome/fontawesome-svg-core";
+
+library.add(faExclamationTriangle);
+
 export default {
   name: "Login",
   data() {
     return {
       form: {
-        email: "alberto@email.com",
+        email: "alberto@email.com.br",
         password: "password",
       },
+      message: null,
+      dismissSecs: 5,
+      dismissCountDown: 0,
     };
   },
+
   methods: {
     ...mapActions({
       signIn: "signIn",
       teste: "teste",
     }),
+    countDownChanged(dismissCountDown) {
+      this.dismissCountDown = dismissCountDown;
+    },
     onSignin() {
       const vue = this;
       this.signIn(this.form)
-        .then(() => {
-          vue.$router.replace("/");
+        .then((response) => {
+          if (response) vue.$router.replace("/");
         })
-        .catch((err) => {
-          /* eslint-disable no-console */
-          console.error(err.response.data.message);
-          /* eslint-enable no-console */
+        .catch((error) => {
+          if (error.response.status == 401)
+            this.message = "Credenciais incorretas, revise seu e-mail e senha";
+          else
+            this.message =
+              "Problemas no envio das credenciais, atualize a página e tente novamente.";
+
+          this.dismissCountDown = this.dismissSecs;
         });
     },
+  },
+  components: {
+    "font-awesome-icon": FontAwesomeIcon,
   },
 };
 </script>

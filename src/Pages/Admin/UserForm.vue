@@ -2,7 +2,10 @@
   <div class="content">
     <div class="main-card mb-3 card">
       <div class="card-body">
-        <h5 class="card-title">Cadastro do Usuário</h5>
+        <h5 class="card-title">
+          <span v-if="form.id == null">Cadastro</span
+          ><span v-else>Editção</span> do Usuário
+        </h5>
         <form class="" @submit.prevent>
           <div class="form-row">
             <div class="col-md-6">
@@ -72,6 +75,7 @@ export default {
     return {
       roles: [],
       form: {
+        id: null,
         name: "",
         email: "",
         role: "",
@@ -86,20 +90,24 @@ export default {
     onSubmit() {
       const token = localStorage.getItem("token");
 
-      let method = 'POST';
-      if(this.form.id) method = 'PUT';
+      let method = "POST";
+      let userId = "";
+      if (this.form.id) {
+        method = "PUT";
+        userId = this.form.id;
+      }
 
       var Options = {
         method: method,
-        url: "/api/users/",
+        url: "/api/users/" + userId,
         data: this.form,
         headers: {
           Authorization: `Bearer ${token}`,
         },
       };
       axios(Options)
-        .then((response) => {
-          this.$emit("updateDataTable", response.data);
+        .then(() => {
+          this.$emit("updateDataTable", true);
           this.$emit("update:showForm", false);
         })
         .catch(() => {
@@ -131,23 +139,6 @@ export default {
         role: this.user.role.id,
       };
     }
-  },
-  watch: {
-    user(value) {
-      if (!value) {
-        this.form = {
-          name: "",
-          email: "",
-          role: "",
-        };
-      } else {
-        this.form = {
-          name: value.name,
-          email: value.email,
-          role: value.role.id,
-        };
-      }
-    },
   },
 };
 </script>

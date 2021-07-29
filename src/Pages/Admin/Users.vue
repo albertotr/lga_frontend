@@ -70,7 +70,7 @@
 </template>
 
 <script>
-import PageTitle from "../../Layout/Components/user/PageTitle.vue";
+import PageTitle from "../../Layout/Components/PageTitleAdd.vue";
 import { mapGetters } from "vuex";
 import axios from "axios";
 
@@ -181,9 +181,9 @@ export default {
         this.dismissCountDown = this.dismissSecs;
       }
 
-      if(value){
+      if (value) {
         this.alertType = "success";
-        this.alertMessage = `Usuário inserido com sucesso. Senha: ${value}`;
+        this.alertMessage = `Usuário inserido/editado com sucesso.`;
         this.dismissCountDown = this.dismissSecs;
       }
     },

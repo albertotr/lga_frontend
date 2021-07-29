@@ -19,17 +19,15 @@ axios.interceptors.response.use(
     return response;
   },
   function (error) {
+    let response = error.response;
     if (error.response.status === 401) {
       localStorage.clear();
       sessionStorage.clear();
-      router.push("/login");
-      Promise.reject(error);
+      if (response.config.url !== '/api/login') router.push("/login");
     } else if (error.response.status === 403) {
-      router.push("/login");
-      Promise.reject(error);
-    } else {
-      return error;
+      if (response.config.url !== '/api/login') router.push("/login");
     }
+    return Promise.reject(error);
   }
 );
 
