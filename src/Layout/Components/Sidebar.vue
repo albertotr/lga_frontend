@@ -236,6 +236,11 @@ export default {
             title: "Usuario",
             icon: "pe-7s-users",
             href: "/admin/users",
+          },
+          {
+            title: "Maquinas",
+            icon: "pe-7s-server",
+            href: "/admin/machines",
           }
         );
       }

@@ -93,7 +93,7 @@ export default {
   data() {
     return {
       form: {
-        email: "alberto@email.com.br",
+        email: "alberto@email.com",
         password: "password",
       },
       message: null,
