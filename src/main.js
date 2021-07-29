@@ -25,7 +25,7 @@ axios.interceptors.response.use(
       sessionStorage.clear();
       if (response.config.url !== '/api/login') router.push("/login");
     } else if (error.response.status === 403) {
-      if (response.config.url !== '/api/login') router.push("/login");
+      alert('O sistema identificou que seu usuário, não possui direitos suficientes para processar está requisição. Refaça sua autenticação ou contate o administrador')
     }
     return Promise.reject(error);
   }
