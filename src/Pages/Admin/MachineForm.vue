@@ -65,6 +65,7 @@
                   id="formSample"
                   class="form-control"
                   v-model="form.sample"
+                  @change="updateSlot($event)"
                 >
                   <option
                     v-for="sample in samples"
@@ -89,6 +90,55 @@
                 />
               </div>
             </div>
+            <div class="col-md-5">
+              <div class="position-relative form-group">
+                <label for="labelFormPartner" class="">Cliente</label>
+                <select
+                  name="partner"
+                  id="formPartner"
+                  class="form-control"
+                  v-model="form.partner"
+                >
+                  <option
+                    v-for="partner in partners"
+                    :key="partner.id"
+                    :value="partner.id"
+                    >{{ partner.name }}</option
+                  >
+                </select>
+              </div>
+            </div>
+            <div class="col-md-12" v-if="selectedPartner">
+              <div class="position-relative form-group">
+                <!-- <h5>Cliente:</h5>
+                <p class="text-bold">{{ selectedPartner.name }}</p>
+                <p>
+                  <h7>Endereço:</h7> 
+                </p> -->
+                <div class="card">
+                  <div class="card-body">
+                    <h5 class="card-title">{{ selectedPartner.name }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">
+                      CPF/CNPJ:&nbsp;<cpfcnpj
+                        :value="selectedPartner.cpf_cnpj"
+                      />
+                    </h6>
+                    <p class="card-text">
+                      Endereço:&nbsp;{{ selectedPartner.address }},&nbsp;{{
+                        selectedPartner.number
+                      }},&nbsp;{{ selectedPartner.neigborhood }},&nbsp;{{
+                        selectedPartner.city
+                      }},&nbsp;
+                      {{ selectedPartner.state }}
+                      <br />
+                      Complemento:&nbsp;{{ selectedPartner.complement }}
+                      <br />
+                      CEP:{{ selectedPartner.postal_code }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <button class="mt-2 btn btn-primary" @click.stop="onSubmit">
@@ -106,20 +156,24 @@
 
 <script>
 import axios from "axios";
+import cpfcnpj from "../Components/CpfCnpj.vue";
 export default {
+  components: { cpfcnpj },
   name: "Machine_Form",
   data() {
     return {
       devices: [],
-      types:[],
-      samples:[],
+      types: [],
+      samples: [],
+      partners: [],
       form: {
         id: null,
         serial: "",
-        device:null,
-        type:null,
-        sample:null,
-        slot:0,
+        device: null,
+        type: null,
+        sample: null,
+        partner: null,
+        slot: 0,
       },
     };
   },
@@ -158,6 +212,13 @@ export default {
     onCancel() {
       this.$emit("update:showForm", false);
     },
+    updateSlot(event) {
+      let sampleId = event.target.value;
+      let selectedSample = this.samples.filter((sp) => {
+        return sp.id == sampleId;
+      });
+      this.form.slot = selectedSample[0].slot;
+    },
   },
   created() {
     const token = localStorage.getItem("token");
@@ -170,7 +231,8 @@ export default {
     };
     axios(OptionsDevice).then((response) => {
       this.devices = response.data;
-      this.devices.push(this.machine.device);
+      if (this.machine && this.machine.device)
+        this.devices.push(this.machine.device);
     });
 
     var OptionsTypes = {
@@ -195,6 +257,17 @@ export default {
       this.samples = response.data;
     });
 
+    var OptionsPartner = {
+      method: "get",
+      url: "/api/partner/",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    axios(OptionsPartner).then((response) => {
+      this.partners = response.data;
+    });
+
     if (this.machine) {
       this.form = {
         id: this.machine.id,
@@ -202,9 +275,24 @@ export default {
         device: this.machine.device_id,
         type: this.machine.type_id,
         sample: this.machine.sample_id,
-        slot: this.machine.sample.slot
+        slot: this.machine.sample.slot,
+        partner: this.machine.partner.id,
       };
     }
+  },
+  computed: {
+    selectedPartner() {
+      if (this.form.partner == null || this.partners == null) return null;
+
+      if (this.partners != null && this.form.partner != null) {
+        let part = this.partners.filter((partner) => {
+          return partner.id == this.form.partner;
+        });
+        return part[0];
+      }
+
+      return null;
+    },
   },
 };
 </script>
