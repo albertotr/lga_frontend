@@ -150,7 +150,7 @@ export default {
                 this.alertType = "success";
                 this.alertMessage = "Máquina excluida com sucesso.";
                 this.dismissCountDown = this.dismissSecs;
-                this.users.splice(this.users.indexOf(machine), 1);
+                this.machines.splice(this.machines.indexOf(machine), 1);
               } else {
                 this.alertType = "danger";
                 this.alertMessage = "Problemas ao excluir a Máquina!";
