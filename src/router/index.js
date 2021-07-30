@@ -4,6 +4,8 @@ import store from "../store";
 
 import Users from "../Pages/Admin/Users";
 import Machines from "../Pages/Admin/Machines";
+import PageNotFound from "../Pages/UserPages/404";
+import PageNotPermited from "../Pages/UserPages/403";
 
 Vue.use(Router);
 
@@ -68,6 +70,13 @@ function configRoutes () {
       meta: { layout: "userpages" },
       component: () => import("../Pages/UserPages/ForgotPassword.vue"),
     },
+
+    /* page not fount */
+    { path: "*", component: PageNotFound },
+    { path: "/404", component: PageNotFound },
+
+    //not permission
+    { path: "/403", component: PageNotPermited },
   ];
 }
 
