@@ -1,46 +1,48 @@
-import "core-js/stable";
-import Vue from "vue";
-import App from "./App";
-import router from "./router";
-import CoreuiVue from "@coreui/vue";
-import { iconsSet as icons } from "./assets/icons/icons.js";
+import Vue from 'vue'
+import router from './router'
 import store from "./store";
-import axios from "axios";
 
-Vue.config.performance = true;
-Vue.use(CoreuiVue);
-Vue.prototype.$log = console.log.bind(console);
+import BootstrapVue from "bootstrap-vue"
+
+import App from './App'
+
+import Default from './Layout/Wrappers/baseLayout.vue';
+import Pages from './Layout/Wrappers/pagesLayout.vue';
+
+import axios from "axios";
 
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = process.env.VUE_APP_API_URL;
 
 axios.interceptors.response.use(
-  function(response) {
+  function (response) {
     return response;
   },
-  function(error) {
+  function (error) {
+    let response = error.response;
     if (error.response.status === 401) {
-      console.info("auth token expired");
       localStorage.clear();
       sessionStorage.clear();
-      router.push("/pages/login");
-      Promise.reject(error);
+      if (response.config.url !== '/api/login') router.push("/login");
     } else if (error.response.status === 403) {
-      router.push("/pages/login");
-      Promise.reject(error);
-    } else {
-      return Promise.reject(error);
+      router.push("/403")
+      alert('O sistema identificou que seu usuário, não possui direitos suficientes para processar está requisição. Refaça sua autenticação ou contate o administrador')
     }
+    return Promise.reject(error);
   }
 );
 
+Vue.config.productionTip = false;
+
+Vue.use(BootstrapVue);
+
+Vue.component('default-layout', Default);
+Vue.component('userpages-layout', Pages);
+
 new Vue({
-  el: "#app",
+  el: '#app',
   router,
   store,
-  icons,
-  template: "<App/>",
-  components: {
-    App,
-  },
+  template: '<App/>',
+  components: { App }
 });
