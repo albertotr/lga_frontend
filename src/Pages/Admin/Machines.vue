@@ -118,11 +118,11 @@ export default {
       this.machine_selected = machine;
       this.showForm = true;
     },
-    onDeleteUser(user) {
+    onDeleteMachine(machine) {
       this.boxTwo = "";
       this.$bvModal
         .msgBoxConfirm(
-          `Deseja realmente excluir o maquina de serial ${user.name}?`,
+          `Deseja realmente excluir o maquina de serial ${machine.serial}?`,
           {
             title: "Confirme a exclusão",
             size: "sm",
@@ -139,7 +139,7 @@ export default {
             const token = localStorage.getItem("token");
             var Options = {
               method: "delete",
-              url: `/api/users/${user.id}`,
+              url: `/api/machine/${machine.id}`,
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-type": "Application/Json",
@@ -148,12 +148,12 @@ export default {
             axios(Options).then((response) => {
               if (response.data) {
                 this.alertType = "success";
-                this.alertMessage = "Usuário excluido com sucesso.";
+                this.alertMessage = "Máquina excluida com sucesso.";
                 this.dismissCountDown = this.dismissSecs;
-                this.users.splice(this.users.indexOf(user), 1);
+                this.users.splice(this.users.indexOf(machine), 1);
               } else {
                 this.alertType = "danger";
-                this.alertMessage = "Problemas ao excluir o usuário!";
+                this.alertMessage = "Problemas ao excluir a Máquina!";
                 this.dismissCountDown = this.dismissSecs;
               }
             });
@@ -164,7 +164,7 @@ export default {
       this.dismissCountDown = dismissCountDown;
     },
     clearForm() {
-      this.user_selected = null;
+      this.machine_selected = null;
       this.showForm = true;
     },
     reloadDataTable(value) {
@@ -172,7 +172,7 @@ export default {
         const token = localStorage.getItem("token");
         var Options = {
           method: "get",
-          url: "/api/machines/",
+          url: "/api/machine/",
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -182,13 +182,13 @@ export default {
         });
       } else if (value === false) {
         this.alertType = "warning";
-        this.alertMessage = "Problemas ao inserir a maquina";
+        this.alertMessage = "Problemas ao inserir/atualizar o registro maquina";
         this.dismissCountDown = this.dismissSecs;
       }
 
       if (value) {
         this.alertType = "success";
-        this.alertMessage = `Usuário inserido/editado com sucesso.`;
+        this.alertMessage = `Máquina inserido/editado com sucesso.`;
         this.dismissCountDown = this.dismissSecs;
       }
     },

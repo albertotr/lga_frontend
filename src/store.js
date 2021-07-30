@@ -107,7 +107,7 @@ const actions = {
   me ({ commit }, token) {
     var getOptions = {
       method: "get",
-      url: "/api/user/",
+      url: "/api/user_info/",
       headers: {
         Authorization: `Bearer ${token}`,
       },

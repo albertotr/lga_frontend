@@ -30,6 +30,7 @@
                   class="form-control"
                   v-model="form.device"
                 >
+                  <option value="null">&nbsp;</option>
                   <option
                     v-for="device in devices"
                     :key="device.id"
@@ -99,6 +100,7 @@
                   class="form-control"
                   v-model="form.partner"
                 >
+                  <option value="null">&nbsp;</option>
                   <option
                     v-for="partner in partners"
                     :key="partner.id"
@@ -110,11 +112,6 @@
             </div>
             <div class="col-md-12" v-if="selectedPartner">
               <div class="position-relative form-group">
-                <!-- <h5>Cliente:</h5>
-                <p class="text-bold">{{ selectedPartner.name }}</p>
-                <p>
-                  <h7>Endereço:</h7> 
-                </p> -->
                 <div class="card">
                   <div class="card-body">
                     <h5 class="card-title">{{ selectedPartner.name }}</h5>
@@ -194,7 +191,7 @@ export default {
 
       var Options = {
         method: method,
-        url: "/api/machines/" + userId,
+        url: "/api/machine/" + userId,
         data: this.form,
         headers: {
           Authorization: `Bearer ${token}`,
@@ -276,7 +273,7 @@ export default {
         type: this.machine.type_id,
         sample: this.machine.sample_id,
         slot: this.machine.sample.slot,
-        partner: this.machine.partner.id,
+        partner: this.machine.partner_id,
       };
     }
   },

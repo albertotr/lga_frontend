@@ -134,7 +134,7 @@ export default {
             const token = localStorage.getItem("token");
             var Options = {
               method: "delete",
-              url: `/api/users/${user.id}`,
+              url: `/api/user/${user.id}`,
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-type": "Application/Json",
@@ -167,7 +167,7 @@ export default {
         const token = localStorage.getItem("token");
         var Options = {
           method: "get",
-          url: "/api/users/",
+          url: "/api/user/",
           headers: {
             Authorization: `Bearer ${token}`,
           },

@@ -99,7 +99,7 @@ export default {
 
       var Options = {
         method: method,
-        url: "/api/users/" + userId,
+        url: "/api/user/" + userId,
         data: this.form,
         headers: {
           Authorization: `Bearer ${token}`,

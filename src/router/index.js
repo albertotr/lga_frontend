@@ -36,13 +36,13 @@ function configRoutes () {
   return [
     // Admin pages
     {
-      path: "/admin/users",
+      path: "/admin/user",
       name: "users",
       component: Users,
     },
 
     {
-      path: "/admin/machines",
+      path: "/admin/machine",
       name: "machines",
       component: Machines,
     },
