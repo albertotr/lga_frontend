@@ -72,7 +72,16 @@ export default {
             title: "Maquinas",
             icon: "pe-7s-server",
             href: "/admin/machine",
-          }
+          },
+          {
+            header: true,
+            title: "Sistema",
+          },
+          {
+            title: "LOG",
+            icon: "pe-7s-note2",
+            href: "/admin/log",
+          },
         );
       }
       return menu;

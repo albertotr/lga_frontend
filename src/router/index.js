@@ -4,6 +4,7 @@ import store from "../store";
 
 import Users from "../Pages/Admin/Users";
 import Machines from "../Pages/Admin/Machines";
+import Logs from "../Pages/Admin/Log";
 import PageNotFound from "../Pages/UserPages/404";
 import PageNotPermited from "../Pages/UserPages/403";
 
@@ -45,6 +46,13 @@ function configRoutes () {
       path: "/admin/machine",
       name: "machines",
       component: Machines,
+    },
+
+    // Sistem pages
+    {
+      path: "/admin/log",
+      name: "Logs",
+      component: Logs,
     },
 
 
