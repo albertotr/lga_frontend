@@ -84,6 +84,21 @@ export default {
           },
         );
       }
+
+      if (this.user.role.level <= 3) {
+        menu.push(
+          {
+            header: true,
+            title: "Gerenciamento",
+          },
+          {
+            title: "Maquinas",
+            icon: "pe-7s-server",
+            href: "/manage/machine",
+          },
+        );
+      }
+
       return menu;
     },
     toggleBodyClass(className) {

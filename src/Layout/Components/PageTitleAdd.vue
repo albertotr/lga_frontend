@@ -13,6 +13,12 @@
         </div>
       </div>
       <div class="page-title-actions">
+        <button type="button" class="btn-shadow mr-3 btn btn-dark" @click="$emit('update:showForm', false)">
+          <font-awesome-icon
+            icon="arrow-circle-left"
+            size="1x"
+          />
+        </button>
         <button
           type="button"
           class="btn-shadow d-inline-flex align-items-center btn btn-success text-white"
@@ -28,10 +34,10 @@
 
 <script>
 import { library } from "@fortawesome/fontawesome-svg-core";
-import { faStar, faPlus, faUsers } from "@fortawesome/free-solid-svg-icons";
+import { faStar, faPlus, faUsers, faArrowCircleLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
-library.add(faStar, faPlus, faUsers);
+library.add(faStar, faPlus, faUsers, faArrowCircleLeft);
 
 export default {
   components: {

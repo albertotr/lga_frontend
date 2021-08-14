@@ -20,6 +20,7 @@
       :subheading="subheading"
       :icon="icon"
       @clearForm="clearForm"
+      :showForm.sync="showForm"
     ></page-title>
     <div class="content">
       <machine-form
