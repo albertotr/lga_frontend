@@ -8,6 +8,7 @@ import Logs from "../Pages/Admin/Log";
 import PageNotFound from "../Pages/UserPages/404";
 import PageNotPermited from "../Pages/UserPages/403";
 import ManageMachines from "../Pages/Manager/Machine/Machines";
+import ManageMessages from "../Pages/Manager/Messages/Messages";
 
 Vue.use(Router);
 
@@ -54,6 +55,13 @@ function configRoutes () {
       path: "/manage/machine",
       name: "managemachines",
       component: ManageMachines,
+    },
+
+    // Manage pages
+    {
+      path: "/manage/message",
+      name: "managemessages",
+      component: ManageMessages,
     },
 
     // Sistem pages

@@ -96,6 +96,11 @@ export default {
             icon: "pe-7s-server",
             href: "/manage/machine",
           },
+          {
+            title: "Mensagens",
+            icon: "pe-7s-server",
+            href: "/manage/message",
+          },
         );
       }
 

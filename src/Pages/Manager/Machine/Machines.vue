@@ -132,7 +132,7 @@ export default {
       const token = localStorage.getItem("token");
       var Options = {
         method: "get",
-        url: `/api/machine/messages/${machine.id}`,
+        url: `/api/machine/messages/${machine.id}/10`,
         headers: {
           Authorization: `Bearer ${token}`,
         },

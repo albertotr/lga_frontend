@@ -6,7 +6,7 @@
         <div class="row text-white bg-gradient-dark">
           <div class="col">
             <strong>Dispositivo:</strong
-            ><template v-if="machine.device">{{ machine.device.mac }}</template>
+            ><template v-if="machine.device">{{ machine.device.mac | friendlyMac }}</template>
           </div>
           <div class="col"><strong>Tipo:</strong> {{ machine.type.name }}</div>
           <div class="col">
@@ -69,14 +69,17 @@ export default {
     messages: null,
   },
   methods: {},
-  created() {
-    console.log(this.machine);
-    console.log(this.messages);
-  },
+  created() {},
   filters: {
     friendlyDate: (date) => {
       let novaData = new Date(date);
       return novaData.toLocaleString("pt-BR");
+    },
+    friendlyMac: (mac) => {
+      return mac
+        .toString(16)
+        .match(/.{1,2}/g)
+        .join(":");
     },
   },
 };
