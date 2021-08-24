@@ -21,7 +21,10 @@
     </div>
     <div class="app-sidebar-content">
       <VuePerfectScrollbar class="app-sidebar-scroll" v-once v-if="user">
-        <sidebar-menu showOneChild :menu="getMenu()" />
+        <sidebar-menu
+          :menu="getMenu()"
+          showOneChild
+        />
       </VuePerfectScrollbar>
     </div>
   </div>
@@ -39,9 +42,9 @@ export default {
   data() {
     return {
       isOpen: false,
+      windowWidth: 0,
       sidebarActive: false,
       collapsed: true,
-      windowWidth: 0,
     };
   },
   props: {
@@ -62,6 +65,7 @@ export default {
           {
             header: true,
             title: "Administrativo",
+            hiddenOnCollapse: true,
           },
           {
             title: "Usuario",
@@ -73,6 +77,11 @@ export default {
             icon: "pe-7s-server",
             href: "/admin/machine",
           },
+          {
+            title: "Dispositivos",
+            icon: "pe-7s-plugin",
+            href: "/admin/device",
+          }
           /* {
             header: true,
             title: "Sistema",
@@ -98,9 +107,9 @@ export default {
           },
           {
             title: "Mensagens",
-            icon: "pe-7s-server",
+            icon: "pe-7s-mail",
             href: "/manage/message",
-          },
+          }
         );
       }
 
@@ -135,7 +144,7 @@ export default {
 
       this.windowWidth = document.documentElement.clientWidth;
 
-      if (this.windowWidth < "1024") {
+      if (this.windowWidth < "1350") {
         el.classList.add("closed-sidebar", "closed-sidebar-md");
       } else {
         el.classList.remove("closed-sidebar", "closed-sidebar-md");
@@ -149,6 +158,7 @@ export default {
       //Init
       this.getWindowWidth();
     });
+    this.toggleBodyClass("closed-sidebar");
   },
 
   beforeDestroy() {

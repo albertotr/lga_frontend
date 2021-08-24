@@ -9,6 +9,7 @@ import PageNotFound from "../Pages/UserPages/404";
 import PageNotPermited from "../Pages/UserPages/403";
 import ManageMachines from "../Pages/Manager/Machine/Machines";
 import ManageMessages from "../Pages/Manager/Messages/Messages";
+import Devices from "../Pages/Admin/Devices";
 
 Vue.use(Router);
 
@@ -48,6 +49,12 @@ function configRoutes () {
       path: "/admin/machine",
       name: "machines",
       component: Machines,
+    },
+
+    {
+      path: "/admin/device",
+      name: "devices",
+      component: Devices,
     },
 
     // Manage pages

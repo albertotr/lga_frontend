@@ -92,7 +92,7 @@ export default {
     return {
       heading: "Administração de Usuários",
       subheading: "Verifique os dados antes de executar as ações.",
-      icon: "fa-users text-success",
+      icon: "users-cog",
       users: null,
       user_selected: null,
       fields: [

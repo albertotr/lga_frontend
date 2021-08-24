@@ -46,7 +46,7 @@
                   <div class="col">
                     {{ message.created_at | friendlyDate }}
                   </div>
-                  <div class="col">{{ message.mac | friendlyMac }}</div>
+                  <div class="col">{{ message.mac}}</div>
                   <div class="col">{{ message.type.code }}</div>
                 </div>
                 <div class="row" v-if="message.type_id !== 1">
@@ -130,12 +130,6 @@ export default {
     friendlyDate: (date) => {
       let novaData = new Date(date);
       return novaData.toLocaleString("pt-BR");
-    },
-    friendlyMac: (mac) => {
-      return mac
-        .toString(16)
-        .match(/.{1,2}/g)
-        .join(":");
     },
   },
   watch: {
