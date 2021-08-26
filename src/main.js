@@ -20,6 +20,7 @@ axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
 axios.defaults.headers.get['Access-Control-Allow-Origin'] = '*';
 axios.defaults.headers.delete['Access-Control-Allow-Origin'] = '*';
 axios.defaults.headers.put['Access-Control-Allow-Origin'] = '*';
+axios.defaults.headers.options['Access-Control-Allow-Origin'] = '*';
 
 axios.interceptors.response.use(
   function (response) {
