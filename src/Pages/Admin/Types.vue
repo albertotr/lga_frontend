@@ -23,15 +23,15 @@
       :showForm.sync="showForm"
     ></page-title>
     <div class="content">
-      <device-form
+      <type-form
         :showForm.sync="showForm"
-        :device="device_selected"
+        :type="type_selected"
         @updateDataTable="reloadDataTable"
         v-if="showForm"
-      ></device-form>
+      ></type-form>
 
       <b-table
-        :items="devices"
+        :items="types"
         :fields="fields"
         striped
         bordered
@@ -45,7 +45,7 @@
             icon="edit"
             size="2x"
             class="text-info"
-            @click="onEditDevice(obj.item)"
+            @click="onEditType(obj.item)"
             v-if="
               permissions.includes('update-device') &&
                 !obj.item.machine &&
@@ -57,19 +57,19 @@
             icon="trash"
             size="2x"
             class="text-danger"
-            @click="onDeleteDevice(obj.item)"
+            @click="onDeleteType(obj.item)"
             v-if="
               permissions.includes('delete-device') &&
                 !obj.item.machine &&
                 !obj.item.deleted_at
             "
           />
-          &nbsp;
+
           <font-awesome-icon
             icon="recycle"
             size="2x"
             class="text-warning"
-            @click="onRestoreDevice(obj.item)"
+            @click="onRestoreType(obj.item)"
             v-if="permissions.includes('delete-device') && obj.item.deleted_at"
           />
           &nbsp;
@@ -81,7 +81,7 @@
             v-if="
               permissions.includes('delete-device') &&
                 obj.item.deleted_at &&
-                !obj.item.machine
+                obj.item.machine_count == '0'
             "
           />
         </template>
@@ -103,29 +103,33 @@ import { mapGetters } from "vuex";
 import axios from "axios";
 
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { faEdit, faTrash, faRecycle, faBomb } from "@fortawesome/free-solid-svg-icons";
+import {
+  faEdit,
+  faTrash,
+  faRecycle,
+  faBomb,
+} from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import DeviceForm from "./DeviceForm.vue";
+import TypeForm from "./TypeForm.vue";
 
 library.add(faEdit, faTrash, faRecycle, faBomb);
 
 export default {
-  name: "Devices",
+  name: "Types",
   components: {
     PageTitle,
     "font-awesome-icon": FontAwesomeIcon,
-    DeviceForm,
+    TypeForm,
   },
   data() {
     return {
-      heading: "Administração de Dispositivos",
+      heading: "Administração de Tipos de Máquinas",
       subheading: "Verifique os dados antes de executar as ações.",
-      icon: "cogs",
-      devices: null,
-      device_selected: null,
+      icon: "clipboard-list",
+      types: null,
+      type_selected: null,
       fields: [
-        { key: "mac", label: "MAC" },
-        { key: "machine.serial", label: "Maquina (serial)" },
+        { key: "name", label: "Name" },
         { key: "action", label: "Ações" },
       ],
       showForm: false,
@@ -139,32 +143,29 @@ export default {
     this.reloadDataTable();
   },
   methods: {
-    onEditDevice(device) {
-      this.device_selected = device;
+    onEditType(type) {
+      this.type_selected = type;
       this.showForm = true;
     },
-    onDeleteDevice(device) {
+    onDeleteType(type) {
       this.boxTwo = "";
       this.$bvModal
-        .msgBoxConfirm(
-          `Deseja realmente excluir o dispositivo de MAC ${device.mac}?`,
-          {
-            title: "Confirme a exclusão",
-            size: "sm",
-            buttonSize: "sm",
-            okVariant: "success",
-            okTitle: "Sim",
-            cancelTitle: "Não",
-            footerClass: "p-2",
-            hideHeaderClose: false,
-          }
-        )
+        .msgBoxConfirm(`Deseja realmente excluir o tipo ${type.name}?`, {
+          title: "Confirme a exclusão",
+          size: "sm",
+          buttonSize: "sm",
+          okVariant: "success",
+          okTitle: "Sim",
+          cancelTitle: "Não",
+          footerClass: "p-2",
+          hideHeaderClose: false,
+        })
         .then((confirm) => {
           if (confirm) {
             const token = localStorage.getItem("token");
             var Options = {
               method: "delete",
-              url: `/api/device/${device.id}`,
+              url: `/api/type/${type.id}`,
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-type": "Application/Json",
@@ -173,40 +174,37 @@ export default {
             axios(Options).then((response) => {
               if (response.data) {
                 this.alertType = "success";
-                this.alertMessage = "Dispositivo excluido com sucesso.";
+                this.alertMessage = "Tipo excluido com sucesso.";
                 this.dismissCountDown = this.dismissSecs;
                 this.reloadDataTable();
               } else {
                 this.alertType = "danger";
-                this.alertMessage = "Problemas ao excluir o Dispositivo!";
+                this.alertMessage = "Problemas ao excluir o tipo!";
                 this.dismissCountDown = this.dismissSecs;
               }
             });
           }
         });
     },
-    onRestoreDevice(device) {
+    onRestoreType(type) {
       this.boxTwo = "";
       this.$bvModal
-        .msgBoxConfirm(
-          `Deseja realmente restaurar o dispositivo de MAC ${device.mac}?`,
-          {
-            title: "Confirme a Restauração",
-            size: "sm",
-            buttonSize: "sm",
-            okVariant: "success",
-            okTitle: "Sim",
-            cancelTitle: "Não",
-            footerClass: "p-2",
-            hideHeaderClose: false,
-          }
-        )
+        .msgBoxConfirm(`Deseja realmente restaurar o tipo ${type.name}?`, {
+          title: "Confirme a Restauração",
+          size: "sm",
+          buttonSize: "sm",
+          okVariant: "success",
+          okTitle: "Sim",
+          cancelTitle: "Não",
+          footerClass: "p-2",
+          hideHeaderClose: false,
+        })
         .then((confirm) => {
           if (confirm) {
             const token = localStorage.getItem("token");
             var Options = {
               method: "get",
-              url: `/api/device/restore/${device.id}`,
+              url: `/api/type/restore/${type.id}`,
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-type": "Application/Json",
@@ -215,54 +213,22 @@ export default {
             axios(Options).then((response) => {
               if (response.data) {
                 this.alertType = "success";
-                this.alertMessage = "Dispositivo restaurado com sucesso.";
+                this.alertMessage = "Tipo restaurado com sucesso.";
                 this.dismissCountDown = this.dismissSecs;
                 this.reloadDataTable();
               } else {
                 this.alertType = "danger";
-                this.alertMessage = "Problemas ao restaurar o Dispositivo!";
+                this.alertMessage = "Problemas ao restaurar o tipo!";
                 this.dismissCountDown = this.dismissSecs;
               }
             });
           }
         });
     },
-    countDownChanged(dismissCountDown) {
-      this.dismissCountDown = dismissCountDown;
-    },
-    clearForm() {
-      this.device_selected = null;
-      this.showForm = true;
-    },
-    reloadDataTable(value) {
-      if (value !== undefined && value.status) {
-        this.alertType = "warning";
-        this.alertMessage = value.data.errors.mac[0];
-        this.dismissCountDown = this.dismissSecs;
-      } else if (value || value === undefined) {
-        const token = localStorage.getItem("token");
-        var Options = {
-          method: "get",
-          url: "/api/device/",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        };
-        axios(Options).then((response) => {
-          this.devices = response.data;
-        });
-      }
-
-      if (value === true) {
-        this.alertType = "success";
-        this.alertMessage = `Dispositivo inserido/editado com sucesso.`;
-        this.dismissCountDown = this.dismissSecs;
-      }
-    },
-    onForceDeleteType(device) {
+    onForceDeleteType(type) {
       this.boxTwo = "";
       this.$bvModal
-        .msgBoxConfirm(`Deseja excluir permanentemente o dispositimo ${device.mac}?`, {
+        .msgBoxConfirm(`Deseja excluir permanentemente o tipo ${type.name}?`, {
           title: "Confirme a Exclusão",
           size: "sm",
           buttonSize: "sm",
@@ -277,7 +243,7 @@ export default {
             const token = localStorage.getItem("token");
             var Options = {
               method: "delete",
-              url: `/api/device/forcedelete/${device.id}`,
+              url: `/api/type/forcedelete/${type.id}`,
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-type": "Application/Json",
@@ -287,29 +253,61 @@ export default {
               .then((response) => {
                 if (response.data) {
                   this.alertType = "success";
-                  this.alertMessage = "Dispositivo excluido permanentemente.";
+                  this.alertMessage = "Tipo excluido permanentemente.";
                   this.dismissCountDown = this.dismissSecs;
                   this.reloadDataTable();
                 } else {
                   this.alertType = "danger";
-                  this.alertMessage = "Problemas ao excluir o Dispositivo!";
+                  this.alertMessage = "Problemas ao excluir o tipo!";
                   this.dismissCountDown = this.dismissSecs;
                 }
               })
               .catch(() => {
                 this.alertType = "danger";
                 this.alertMessage =
-                  "Problemas ao excluir o tipo, provavelmente existe uma Máquina vinculada a este Dispositivo!";
+                  "Problemas ao excluir o tipo, provavelmente existe uma Máquina vinculada a este tipo!";
                 this.dismissCountDown = this.dismissSecs;
               });
           }
         });
-    }
+    },
+    countDownChanged(dismissCountDown) {
+      this.dismissCountDown = dismissCountDown;
+    },
+    clearForm() {
+      this.device_selected = null;
+      this.showForm = true;
+    },
+    reloadDataTable(value) {
+      if (value !== undefined && value.status) {
+        this.alertType = "warning";
+        this.alertMessage = value.data.errors.name[0];
+        this.dismissCountDown = this.dismissSecs;
+      } else if (value || value === undefined) {
+        const token = localStorage.getItem("token");
+        var Options = {
+          method: "get",
+          url: "/api/type/",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        };
+        axios(Options).then((response) => {
+          this.types = response.data;
+        });
+      }
+
+      if (value === true) {
+        this.alertType = "success";
+        this.alertMessage = `Tipo inserido/editado com sucesso.`;
+        this.dismissCountDown = this.dismissSecs;
+      }
+    },
   },
   computed: {
     ...mapGetters(["permissions"]),
     loadingTableResult() {
-      return this.devices == null;
+      return this.types == null;
     },
   },
 };

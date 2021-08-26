@@ -34,10 +34,10 @@
 
 <script>
 import { library } from "@fortawesome/fontawesome-svg-core";
-import { faStar, faPlus, faUsers, faArrowCircleLeft, faCogs, faServer, faUsersCog } from "@fortawesome/free-solid-svg-icons";
+import { faStar, faPlus, faUsers, faArrowCircleLeft, faCogs, faServer, faUsersCog, faClipboardList } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
-library.add(faStar, faPlus, faUsers, faArrowCircleLeft, faCogs, faServer, faUsersCog);
+library.add(faStar, faPlus, faUsers, faArrowCircleLeft, faCogs, faServer, faUsersCog, faClipboardList);
 
 export default {
   components: {

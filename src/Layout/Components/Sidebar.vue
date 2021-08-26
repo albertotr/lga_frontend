@@ -81,6 +81,11 @@ export default {
             title: "Dispositivos",
             icon: "pe-7s-plugin",
             href: "/admin/device",
+          },
+          {
+            title: "Tipos",
+            icon: "pe-7s-ticket",
+            href: "/admin/type",
           }
           /* {
             header: true,

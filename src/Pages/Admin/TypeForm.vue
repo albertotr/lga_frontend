@@ -10,15 +10,13 @@
           <div class="form-row">
             <div class="col-md-6">
               <div class="position-relative form-group">
-                <label for="labelFormName" class="">MAC</label
-                ><the-mask
-                  name="mac"
-                  id="formMac"
+                <label for="labelFormName" class="">Nome</label
+                ><input
+                  name="name"
+                  id="formName"
                   type="text"
-                  class="form-control text-uppercase"
-                  v-model="form.mac"
-                  :mask="['XX-XX-XX-XX-XX-XX']"
-                  masked
+                  class="form-control"
+                  v-model="form.name"
                 />
               </div>
             </div>
@@ -41,17 +39,17 @@
 import axios from "axios";
 export default {
   components: {},
-  name: "Device_Form",
+  name: "Type_Form",
   data() {
     return {
       form: {
         id: null,
-        mac: "",
+        name: "",
       },
     };
   },
   props: {
-    device: Object,
+    type: Object,
     showForm: Boolean,
   },
   methods: {
@@ -67,7 +65,7 @@ export default {
 
       var Options = {
         method: method,
-        url: "/api/device/" + id,
+        url: "/api/type/" + id,
         data: this.form,
         headers: {
           Authorization: `Bearer ${token}`,
@@ -87,10 +85,10 @@ export default {
     },
   },
   created() {
-    if (this.device) {
+    if (this.type) {
       this.form = {
-        id: this.device.id,
-        mac: this.device.mac,
+        id: this.type.id,
+        name: this.type.name,
       };
     }
   },

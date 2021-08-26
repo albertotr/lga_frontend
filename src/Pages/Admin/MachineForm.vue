@@ -234,7 +234,7 @@ export default {
 
     var OptionsTypes = {
       method: "get",
-      url: "/api/type/",
+      url: "/api/type/available",
       headers: {
         Authorization: `Bearer ${token}`,
       },
