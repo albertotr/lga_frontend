@@ -19,6 +19,7 @@ const router = new Router({
     return window.scrollTo({ top: 0, behavior: "smooth" });
   },
   mode: "history",
+  base: process.env.API_URL,
   routes: configRoutes(),
 });
 
