@@ -16,6 +16,10 @@ Vue.use(VueTheMask)
 
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = process.env.VUE_APP_API_URL;
+axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
+axios.defaults.headers.get['Access-Control-Allow-Origin'] = '*';
+axios.defaults.headers.delete['Access-Control-Allow-Origin'] = '*';
+axios.defaults.headers.put['Access-Control-Allow-Origin'] = '*';
 
 axios.interceptors.response.use(
   function (response) {
