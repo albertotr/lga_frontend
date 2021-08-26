@@ -60,7 +60,7 @@ const actions = {
   signIn ({ dispatch }, credentials) {
     return new Promise((resolve, reject) => {
       axios
-        .get("/sanctum/csrf-cookie")
+        .get("/sanctum/csrf-cookie", { headers: {'Access-Control-Allow-Origin':'*'}})
         .then(() => {
           axios
             .post("/api/login", credentials)
