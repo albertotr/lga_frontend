@@ -11,6 +11,9 @@ import Pages from './Layout/Wrappers/pagesLayout.vue';
 
 import axios from "axios";
 
+import VueTheMask from 'vue-the-mask'
+Vue.use(VueTheMask)
+
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = process.env.VUE_APP_API_URL;
 

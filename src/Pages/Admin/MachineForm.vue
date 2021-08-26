@@ -221,7 +221,7 @@ export default {
     const token = localStorage.getItem("token");
     var OptionsDevice = {
       method: "get",
-      url: "/api/device/",
+      url: "/api/device/available",
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -234,7 +234,7 @@ export default {
 
     var OptionsTypes = {
       method: "get",
-      url: "/api/type/",
+      url: "/api/type/available",
       headers: {
         Authorization: `Bearer ${token}`,
       },

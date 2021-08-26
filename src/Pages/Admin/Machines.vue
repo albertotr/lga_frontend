@@ -92,7 +92,7 @@ export default {
     return {
       heading: "Administração de Máquinas",
       subheading: "Verifique os dados antes de executar as ações.",
-      icon: "fa-users text-success",
+      icon: "server",
       machines: null,
       machine_selected: null,
       fields: [
