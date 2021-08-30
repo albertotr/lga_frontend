@@ -23,15 +23,15 @@
       :showForm.sync="showForm"
     ></page-title>
     <div class="content">
-      <type-form
+      <sample-form
         :showForm.sync="showForm"
-        :type="type_selected"
+        :sample="sample_selected"
         @updateDataTable="reloadDataTable"
         v-if="showForm"
-      ></type-form>
+      ></sample-form>
 
       <b-table
-        :items="types"
+        :items="samples"
         :fields="fields"
         striped
         bordered
@@ -45,7 +45,7 @@
             icon="edit"
             size="2x"
             class="text-info"
-            @click="onEditType(obj.item)"
+            @click="onEditSample(obj.item)"
             v-if="
               permissions.includes('update-device') &&
                 !obj.item.machine &&
@@ -57,7 +57,7 @@
             icon="trash"
             size="2x"
             class="text-danger"
-            @click="onDeleteType(obj.item)"
+            @click="onDeleteSample(obj.item)"
             v-if="
               permissions.includes('delete-device') &&
                 !obj.item.machine &&
@@ -69,7 +69,7 @@
             icon="recycle"
             size="2x"
             class="text-warning"
-            @click="onRestoreType(obj.item)"
+            @click="onRestoreSample(obj.item)"
             v-if="permissions.includes('delete-device') && obj.item.deleted_at"
           />
           &nbsp;
@@ -77,7 +77,7 @@
             icon="bomb"
             size="2x"
             class="text-danger"
-            @click="onForceDeleteType(obj.item)"
+            @click="onForceDeleteSample(obj.item)"
             v-if="
               permissions.includes('delete-device') &&
                 obj.item.deleted_at &&
@@ -110,26 +110,28 @@ import {
   faBomb,
 } from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import TypeForm from "./TypeForm.vue";
+import SampleForm from "./SampleForm.vue";
 
 library.add(faEdit, faTrash, faRecycle, faBomb);
 
 export default {
-  name: "Types",
+  name: "Samples",
   components: {
     PageTitle,
     "font-awesome-icon": FontAwesomeIcon,
-    TypeForm,
+    SampleForm,
   },
   data() {
     return {
-      heading: "Administração de Tipos de Máquinas",
+      heading: "Administração de Modelos de Máquinas",
       subheading: "Verifique os dados antes de executar as ações.",
       icon: "clipboard-list",
-      types: null,
-      type_selected: null,
+      samples: null,
+      sample_selected: null,
       fields: [
         { key: "name", label: "Name" },
+        { key: "slot", label: "Slot" },
+        { key: "machine_count", label: "Maquinas" },
         { key: "action", label: "Ações" },
       ],
       showForm: false,
@@ -143,14 +145,14 @@ export default {
     this.reloadDataTable();
   },
   methods: {
-    onEditType(type) {
-      this.type_selected = type;
+    onEditSample(sample) {
+      this.sample_selected = sample;
       this.showForm = true;
     },
-    onDeleteType(type) {
+    onDeleteSample(sample) {
       this.boxTwo = "";
       this.$bvModal
-        .msgBoxConfirm(`Deseja realmente excluir o tipo ${type.name}?`, {
+        .msgBoxConfirm(`Deseja realmente excluir o modelo ${sample.name}?`, {
           title: "Confirme a exclusão",
           size: "sm",
           buttonSize: "sm",
@@ -165,7 +167,7 @@ export default {
             const token = localStorage.getItem("token");
             var Options = {
               method: "delete",
-              url: `/api/type/${type.id}`,
+              url: `/api/sample/${sample.id}`,
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-type": "Application/Json",
@@ -174,22 +176,22 @@ export default {
             axios(Options).then((response) => {
               if (response.data) {
                 this.alertType = "success";
-                this.alertMessage = "Tipo excluido com sucesso.";
+                this.alertMessage = "Modelo excluido com sucesso.";
                 this.dismissCountDown = this.dismissSecs;
                 this.reloadDataTable();
               } else {
                 this.alertType = "danger";
-                this.alertMessage = "Problemas ao excluir o tipo!";
+                this.alertMessage = "Problemas ao excluir o Modelo!";
                 this.dismissCountDown = this.dismissSecs;
               }
             });
           }
         });
     },
-    onRestoreType(type) {
+    onRestoreSample(sample) {
       this.boxTwo = "";
       this.$bvModal
-        .msgBoxConfirm(`Deseja realmente restaurar o tipo ${type.name}?`, {
+        .msgBoxConfirm(`Deseja realmente restaurar o tipo ${sample.name}?`, {
           title: "Confirme a Restauração",
           size: "sm",
           buttonSize: "sm",
@@ -204,7 +206,7 @@ export default {
             const token = localStorage.getItem("token");
             var Options = {
               method: "get",
-              url: `/api/type/restore/${type.id}`,
+              url: `/api/sample/restore/${sample.id}`,
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-type": "Application/Json",
@@ -225,25 +227,28 @@ export default {
           }
         });
     },
-    onForceDeleteType(type) {
+    onForceDeleteSample(sample) {
       this.boxTwo = "";
       this.$bvModal
-        .msgBoxConfirm(`Deseja excluir permanentemente o tipo ${type.name}?`, {
-          title: "Confirme a Exclusão",
-          size: "sm",
-          buttonSize: "sm",
-          okVariant: "success",
-          okTitle: "Sim",
-          cancelTitle: "Não",
-          footerClass: "p-2",
-          hideHeaderClose: false,
-        })
+        .msgBoxConfirm(
+          `Deseja excluir permanentemente o modelo ${sample.name}?`,
+          {
+            title: "Confirme a Exclusão",
+            size: "sm",
+            buttonSize: "sm",
+            okVariant: "success",
+            okTitle: "Sim",
+            cancelTitle: "Não",
+            footerClass: "p-2",
+            hideHeaderClose: false,
+          }
+        )
         .then((confirm) => {
           if (confirm) {
             const token = localStorage.getItem("token");
             var Options = {
               method: "delete",
-              url: `/api/type/forcedelete/${type.id}`,
+              url: `/api/sample/forcedelete/${sample.id}`,
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-type": "Application/Json",
@@ -253,19 +258,19 @@ export default {
               .then((response) => {
                 if (response.data) {
                   this.alertType = "success";
-                  this.alertMessage = "Tipo excluido permanentemente.";
+                  this.alertMessage = "Modelo excluido permanentemente.";
                   this.dismissCountDown = this.dismissSecs;
                   this.reloadDataTable();
                 } else {
                   this.alertType = "danger";
-                  this.alertMessage = "Problemas ao excluir o tipo!";
+                  this.alertMessage = "Problemas ao excluir o modelo!";
                   this.dismissCountDown = this.dismissSecs;
                 }
               })
               .catch(() => {
                 this.alertType = "danger";
                 this.alertMessage =
-                  "Problemas ao excluir o tipo, provavelmente existe uma Máquina vinculada a este tipo!";
+                  "Problemas ao excluir o modelo, provavelmente existe uma Máquina vinculada a este modelo!";
                 this.dismissCountDown = this.dismissSecs;
               });
           }
@@ -275,25 +280,31 @@ export default {
       this.dismissCountDown = dismissCountDown;
     },
     clearForm() {
-      this.type_selected = null;
+      this.sample_selected = null;
       this.showForm = true;
     },
     reloadDataTable(value) {
       if (value !== undefined && value.status) {
         this.alertType = "warning";
-        this.alertMessage = value.data.errors.name[0];
+
+        this.alertMessage = "";
+        if (value.data.errors.name)
+          this.alertMessage = value.data.errors.name[0];
+        if (value.data.errors.slot)
+          this.alertMessage += "\n"+value.data.errors.slot[0];
+
         this.dismissCountDown = this.dismissSecs;
       } else if (value || value === undefined) {
         const token = localStorage.getItem("token");
         var Options = {
           method: "get",
-          url: "/api/type/",
+          url: "/api/sample/",
           headers: {
             Authorization: `Bearer ${token}`,
           },
         };
         axios(Options).then((response) => {
-          this.types = response.data;
+          this.samples = response.data;
         });
       }
 
@@ -307,7 +318,7 @@ export default {
   computed: {
     ...mapGetters(["permissions"]),
     loadingTableResult() {
-      return this.types == null;
+      return this.samples == null;
     },
   },
 };

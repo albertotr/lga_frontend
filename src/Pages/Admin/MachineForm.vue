@@ -245,7 +245,7 @@ export default {
 
     var OptionsSamples = {
       method: "get",
-      url: "/api/sample/",
+      url: "/api/sample/available",
       headers: {
         Authorization: `Bearer ${token}`,
       },

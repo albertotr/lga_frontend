@@ -86,6 +86,11 @@ export default {
             title: "Tipos",
             icon: "pe-7s-ticket",
             href: "/admin/type",
+          },
+          {
+            title: "Modelos",
+            icon: "pe-7s-ribbon",
+            href: "/admin/sample",
           }
           /* {
             header: true,
