@@ -21,6 +21,7 @@
       :icon="icon"
       @clearForm="clearForm"
       :showForm.sync="showForm"
+      @updateDataTable="reloadDataTable"
     ></page-title>
     <div class="content">
       <machine-form
@@ -183,7 +184,7 @@ export default {
         });
       } else if (value === false) {
         this.alertType = "warning";
-        this.alertMessage = "Problemas ao inserir/atualizar o registro maquina";
+        this.alertMessage = "Verifique o formulário";
         this.dismissCountDown = this.dismissSecs;
       }
 

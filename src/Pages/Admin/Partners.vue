@@ -20,20 +20,19 @@
       :subheading="subheading"
       :icon="icon"
       @clearForm="clearForm"
-      @updateDataTable="reloadDataTable"
       :showForm.sync="showForm"
+      @updateDataTable="reloadDataTable"
     ></page-title>
     <div class="content">
-      <user-form
-        :form="user_selected"
+      <partner-form
         :showForm.sync="showForm"
-        :user="user_selected"
+        :partner="partner_selected"
         @updateDataTable="reloadDataTable"
         v-if="showForm"
-      ></user-form>
+      ></partner-form>
 
       <b-table
-        :items="users"
+        :items="partners"
         :fields="fields"
         striped
         bordered
@@ -47,22 +46,31 @@
             icon="edit"
             size="2x"
             class="text-info"
-            @click="onEditUser(obj.item)"
-            v-if="permissions.includes('update-user') && !obj.item.deleted_at"
+            @click="onEditPartner(obj.item)"
+            v-if="
+              permissions.includes('update-device') &&
+                !obj.item.machine &&
+                !obj.item.deleted_at
+            "
           />
           &nbsp;
           <font-awesome-icon
             icon="trash"
             size="2x"
             class="text-danger"
-            @click="onDeleteUser(obj.item)"
-            v-if="permissions.includes('delete-user') && !obj.item.deleted_at"
+            @click="onDeletePartner(obj.item)"
+            v-if="
+              permissions.includes('delete-device') &&
+                !obj.item.machine &&
+                !obj.item.deleted_at
+            "
           />
+
           <font-awesome-icon
             icon="recycle"
             size="2x"
             class="text-warning"
-            @click="onRestoreUser(obj.item)"
+            @click="onRestorePartner(obj.item)"
             v-if="permissions.includes('delete-device') && obj.item.deleted_at"
           />
           &nbsp;
@@ -70,10 +78,11 @@
             icon="bomb"
             size="2x"
             class="text-danger"
-            @click="onForceDeleteUser(obj.item)"
+            @click="onForceDeletePartner(obj.item)"
             v-if="
               permissions.includes('delete-device') &&
-                obj.item.deleted_at
+                obj.item.deleted_at &&
+                obj.item.machine_count == '0'
             "
           />
         </template>
@@ -95,30 +104,33 @@ import { mapGetters } from "vuex";
 import axios from "axios";
 
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
+import {
+  faEdit,
+  faTrash,
+  faRecycle,
+  faBomb,
+} from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import UserForm from "./UserForm.vue";
+import PartnerForm from "./PartnerForm.vue";
 
-library.add(faEdit, faTrash);
+library.add(faEdit, faTrash, faRecycle, faBomb);
 
 export default {
-  name: "Users",
+  name: "Partners",
   components: {
     PageTitle,
     "font-awesome-icon": FontAwesomeIcon,
-    UserForm,
+    PartnerForm,
   },
   data() {
     return {
-      heading: "Administração de Usuários",
+      heading: "Administração de Clientes",
       subheading: "Verifique os dados antes de executar as ações.",
-      icon: "users-cog",
-      users: null,
-      user_selected: null,
+      icon: "clipboard-list",
+      partners: null,
+      partner_selected: null,
       fields: [
-        { key: "name", label: "Nome" },
-        { key: "email", label: "E-Mail" },
-        { key: "role.name", label: "Perfil" },
+        { key: "name", label: "Name" },
         { key: "action", label: "Ações" },
       ],
       showForm: false,
@@ -132,14 +144,14 @@ export default {
     this.reloadDataTable();
   },
   methods: {
-    onEditUser(user) {
-      this.user_selected = user;
+    onEditPartner(partner) {
+      this.partner_selected = partner;
       this.showForm = true;
     },
-    onDeleteUser(user) {
+    onDeletePartner(partner) {
       this.boxTwo = "";
       this.$bvModal
-        .msgBoxConfirm(`Deseja realmente excluir o usuário ${user.name}?`, {
+        .msgBoxConfirm(`Deseja realmente excluir o cliente ${partner.name}?`, {
           title: "Confirme a exclusão",
           size: "sm",
           buttonSize: "sm",
@@ -154,7 +166,7 @@ export default {
             const token = localStorage.getItem("token");
             var Options = {
               method: "delete",
-              url: `/api/user/${user.id}`,
+              url: `/api/partner/${partner.id}`,
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-type": "Application/Json",
@@ -163,23 +175,23 @@ export default {
             axios(Options).then((response) => {
               if (response.data) {
                 this.alertType = "success";
-                this.alertMessage = "Usuário excluido com sucesso.";
+                this.alertMessage = "Cliente excluido com sucesso.";
                 this.dismissCountDown = this.dismissSecs;
                 this.reloadDataTable();
               } else {
                 this.alertType = "danger";
-                this.alertMessage = "Problemas ao excluir o usuário!";
+                this.alertMessage = "Problemas ao excluir o Cliente!";
                 this.dismissCountDown = this.dismissSecs;
               }
             });
           }
         });
     },
-    onRestoreUser(user) {
+    onRestorePartner(partner) {
       this.boxTwo = "";
       this.$bvModal
         .msgBoxConfirm(
-          `Deseja realmente restaurar o usuario ${user.name}?`,
+          `Deseja realmente restaurar o cliente ${partner.name}?`,
           {
             title: "Confirme a Restauração",
             size: "sm",
@@ -196,7 +208,7 @@ export default {
             const token = localStorage.getItem("token");
             var Options = {
               method: "get",
-              url: `/api/user/restore/${user.id}`,
+              url: `/api/partner/restore/${partner.id}`,
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-type": "Application/Json",
@@ -217,11 +229,11 @@ export default {
           }
         });
     },
-    onForceDeleteUser(user) {
+    onForceDeletePartner(partner) {
       this.boxTwo = "";
       this.$bvModal
         .msgBoxConfirm(
-          `Deseja excluir permanentemente o usuario ${user.name}?`,
+          `Deseja excluir permanentemente o cliente ${partner.name}?`,
           {
             title: "Confirme a Exclusão",
             size: "sm",
@@ -238,7 +250,7 @@ export default {
             const token = localStorage.getItem("token");
             var Options = {
               method: "delete",
-              url: `/api/user/forcedelete/${user.id}`,
+              url: `/api/partner/forcedelete/${partner.id}`,
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-type": "Application/Json",
@@ -270,31 +282,32 @@ export default {
       this.dismissCountDown = dismissCountDown;
     },
     clearForm() {
-      this.user_selected = null;
+      this.partner_selected = null;
       this.showForm = true;
     },
     reloadDataTable(value) {
-      if (value || value === undefined) {
+      if (value !== undefined && value.status) {
+        this.alertType = "warning";
+
+        this.alertMessage = "Verifique o formulário ";
+        this.dismissCountDown = this.dismissSecs;
+      } else if (value || value === undefined) {
         const token = localStorage.getItem("token");
         var Options = {
           method: "get",
-          url: "/api/user/",
+          url: "/api/partner/",
           headers: {
             Authorization: `Bearer ${token}`,
           },
         };
         axios(Options).then((response) => {
-          this.users = response.data;
+          this.partners = response.data;
         });
-      } else if (value === false) {
-        this.alertType = "warning";
-        this.alertMessage = "Verifique o formulário.";
-        this.dismissCountDown = this.dismissSecs;
       }
 
-      if (value) {
+      if (value === true) {
         this.alertType = "success";
-        this.alertMessage = `Usuário inserido/editado com sucesso.`;
+        this.alertMessage = `Cliente inserido/editado com sucesso.`;
         this.dismissCountDown = this.dismissSecs;
       }
     },
@@ -302,7 +315,7 @@ export default {
   computed: {
     ...mapGetters(["permissions"]),
     loadingTableResult() {
-      return this.users == null;
+      return this.partners == null;
     },
   },
 };

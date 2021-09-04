@@ -91,6 +91,11 @@ export default {
             title: "Modelos",
             icon: "pe-7s-ribbon",
             href: "/admin/sample",
+          },
+          {
+            title: "Cliente",
+            icon: "pe-7s-map-2",
+            href: "/admin/parner",
           }
           /* {
             header: true,

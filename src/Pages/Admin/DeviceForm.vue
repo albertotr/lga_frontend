@@ -16,10 +16,18 @@
                   id="formMac"
                   type="text"
                   class="form-control text-uppercase"
+                  :class="{ 'is-invalid': invalidMac }"
                   v-model="form.mac"
                   :mask="['XX-XX-XX-XX-XX-XX']"
                   masked
                 />
+                <div class="invalid-feedback">
+                  <ul>
+                    <li v-for="msg in invalidMacMessage" :key="msg">
+                      {{ msg }}
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
@@ -48,6 +56,8 @@ export default {
         id: null,
         mac: "",
       },
+      invalidMacMessage: "",
+      error:[],
     };
   },
   props: {
@@ -80,6 +90,12 @@ export default {
         })
         .catch((msg) => {
           this.$emit("updateDataTable", msg.response);
+          if (msg.response.status == 422) {
+            this.error = msg.response.data.errors;
+
+            if (this.error["mac"])
+              this.invalidMacMessage = this.error["mac"];
+          }
         });
     },
     onCancel() {
@@ -94,7 +110,13 @@ export default {
       };
     }
   },
-  computed: {},
+  computed: {
+    invalidMac() {
+      if (this.error == undefined || this.error == null) return false;
+      if (this.error["mac"]) return true;
+      return false;
+    },
+  },
 };
 </script>
 

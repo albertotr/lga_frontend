@@ -16,8 +16,16 @@
                   id="formName"
                   type="text"
                   class="form-control"
+                  :class="{ 'is-invalid': invalidName }"
                   v-model="form.name"
                 />
+                <div class="invalid-feedback">
+                  <ul>
+                    <li v-for="msg in invalidNameMessage" :key="msg">
+                      {{ msg }}
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
             <div class="col-md-6">
@@ -27,9 +35,18 @@
                   name="name"
                   id="formSlot"
                   type="number"
+                  min="0"
                   class="form-control"
+                  :class="{ 'is-invalid': invalidSlot }"
                   v-model.number="form.slot"
                 />
+                <div class="invalid-feedback">
+                  <ul>
+                    <li v-for="msg in invalidSlotMessage" :key="msg">
+                      {{ msg }}
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
@@ -59,6 +76,9 @@ export default {
         name: "",
         slot: 0,
       },
+      error: null,
+      invalidNameMessage: "",
+      invalidSlotMessage: "",
     };
   },
   props: {
@@ -91,6 +111,14 @@ export default {
         })
         .catch((msg) => {
           this.$emit("updateDataTable", msg.response);
+          if (msg.response.status == 422) {
+            this.error = msg.response.data.errors;
+
+            if (this.error["name"])
+              this.invalidNameMessage = this.error["name"];
+            if (this.error["slot"])
+              this.invalidSlotMessage = this.error["slot"];
+          }
         });
     },
     onCancel() {
@@ -102,11 +130,22 @@ export default {
       this.form = {
         id: this.sample.id,
         name: this.sample.name,
-        slot: this.sample.slot
+        slot: this.sample.slot,
       };
     }
   },
-  computed: {},
+  computed: {
+    invalidName() {
+      if (this.error == undefined || this.error == null) return false;
+      if (this.error["name"]) return true;
+      return false;
+    },
+    invalidSlot() {
+      if (this.error == undefined || this.error == null) return false;
+      if (this.error["slot"]) return true;
+      return false;
+    },
+  },
 };
 </script>
 

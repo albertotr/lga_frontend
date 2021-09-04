@@ -192,7 +192,7 @@ export default {
     onRestoreSample(sample) {
       this.boxTwo = "";
       this.$bvModal
-        .msgBoxConfirm(`Deseja realmente restaurar o tipo ${sample.name}?`, {
+        .msgBoxConfirm(`Deseja realmente restaurar o modelo ${sample.name}?`, {
           title: "Confirme a Restauração",
           size: "sm",
           buttonSize: "sm",
@@ -216,12 +216,12 @@ export default {
             axios(Options).then((response) => {
               if (response.data) {
                 this.alertType = "success";
-                this.alertMessage = "Tipo restaurado com sucesso.";
+                this.alertMessage = "Modelo restaurado com sucesso.";
                 this.dismissCountDown = this.dismissSecs;
                 this.reloadDataTable();
               } else {
                 this.alertType = "danger";
-                this.alertMessage = "Problemas ao restaurar o tipo!";
+                this.alertMessage = "Problemas ao restaurar o modelo!";
                 this.dismissCountDown = this.dismissSecs;
               }
             });
@@ -288,12 +288,7 @@ export default {
       if (value !== undefined && value.status) {
         this.alertType = "warning";
 
-        this.alertMessage = "";
-        if (value.data.errors.name)
-          this.alertMessage = value.data.errors.name[0];
-        if (value.data.errors.slot)
-          this.alertMessage += "\n"+value.data.errors.slot[0];
-
+        this.alertMessage = "Verifique o formulário";
         this.dismissCountDown = this.dismissSecs;
       } else if (value || value === undefined) {
         const token = localStorage.getItem("token");
@@ -311,7 +306,7 @@ export default {
 
       if (value === true) {
         this.alertType = "success";
-        this.alertMessage = `Tipo inserido/editado com sucesso.`;
+        this.alertMessage = `Modelo inserido/editado com sucesso.`;
         this.dismissCountDown = this.dismissSecs;
       }
     },

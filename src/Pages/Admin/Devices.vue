@@ -21,6 +21,7 @@
       :icon="icon"
       @clearForm="clearForm"
       :showForm.sync="showForm"
+      @updateDataTable="reloadDataTable"
     ></page-title>
     <div class="content">
       <device-form
@@ -132,7 +133,7 @@ export default {
       dismissSecs: 10,
       dismissCountDown: 0,
       alertType: "success",
-      alertMessage: "",
+      alertMessage: "Verifique o formulário",
     };
   },
   created() {
@@ -237,7 +238,6 @@ export default {
     reloadDataTable(value) {
       if (value !== undefined && value.status) {
         this.alertType = "warning";
-        this.alertMessage = value.data.errors.mac[0];
         this.dismissCountDown = this.dismissSecs;
       } else if (value || value === undefined) {
         const token = localStorage.getItem("token");
