@@ -17,8 +17,16 @@
                   placeholder="Digite o nome do usuário"
                   type="text"
                   class="form-control"
+                  :class="{ 'is-invalid': invalidName }"
                   v-model="form.name"
                 />
+                <div class="invalid-feedback">
+                  <ul>
+                    <li v-for="msg in invalidNameMessage" :key="msg">
+                      {{ msg }}
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
             <div class="col-md-6">
@@ -30,8 +38,16 @@
                   placeholder="joaosilva@email.com.br"
                   type="text"
                   class="form-control"
+                  :class="{ 'is-invalid': invalidEmail }"
                   v-model="form.email"
                 />
+                <div class="invalid-feedback">
+                  <ul>
+                    <li v-for="msg in invalidEmailMessage" :key="msg">
+                      {{ msg }}
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
             <div class="col-md-6">
@@ -41,6 +57,7 @@
                   name="role"
                   id="formRole"
                   class="form-control"
+                  :class="{ 'is-invalid': invalidRole }"
                   v-model="form.role"
                 >
                   <option
@@ -50,17 +67,31 @@
                     >{{ role.name }}</option
                   >
                 </select>
+                <div class="invalid-feedback">
+                  <ul>
+                    <li v-for="msg in invalidRoleMessage" :key="msg">
+                      {{ msg }}
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
 
-          <button class="mt-2 btn btn-primary" @click.stop="onSubmit">
-            Salvar
-          </button>
+          <div class="text-center text-danger my-2" v-if="recording">
+            <b-spinner class="align-middle"></b-spinner>
+            <strong>Carregando...</strong>
+          </div>
 
-          <button class="mt-2 btn btn-danger" @click.stop="onCancel">
-            Cancelar
-          </button>
+          <template v-else>
+            <button class="mt-2 btn btn-primary" @click.stop="onSubmit">
+              Salvar
+            </button>
+
+            <button class="mt-2 btn btn-danger" @click.stop="onCancel">
+              Cancelar
+            </button>
+          </template>
         </form>
       </div>
     </div>
@@ -80,6 +111,11 @@ export default {
         email: "",
         role: "",
       },
+      error: null,
+      invalidNameMessage: "",
+      invalidEmailMessage: "",
+      invalidRoleMessage: "",
+      recording: false,
     };
   },
   props: {
@@ -88,6 +124,7 @@ export default {
   },
   methods: {
     onSubmit() {
+      this.recording = true;
       const token = localStorage.getItem("token");
 
       let method = "POST";
@@ -110,8 +147,19 @@ export default {
           this.$emit("updateDataTable", true);
           this.$emit("update:showForm", false);
         })
-        .catch(() => {
+        .catch((msg) => {
           this.$emit("updateDataTable", false);
+          if (msg.response.status == 422) {
+            this.error = msg.response.data.errors;
+
+            if (this.error["name"])
+              this.invalidNameMessage = this.error["name"];
+            if (this.error["email"])
+              this.invalidEmailMessage = this.error["email"];
+            if (this.error["role"])
+              this.invalidRoleMessage = this.error["role"];
+          }
+          this.recording = false;
         });
     },
     onCancel() {
@@ -139,6 +187,23 @@ export default {
         role: this.user.role.id,
       };
     }
+  },
+  computed: {
+    invalidName() {
+      if (this.error == undefined || this.error == null) return false;
+      if (this.error["name"]) return true;
+      return false;
+    },
+    invalidEmail() {
+      if (this.error == undefined || this.error == null) return false;
+      if (this.error["email"]) return true;
+      return false;
+    },
+    invalidRole() {
+      if (this.error == undefined || this.error == null) return false;
+      if (this.error["role"]) return true;
+      return false;
+    },
   },
 };
 </script>

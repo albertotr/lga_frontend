@@ -17,8 +17,16 @@
                   placeholder="Digite o serial da máquina"
                   type="text"
                   class="form-control"
+                  :class="{ 'is-invalid': invalidSerial }"
                   v-model="form.serial"
                 />
+                <div class="invalid-feedback">
+                  <ul>
+                    <li v-for="msg in invalidSerialMessage" :key="msg">
+                      {{ msg }}
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
             <div class="col-md-3">
@@ -47,6 +55,7 @@
                   name="type"
                   id="formType"
                   class="form-control"
+                  :class="{ 'is-invalid': invalidType }"
                   v-model="form.type"
                 >
                   <option
@@ -56,6 +65,13 @@
                     >{{ type.name }}</option
                   >
                 </select>
+                <div class="invalid-feedback">
+                  <ul>
+                    <li v-for="msg in invalidTypeMessage" :key="msg">
+                      {{ msg }}
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
             <div class="col-md-3">
@@ -65,6 +81,7 @@
                   name="sample"
                   id="formSample"
                   class="form-control"
+                  :class="{ 'is-invalid': invalidSample }"
                   v-model="form.sample"
                   @change="updateSlot($event)"
                 >
@@ -75,6 +92,13 @@
                     >{{ sample.name }}</option
                   >
                 </select>
+                <div class="invalid-feedback">
+                  <ul>
+                    <li v-for="msg in invalidSampleMessage" :key="msg">
+                      {{ msg }}
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
             <div class="col-md-2">
@@ -172,6 +196,10 @@ export default {
         partner: null,
         slot: 0,
       },
+      error: [],
+      invalidSerialMessage: null,
+      invalidTypeMessage: null,
+      invalidSampleMessage: null,
     };
   },
   props: {
@@ -202,8 +230,18 @@ export default {
           this.$emit("updateDataTable", true);
           this.$emit("update:showForm", false);
         })
-        .catch(() => {
+        .catch((msg) => {
           this.$emit("updateDataTable", false);
+          if (msg.response.status == 422) {
+            this.error = msg.response.data.errors;
+
+            if (this.error["serial"])
+              this.invalidSerialMessage = this.error["serial"];
+            if (this.error["type"])
+              this.invalidTypeMessage = this.error["type"];
+            if (this.error["sample"])
+              this.invalidSampleMessage = this.error["sample"];
+          }
         });
     },
     onCancel() {
@@ -256,7 +294,7 @@ export default {
 
     var OptionsPartner = {
       method: "get",
-      url: "/api/partner/",
+      url: "/api/partner/available",
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -289,6 +327,21 @@ export default {
       }
 
       return null;
+    },
+    invalidSerial() {
+      if (this.error == undefined || this.error == null) return false;
+      if (this.error["serial"]) return true;
+      return false;
+    },
+    invalidType() {
+      if (this.error == undefined || this.error == null) return false;
+      if (this.error["type"]) return true;
+      return false;
+    },
+    invalidSample() {
+      if (this.error == undefined || this.error == null) return false;
+      if (this.error["sample"]) return true;
+      return false;
     },
   },
 };

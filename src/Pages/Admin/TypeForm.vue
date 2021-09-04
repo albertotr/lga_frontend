@@ -16,8 +16,16 @@
                   id="formName"
                   type="text"
                   class="form-control"
+                  :class="{ 'is-invalid': invalidName }"
                   v-model="form.name"
                 />
+                <div class="invalid-feedback">
+                  <ul>
+                    <li v-for="msg in invalidNameMessage" :key="msg">
+                      {{ msg }}
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
@@ -46,6 +54,8 @@ export default {
         id: null,
         name: "",
       },
+      invalidNameMessage: "",
+      error: null,
     };
   },
   props: {
@@ -78,6 +88,12 @@ export default {
         })
         .catch((msg) => {
           this.$emit("updateDataTable", msg.response);
+          if (msg.response.status == 422) {
+            this.error = msg.response.data.errors;
+
+            if (this.error["name"])
+              this.invalidNameMessage = this.error["name"];
+          }
         });
     },
     onCancel() {
@@ -92,7 +108,13 @@ export default {
       };
     }
   },
-  computed: {},
+  computed: {
+    invalidName() {
+      if (this.error == undefined || this.error == null) return false;
+      if (this.error["name"]) return true;
+      return false;
+    },
+  },
 };
 </script>
 

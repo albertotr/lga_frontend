@@ -12,6 +12,7 @@ import ManageMessages from "../Pages/Manager/Messages/Messages";
 import Devices from "../Pages/Admin/Devices";
 import Types from "../Pages/Admin/Types";
 import Samples from "../Pages/Admin/Samples";
+import Partners from "../Pages/Admin/Partners";
 
 Vue.use(Router);
 
@@ -70,6 +71,12 @@ function configRoutes () {
       path: "/admin/sample",
       name: "samples",
       component: Samples
+    },
+
+    {
+      path: "/admin/parner",
+      name: "partners",
+      component: Partners
     },
 
     // Manage pages
