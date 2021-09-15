@@ -93,7 +93,7 @@ export default {
             href: "/admin/sample",
           },
           {
-            title: "Cliente",
+            title: "Parceiro",
             icon: "pe-7s-map-2",
             href: "/admin/parner",
           }

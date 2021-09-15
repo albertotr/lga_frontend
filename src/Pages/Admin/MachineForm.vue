@@ -115,25 +115,6 @@
                 />
               </div>
             </div>
-            <div class="col-md-5">
-              <div class="position-relative form-group">
-                <label for="labelFormPartner" class="">Cliente</label>
-                <select
-                  name="partner"
-                  id="formPartner"
-                  class="form-control"
-                  v-model="form.partner"
-                >
-                  <option value="null">&nbsp;</option>
-                  <option
-                    v-for="partner in partners"
-                    :key="partner.id"
-                    :value="partner.id"
-                    >{{ partner.name }}</option
-                  >
-                </select>
-              </div>
-            </div>
             <div class="col-md-12" v-if="selectedPartner">
               <div class="position-relative form-group">
                 <div class="card">

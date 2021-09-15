@@ -55,7 +55,7 @@
             size="2x"
             class="text-danger"
             @click="onDeleteMachine(obj.item)"
-            v-if="permissions.includes('delete-machine')"
+            v-if="permissions.includes('delete-machine') &&  obj.item.partners_count == 0"
           />
         </template>
 
@@ -101,7 +101,6 @@ export default {
         { key: "type.name", label: "Tipo" },
         { key: "sample.name", label: "Modelo" },
         { key: "device.mac", label: "MAC" },
-        { key: "partner.name", label: "Cliente" },
         { key: "sample.slot", label: "Slot" },
         { key: "action", label: "Ações" },
       ],
