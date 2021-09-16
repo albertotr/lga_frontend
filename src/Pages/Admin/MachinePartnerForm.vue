@@ -29,24 +29,12 @@
           :busy="loadingTableResult"
           responsive="sm"
         >
-          <template #cell(action)="obj">
+          <template #cell(action)="obj" class="text-center">
             <font-awesome-icon
-              icon="edit"
+              icon="unlink"
               size="2x"
               class="text-info"
-              @click="onEditMachine(obj.item)"
-              v-if="permissions.includes('update-machine')"
-            />
-            &nbsp;
-            <font-awesome-icon
-              icon="trash"
-              size="2x"
-              class="text-danger"
-              @click="onDeleteMachine(obj.item)"
-              v-if="
-                permissions.includes('delete-machine') &&
-                  obj.item.partners_count == 0
-              "
+              @click="onPartnerDetach(obj.item)"
             />
           </template>
 
@@ -69,10 +57,10 @@
         >
           <template #cell(action)="obj">
             <font-awesome-icon
-              icon="handshake"
+              icon="link"
               size="2x"
               class="text-info"
-              @click="onPartnerSelected(obj.item)"
+              @click="onPartnerAttach(obj.item)"
               v-b-modal.informParticipation
             />
           </template>
@@ -123,9 +111,9 @@
 <script>
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { faHandshake } from "@fortawesome/free-solid-svg-icons";
+import { faLink, faUnlink } from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
-library.add(faHandshake);
+library.add(faLink, faUnlink);
 
 export default {
   name: "MachinePartner",
@@ -142,6 +130,7 @@ export default {
         { key: "name", label: "Nome" },
         { key: "cpf_cnpj", label: "CPF/CNPJ" },
         { key: "pivot.participation", label: "Participação %" },
+        { key: "action", label: "Ações" },
       ],
 
       fieldsPartner: [
@@ -229,10 +218,13 @@ export default {
         .then(() => {
           this.selectedPartnerAdd.pivot = pivot;
           this.machine.partners.push(this.selectedPartnerAdd);
+          --this.machine.partners_count;
+
           this.partners.splice(
             this.partners.indexOf(this.selectedPartnerAdd),
             1
           );
+
           this.validParticipationMessage = "";
           this.validation = false;
         })
@@ -248,9 +240,61 @@ export default {
 
       return false;
     },
-    onPartnerSelected(partner) {
+    onPartnerAttach(partner) {
       this.selectedPartnerAdd = partner;
     },
+
+    onPartnerDetach(partner) {
+      this.boxTwo = "";
+      this.$bvModal
+        .msgBoxConfirm(
+          `Deseja realmente desvincular o parceiro ${partner.name}?`,
+          {
+            title: "Confirmar",
+            size: "sm",
+            buttonSize: "sm",
+            okVariant: "success",
+            okTitle: "Sim",
+            cancelTitle: "Não",
+            footerClass: "p-2",
+            hideHeaderClose: false,
+          }
+        )
+        .then((confirm) => {
+          if (confirm) {
+            let pivot = new Object();
+            pivot.machine_id = this.machine.id;
+            pivot.partner_id = partner.id;
+
+            const token = localStorage.getItem("token");
+            let method = "POST";
+
+            var Options = {
+              method: method,
+              url: "/api/machine/detachpartner",
+              data: pivot,
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            };
+            axios(Options)
+              .then(() => {
+                delete partner.pivot;
+                this.partners.push(partner);
+                this.machine.partners.splice(
+                  this.machine.partners.indexOf(partner),
+                  1
+                );
+                --this.machine.partners_count;
+              })
+              .catch((msg) => {
+                this.alertMessage = msg.response.data;
+                this.dismissCountDown = this.dismissSecs;
+              });
+          }
+        });
+    },
+
     countDownChanged(dismissCountDown) {
       this.dismissCountDown = dismissCountDown;
     },
