@@ -4,7 +4,7 @@
       <div class="card-body">
         <h5 class="card-title">
           <span v-if="form.id == null">Cadastro</span
-          ><span v-else>Editção</span> de Cliente
+          ><span v-else>Editção</span> de Parceiro
         </h5>
         <form class="" @submit.prevent>
           <div class="form-row">

@@ -153,14 +153,16 @@
         </form>
       </div>
     </div>
+    <machine-partner :machine="machine" :partners="partners" />
   </div>
 </template>
 
 <script>
 import axios from "axios";
 import cpfcnpj from "../Components/CpfCnpj.vue";
+import MachinePartner from "./MachinePartnerForm.vue";
 export default {
-  components: { cpfcnpj },
+  components: { cpfcnpj, MachinePartner },
   name: "Machine_Form",
   data() {
     return {
@@ -174,7 +176,7 @@ export default {
         device: null,
         type: null,
         sample: null,
-        partner: null,
+        partners: [],
         slot: 0,
       },
       error: [],
@@ -186,6 +188,8 @@ export default {
   props: {
     machine: Object,
     showForm: Boolean,
+    errorMessage: String,
+    countdown: Number,
   },
   methods: {
     onSubmit() {
@@ -212,8 +216,8 @@ export default {
           this.$emit("update:showForm", false);
         })
         .catch((msg) => {
-          this.$emit("updateDataTable", false);
           if (msg.response.status == 422) {
+            this.$emit("updateDataTable", false);
             this.error = msg.response.data.errors;
 
             if (this.error["serial"])
@@ -222,6 +226,10 @@ export default {
               this.invalidTypeMessage = this.error["type"];
             if (this.error["sample"])
               this.invalidSampleMessage = this.error["sample"];
+          } else {
+            this.$emit("updateDataTable", false);
+            this.$emit("update:errorMessage", msg.response.data);
+            this.$emit("update:countdown", 10);
           }
         });
     },
@@ -292,7 +300,7 @@ export default {
         type: this.machine.type_id,
         sample: this.machine.sample_id,
         slot: this.machine.sample.slot,
-        partner: this.machine.partner_id,
+        partners: this.machine.partners,
       };
     }
   },
