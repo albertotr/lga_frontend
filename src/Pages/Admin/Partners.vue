@@ -61,7 +61,7 @@
             @click="onDeletePartner(obj.item)"
             v-if="
               permissions.includes('delete-device') &&
-                !obj.item.machine &&
+                obj.item.machines_count == 0 &&
                 !obj.item.deleted_at
             "
           />
@@ -124,7 +124,7 @@ export default {
   },
   data() {
     return {
-      heading: "Administração de Clientes",
+      heading: "Administração de Parceiros",
       subheading: "Verifique os dados antes de executar as ações.",
       icon: "clipboard-list",
       partners: null,
@@ -175,12 +175,12 @@ export default {
             axios(Options).then((response) => {
               if (response.data) {
                 this.alertType = "success";
-                this.alertMessage = "Cliente excluido com sucesso.";
+                this.alertMessage = "Parceiro excluido com sucesso.";
                 this.dismissCountDown = this.dismissSecs;
                 this.reloadDataTable();
               } else {
                 this.alertType = "danger";
-                this.alertMessage = "Problemas ao excluir o Cliente!";
+                this.alertMessage = "Problemas ao excluir o Parceiro!";
                 this.dismissCountDown = this.dismissSecs;
               }
             });
@@ -217,7 +217,7 @@ export default {
             axios(Options).then((response) => {
               if (response.data) {
                 this.alertType = "success";
-                this.alertMessage = "Cliente restaurado com sucesso.";
+                this.alertMessage = "Parceiro restaurado com sucesso.";
                 this.dismissCountDown = this.dismissSecs;
                 this.reloadDataTable();
               } else {
@@ -260,7 +260,7 @@ export default {
               .then((response) => {
                 if (response.data) {
                   this.alertType = "success";
-                  this.alertMessage = "Cliente excluido permanentemente.";
+                  this.alertMessage = "Parceiro excluido permanentemente.";
                   this.dismissCountDown = this.dismissSecs;
                   this.reloadDataTable();
                 } else {
@@ -307,7 +307,7 @@ export default {
 
       if (value === true) {
         this.alertType = "success";
-        this.alertMessage = `Cliente inserido/editado com sucesso.`;
+        this.alertMessage = `Parceiro inserido/editado com sucesso.`;
         this.dismissCountDown = this.dismissSecs;
       }
     },
