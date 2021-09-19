@@ -94,8 +94,18 @@ export default {
           },
           {
             title: "Parceiro",
-            icon: "pe-7s-map-2",
+            icon: "pe-7s-wristwatch",
             href: "/admin/parner",
+          },
+          {
+            title: "Operador",
+            icon: "pe-7s-tools",
+            href: "/admin/operator",
+          },
+          {
+            title: "Localização",
+            icon: "pe-7s-map-2",
+            href: "/admin/location",
           }
           /* {
             header: true,

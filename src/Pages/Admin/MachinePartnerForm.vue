@@ -46,6 +46,7 @@
           </template>
         </b-table>
 
+        <h5>Parceiros Disponiveis</h5>
         <b-table
           :items="partners"
           :fields="fieldsPartner"
@@ -111,9 +112,9 @@
 <script>
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { faLink, faUnlink } from "@fortawesome/free-solid-svg-icons";
+import { faLink, faUnlink, faExclamationCircle } from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
-library.add(faLink, faUnlink);
+library.add(faLink, faUnlink, faExclamationCircle);
 
 export default {
   name: "MachinePartner",

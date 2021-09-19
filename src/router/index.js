@@ -13,6 +13,8 @@ import Devices from "../Pages/Admin/Devices";
 import Types from "../Pages/Admin/Types";
 import Samples from "../Pages/Admin/Samples";
 import Partners from "../Pages/Admin/Partners";
+import Operators from "../Pages/Admin/Operators";
+import Locations from "../Pages/Admin/Locations";
 
 Vue.use(Router);
 
@@ -77,6 +79,18 @@ function configRoutes () {
       path: "/admin/parner",
       name: "partners",
       component: Partners
+    },
+
+    {
+      path: "/admin/operator",
+      name: "operators",
+      component: Operators
+    },
+
+    {
+      path: "/admin/location",
+      name: "locations",
+      component: Locations
     },
 
     // Manage pages

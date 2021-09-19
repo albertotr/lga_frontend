@@ -115,6 +115,47 @@
                 />
               </div>
             </div>
+
+            <div class="col-md-3">
+              <div class="position-relative form-group">
+                <label for="labelFormOperator" class="">Operador</label>
+                <select
+                  name="operator"
+                  id="formOperator"
+                  class="form-control"
+                  v-model="form.operator"
+                >
+                  <option value="null">&nbsp;</option>
+                  <option
+                    v-for="operator in operators"
+                    :key="operator.id"
+                    :value="operator.id"
+                    >{{ operator.name }}</option
+                  >
+                </select>
+              </div>
+            </div>
+
+            <div class="col-md-3">
+              <div class="position-relative form-group">
+                <label for="labelFormLocations" class="">Localização</label>
+                <select
+                  name="location"
+                  id="formLocations"
+                  class="form-control"
+                  v-model="form.location"
+                >
+                  <option value="null">&nbsp;</option>
+                  <option
+                    v-for="location in locations"
+                    :key="location.id"
+                    :value="location.id"
+                    >{{ location.name }}</option
+                  >
+                </select>
+              </div>
+            </div>
+
             <div class="col-md-12" v-if="selectedPartner">
               <div class="position-relative form-group">
                 <div class="card">
@@ -143,6 +184,19 @@
             </div>
           </div>
 
+          <div
+            class="alert alert-warning"
+            role="alert"
+            v-if="machine.location.operator_id !== machine.operator_id"
+          >
+            <font-awesome-icon
+              icon="exclamation-triangle"
+              size="2x"
+              class="text-warning"
+            /> 
+            Verifique o Operador e a Localização, o operador selecionado não gerencia a localização informada.
+          </div>
+
           <button class="mt-2 btn btn-primary" @click.stop="onSubmit">
             Salvar
           </button>
@@ -161,8 +215,14 @@
 import axios from "axios";
 import cpfcnpj from "../Components/CpfCnpj.vue";
 import MachinePartner from "./MachinePartnerForm.vue";
+
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { faExclamationTriangle } from "@fortawesome/free-solid-svg-icons";
+import { library } from "@fortawesome/fontawesome-svg-core";
+library.add(faExclamationTriangle);
+
 export default {
-  components: { cpfcnpj, MachinePartner },
+  components: { cpfcnpj, MachinePartner, FontAwesomeIcon },
   name: "Machine_Form",
   data() {
     return {
@@ -170,6 +230,8 @@ export default {
       types: [],
       samples: [],
       partners: [],
+      operators: [],
+      locations: [],
       form: {
         id: null,
         serial: "",
@@ -177,6 +239,8 @@ export default {
         type: null,
         sample: null,
         partners: [],
+        operator: null,
+        location: null,
         slot: 0,
       },
       error: [],
@@ -281,6 +345,28 @@ export default {
       this.samples = response.data;
     });
 
+    var OptionsOperators = {
+      method: "get",
+      url: "/api/operator/available",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    axios(OptionsOperators).then((response) => {
+      this.operators = response.data;
+    });
+
+    var OptionsLocations = {
+      method: "get",
+      url: "/api/location/available",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    axios(OptionsLocations).then((response) => {
+      this.locations = response.data;
+    });
+
     var OptionsPartner = {
       method: "get",
       url: "/api/partner/available",
@@ -301,6 +387,8 @@ export default {
         sample: this.machine.sample_id,
         slot: this.machine.sample.slot,
         partners: this.machine.partners,
+        operator: this.machine.operator_id,
+        location: this.machine.location_id,
       };
     }
   },
