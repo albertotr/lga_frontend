@@ -24,15 +24,15 @@
       @updateDataTable="reloadDataTable"
     ></page-title>
     <div class="content">
-      <partner-form
+      <location-form
         :showForm.sync="showForm"
-        :partner="partner_selected"
+        :location="location_selected"
         @updateDataTable="reloadDataTable"
         v-if="showForm"
-      ></partner-form>
+      ></location-form>
 
       <b-table
-        :items="partners"
+        :items="locations"
         :fields="fields"
         striped
         bordered
@@ -46,9 +46,9 @@
             icon="edit"
             size="2x"
             class="text-info"
-            @click="onEditPartner(obj.item)"
+            @click="onEditLocations(obj.item)"
             v-if="
-              permissions.includes('update-partner') &&
+              permissions.includes('update-location') &&
                 !obj.item.machine &&
                 !obj.item.deleted_at
             "
@@ -58,9 +58,9 @@
             icon="trash"
             size="2x"
             class="text-danger"
-            @click="onDeletePartner(obj.item)"
+            @click="onDeleteLocations(obj.item)"
             v-if="
-              permissions.includes('delete-partner') &&
+              permissions.includes('delete-location') &&
                 obj.item.machines_count == 0 &&
                 !obj.item.deleted_at
             "
@@ -70,19 +70,19 @@
             icon="recycle"
             size="2x"
             class="text-warning"
-            @click="onRestorePartner(obj.item)"
-            v-if="permissions.includes('delete-partner') && obj.item.deleted_at"
+            @click="onRestoreLocations(obj.item)"
+            v-if="permissions.includes('delete-location') && obj.item.deleted_at"
           />
           &nbsp;
           <font-awesome-icon
             icon="bomb"
             size="2x"
             class="text-danger"
-            @click="onForceDeletePartner(obj.item)"
+            @click="onForceDeleteLocations(obj.item)"
             v-if="
-              permissions.includes('delete-partner') &&
+              permissions.includes('delete-location') &&
                 obj.item.deleted_at &&
-                obj.item.machine_count == '0'
+                obj.item.machines_count == '0'
             "
           />
         </template>
@@ -111,26 +111,27 @@ import {
   faBomb,
 } from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import PartnerForm from "./PartnerForm.vue";
+import LocationForm from "./LocationForm.vue";
 
 library.add(faEdit, faTrash, faRecycle, faBomb);
 
 export default {
-  name: "Partners",
+  name: "Locationss",
   components: {
     PageTitle,
     "font-awesome-icon": FontAwesomeIcon,
-    PartnerForm,
+    LocationForm,
   },
   data() {
     return {
-      heading: "Administração de Parceiros",
+      heading: "Administração de Localizações",
       subheading: "Verifique os dados antes de executar as ações.",
       icon: "clipboard-list",
-      partners: null,
-      partner_selected: null,
+      locations: null,
+      location_selected: null,
       fields: [
         { key: "name", label: "Name" },
+        { key: "operator.name", label: "Operador" },
         { key: "action", label: "Ações" },
       ],
       showForm: false,
@@ -144,14 +145,14 @@ export default {
     this.reloadDataTable();
   },
   methods: {
-    onEditPartner(partner) {
-      this.partner_selected = partner;
+    onEditLocations(location) {
+      this.location_selected = location;
       this.showForm = true;
     },
-    onDeletePartner(partner) {
+    onDeleteLocations(location) {
       this.boxTwo = "";
       this.$bvModal
-        .msgBoxConfirm(`Deseja realmente excluir o parceiro ${partner.name}?`, {
+        .msgBoxConfirm(`Deseja realmente excluir o localização ${location.name}?`, {
           title: "Confirme a exclusão",
           size: "sm",
           buttonSize: "sm",
@@ -166,7 +167,7 @@ export default {
             const token = localStorage.getItem("token");
             var Options = {
               method: "delete",
-              url: `/api/partner/${partner.id}`,
+              url: `/api/location/${location.id}`,
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-type": "Application/Json",
@@ -175,23 +176,23 @@ export default {
             axios(Options).then((response) => {
               if (response.data) {
                 this.alertType = "success";
-                this.alertMessage = "Parceiro excluido com sucesso.";
+                this.alertMessage = "Localização excluido com sucesso.";
                 this.dismissCountDown = this.dismissSecs;
                 this.reloadDataTable();
               } else {
                 this.alertType = "danger";
-                this.alertMessage = "Problemas ao excluir o Parceiro!";
+                this.alertMessage = "Problemas ao excluir a Localização!";
                 this.dismissCountDown = this.dismissSecs;
               }
             });
           }
         });
     },
-    onRestorePartner(partner) {
+    onRestoreLocations(location) {
       this.boxTwo = "";
       this.$bvModal
         .msgBoxConfirm(
-          `Deseja realmente restaurar o parceiro ${partner.name}?`,
+          `Deseja realmente restaurar o localização ${location.name}?`,
           {
             title: "Confirme a Restauração",
             size: "sm",
@@ -208,7 +209,7 @@ export default {
             const token = localStorage.getItem("token");
             var Options = {
               method: "get",
-              url: `/api/partner/restore/${partner.id}`,
+              url: `/api/location/restore/${location.id}`,
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-type": "Application/Json",
@@ -217,23 +218,23 @@ export default {
             axios(Options).then((response) => {
               if (response.data) {
                 this.alertType = "success";
-                this.alertMessage = "Parceiro restaurado com sucesso.";
+                this.alertMessage = "Localização restaurado com sucesso.";
                 this.dismissCountDown = this.dismissSecs;
                 this.reloadDataTable();
               } else {
                 this.alertType = "danger";
-                this.alertMessage = "Problemas ao restaurar o tipo!";
+                this.alertMessage = "Problemas ao restaurar a locaslização!";
                 this.dismissCountDown = this.dismissSecs;
               }
             });
           }
         });
     },
-    onForceDeletePartner(partner) {
+    onForceDeleteLocations(location) {
       this.boxTwo = "";
       this.$bvModal
         .msgBoxConfirm(
-          `Deseja excluir permanentemente o parceiro ${partner.name}?`,
+          `Deseja excluir permanentemente o localização ${location.name}?`,
           {
             title: "Confirme a Exclusão",
             size: "sm",
@@ -250,7 +251,7 @@ export default {
             const token = localStorage.getItem("token");
             var Options = {
               method: "delete",
-              url: `/api/partner/forcedelete/${partner.id}`,
+              url: `/api/location/forcedelete/${location.id}`,
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-type": "Application/Json",
@@ -260,19 +261,19 @@ export default {
               .then((response) => {
                 if (response.data) {
                   this.alertType = "success";
-                  this.alertMessage = "Parceiro excluido permanentemente.";
+                  this.alertMessage = "Localização excluido permanentemente.";
                   this.dismissCountDown = this.dismissSecs;
                   this.reloadDataTable();
                 } else {
                   this.alertType = "danger";
-                  this.alertMessage = "Problemas ao excluir o parceiro!";
+                  this.alertMessage = "Problemas ao excluir a localização!";
                   this.dismissCountDown = this.dismissSecs;
                 }
               })
               .catch(() => {
                 this.alertType = "danger";
                 this.alertMessage =
-                  "Problemas ao excluir o parceiro, provavelmente existe uma Máquina vinculada a este parceiro!";
+                  "Problemas ao excluir a localização, provavelmente existe uma Máquina vinculada a esta localização!";
                 this.dismissCountDown = this.dismissSecs;
               });
           }
@@ -282,7 +283,7 @@ export default {
       this.dismissCountDown = dismissCountDown;
     },
     clearForm() {
-      this.partner_selected = null;
+      this.location_selected = null;
       this.showForm = true;
     },
     reloadDataTable(value) {
@@ -295,19 +296,19 @@ export default {
         const token = localStorage.getItem("token");
         var Options = {
           method: "get",
-          url: "/api/partner/",
+          url: "/api/location/",
           headers: {
             Authorization: `Bearer ${token}`,
           },
         };
         axios(Options).then((response) => {
-          this.partners = response.data;
+          this.locations = response.data;
         });
       }
 
       if (value === true) {
         this.alertType = "success";
-        this.alertMessage = `Parceiro inserido/editado com sucesso.`;
+        this.alertMessage = `Localização inserida/editada com sucesso.`;
         this.dismissCountDown = this.dismissSecs;
       }
     },
@@ -315,7 +316,7 @@ export default {
   computed: {
     ...mapGetters(["permissions"]),
     loadingTableResult() {
-      return this.partners == null;
+      return this.locations == null;
     },
   },
 };

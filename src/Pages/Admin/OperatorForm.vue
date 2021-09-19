@@ -4,7 +4,7 @@
       <div class="card-body">
         <h5 class="card-title">
           <span v-if="form.id == null">Cadastro</span
-          ><span v-else>Editção</span> de Parceiro
+          ><span v-else>Editção</span> de Operador
         </h5>
         <form class="" @submit.prevent>
           <div class="form-row">
@@ -197,7 +197,7 @@
 import axios from "axios";
 export default {
   components: {},
-  name: "Partner_Form",
+  name: "Operator_Form",
   data() {
     return {
       form: {
@@ -222,7 +222,7 @@ export default {
     };
   },
   props: {
-    partner: Object,
+    operator: Object,
     showForm: Boolean,
   },
   methods: {
@@ -238,7 +238,7 @@ export default {
 
       var Options = {
         method: method,
-        url: "/api/partner/" + id,
+        url: "/api/operator/" + id,
         data: this.form,
         headers: {
           Authorization: `Bearer ${token}`,
@@ -274,18 +274,18 @@ export default {
     },
   },
   created() {
-    if (this.partner) {
+    if (this.operator) {
       this.form = {
-        id: this.partner.id,
-        name: this.partner.name,
-        address: this.partner.address,
-        number: this.partner.number,
-        complement: this.partner.complement,
-        neighborhood: this.partner.neighborhood,
-        city: this.partner.city,
-        state: this.partner.state,
-        postalcode: this.partner.postal_code,
-        cpfcnpj: this.partner.cpf_cnpj,
+        id: this.operator.id,
+        name: this.operator.name,
+        address: this.operator.address,
+        number: this.operator.number,
+        complement: this.operator.complement,
+        neighborhood: this.operator.neighborhood,
+        city: this.operator.city,
+        state: this.operator.state,
+        postalcode: this.operator.postal_code,
+        cpfcnpj: this.operator.cpf_cnpj,
       };
     }
   },

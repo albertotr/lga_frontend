@@ -26,6 +26,8 @@
     <div class="content">
       <machine-form
         :showForm.sync="showForm"
+        :errorMessage.sync="alertMessage"
+        :countdown.sync="dismissCountDown"
         :machine="machine_selected"
         @updateDataTable="reloadDataTable"
         v-if="showForm"

@@ -24,15 +24,15 @@
       @updateDataTable="reloadDataTable"
     ></page-title>
     <div class="content">
-      <partner-form
+      <operator-form
         :showForm.sync="showForm"
-        :partner="partner_selected"
+        :operator="operator_selected"
         @updateDataTable="reloadDataTable"
         v-if="showForm"
-      ></partner-form>
+      ></operator-form>
 
       <b-table
-        :items="partners"
+        :items="operators"
         :fields="fields"
         striped
         bordered
@@ -46,9 +46,9 @@
             icon="edit"
             size="2x"
             class="text-info"
-            @click="onEditPartner(obj.item)"
+            @click="onEditOperator(obj.item)"
             v-if="
-              permissions.includes('update-partner') &&
+              permissions.includes('update-operator') &&
                 !obj.item.machine &&
                 !obj.item.deleted_at
             "
@@ -58,9 +58,9 @@
             icon="trash"
             size="2x"
             class="text-danger"
-            @click="onDeletePartner(obj.item)"
+            @click="onDeleteOperator(obj.item)"
             v-if="
-              permissions.includes('delete-partner') &&
+              permissions.includes('delete-operator') &&
                 obj.item.machines_count == 0 &&
                 !obj.item.deleted_at
             "
@@ -70,19 +70,19 @@
             icon="recycle"
             size="2x"
             class="text-warning"
-            @click="onRestorePartner(obj.item)"
-            v-if="permissions.includes('delete-partner') && obj.item.deleted_at"
+            @click="onRestoreOperator(obj.item)"
+            v-if="permissions.includes('delete-operator') && obj.item.deleted_at"
           />
           &nbsp;
           <font-awesome-icon
             icon="bomb"
             size="2x"
             class="text-danger"
-            @click="onForceDeletePartner(obj.item)"
+            @click="onForceDeleteOperator(obj.item)"
             v-if="
-              permissions.includes('delete-partner') &&
+              permissions.includes('delete-operator') &&
                 obj.item.deleted_at &&
-                obj.item.machine_count == '0'
+                obj.item.machines_count == '0'
             "
           />
         </template>
@@ -111,24 +111,24 @@ import {
   faBomb,
 } from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import PartnerForm from "./PartnerForm.vue";
+import OperatorForm from "./OperatorForm.vue";
 
 library.add(faEdit, faTrash, faRecycle, faBomb);
 
 export default {
-  name: "Partners",
+  name: "Operators",
   components: {
     PageTitle,
     "font-awesome-icon": FontAwesomeIcon,
-    PartnerForm,
+    OperatorForm,
   },
   data() {
     return {
-      heading: "Administração de Parceiros",
+      heading: "Administração de Operadores",
       subheading: "Verifique os dados antes de executar as ações.",
       icon: "clipboard-list",
-      partners: null,
-      partner_selected: null,
+      operators: null,
+      operator_selected: null,
       fields: [
         { key: "name", label: "Name" },
         { key: "action", label: "Ações" },
@@ -144,14 +144,14 @@ export default {
     this.reloadDataTable();
   },
   methods: {
-    onEditPartner(partner) {
-      this.partner_selected = partner;
+    onEditOperator(operator) {
+      this.operator_selected = operator;
       this.showForm = true;
     },
-    onDeletePartner(partner) {
+    onDeleteOperator(operator) {
       this.boxTwo = "";
       this.$bvModal
-        .msgBoxConfirm(`Deseja realmente excluir o parceiro ${partner.name}?`, {
+        .msgBoxConfirm(`Deseja realmente excluir o operator ${operator.name}?`, {
           title: "Confirme a exclusão",
           size: "sm",
           buttonSize: "sm",
@@ -166,7 +166,7 @@ export default {
             const token = localStorage.getItem("token");
             var Options = {
               method: "delete",
-              url: `/api/partner/${partner.id}`,
+              url: `/api/operator/${operator.id}`,
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-type": "Application/Json",
@@ -187,11 +187,11 @@ export default {
           }
         });
     },
-    onRestorePartner(partner) {
+    onRestoreOperator(operator) {
       this.boxTwo = "";
       this.$bvModal
         .msgBoxConfirm(
-          `Deseja realmente restaurar o parceiro ${partner.name}?`,
+          `Deseja realmente restaurar o operator ${operator.name}?`,
           {
             title: "Confirme a Restauração",
             size: "sm",
@@ -208,7 +208,7 @@ export default {
             const token = localStorage.getItem("token");
             var Options = {
               method: "get",
-              url: `/api/partner/restore/${partner.id}`,
+              url: `/api/operator/restore/${operator.id}`,
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-type": "Application/Json",
@@ -229,11 +229,11 @@ export default {
           }
         });
     },
-    onForceDeletePartner(partner) {
+    onForceDeleteOperator(operator) {
       this.boxTwo = "";
       this.$bvModal
         .msgBoxConfirm(
-          `Deseja excluir permanentemente o parceiro ${partner.name}?`,
+          `Deseja excluir permanentemente o operator ${operator.name}?`,
           {
             title: "Confirme a Exclusão",
             size: "sm",
@@ -250,7 +250,7 @@ export default {
             const token = localStorage.getItem("token");
             var Options = {
               method: "delete",
-              url: `/api/partner/forcedelete/${partner.id}`,
+              url: `/api/operator/forcedelete/${operator.id}`,
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-type": "Application/Json",
@@ -265,14 +265,14 @@ export default {
                   this.reloadDataTable();
                 } else {
                   this.alertType = "danger";
-                  this.alertMessage = "Problemas ao excluir o parceiro!";
+                  this.alertMessage = "Problemas ao excluir o operator!";
                   this.dismissCountDown = this.dismissSecs;
                 }
               })
               .catch(() => {
                 this.alertType = "danger";
                 this.alertMessage =
-                  "Problemas ao excluir o parceiro, provavelmente existe uma Máquina vinculada a este parceiro!";
+                  "Problemas ao excluir o operator, provavelmente existe uma Máquina ou Localização vinculada a este operator!";
                 this.dismissCountDown = this.dismissSecs;
               });
           }
@@ -282,7 +282,7 @@ export default {
       this.dismissCountDown = dismissCountDown;
     },
     clearForm() {
-      this.partner_selected = null;
+      this.operator_selected = null;
       this.showForm = true;
     },
     reloadDataTable(value) {
@@ -295,13 +295,13 @@ export default {
         const token = localStorage.getItem("token");
         var Options = {
           method: "get",
-          url: "/api/partner/",
+          url: "/api/operator/",
           headers: {
             Authorization: `Bearer ${token}`,
           },
         };
         axios(Options).then((response) => {
-          this.partners = response.data;
+          this.operators = response.data;
         });
       }
 
@@ -315,7 +315,7 @@ export default {
   computed: {
     ...mapGetters(["permissions"]),
     loadingTableResult() {
-      return this.partners == null;
+      return this.operators == null;
     },
   },
 };

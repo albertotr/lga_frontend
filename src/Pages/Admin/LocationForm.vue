@@ -4,7 +4,7 @@
       <div class="card-body">
         <h5 class="card-title">
           <span v-if="form.id == null">Cadastro</span
-          ><span v-else>Editção</span> de Parceiro
+          ><span v-else>Editção</span> de Localização
         </h5>
         <form class="" @submit.prevent>
           <div class="form-row">
@@ -146,32 +146,25 @@
           <div class="form-row">
             <div class="col-md-6">
               <div class="position-relative form-group">
-                <label for="labelFormPostalCode" class="">CEP</label
-                ><the-mask
-                  name="postalcode"
-                  id="formPostalCode"
-                  type="text"
+                <label for="labelFormOperator" class="">Operador</label>
+                <select
+                  name="operator"
+                  id="formOperator"
                   class="form-control"
-                  v-model="form.postalcode"
-                  :mask="['#####-###']"
-                />
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="position-relative form-group">
-                <label for="labelFormCpfCnpj" class="">Cpf/Cnpj</label
-                ><the-mask
-                  name="cpfcnpj"
-                  id="formCpfCnpj"
-                  type="text"
-                  class="form-control"
-                  :class="{ 'is-invalid': invalidCpfCnpj }"
-                  v-model="form.cpfcnpj"
-                  :mask="['###.###.###-##', '##.###.###/####-##']"
-                />
+                  :class="{ 'is-invalid': invalidOperatorId }"
+                  v-model="form.operator_id"
+                >
+                  <option value="null">&nbsp;</option>
+                  <option
+                    v-for="operator in operators"
+                    :key="operator.id"
+                    :value="operator.id"
+                    >{{ operator.name }}</option
+                  >
+                </select>
                 <div class="invalid-feedback">
                   <ul>
-                    <li v-for="msg in invalidCpfCnpjMessage" :key="msg">
+                    <li v-for="msg in invalidOperatorIdMessage" :key="msg">
                       {{ msg }}
                     </li>
                   </ul>
@@ -197,9 +190,10 @@
 import axios from "axios";
 export default {
   components: {},
-  name: "Partner_Form",
+  name: "Location_Form",
   data() {
     return {
+      operators: [],
       form: {
         id: null,
         name: "",
@@ -210,7 +204,7 @@ export default {
         city: "",
         state: "",
         postalcode: "",
-        cpfcnpj: "",
+        location_id: "",
       },
       error: null,
       invalidNameMessage: "",
@@ -218,11 +212,11 @@ export default {
       invalidAddressMessage: "",
       invalidCityMessage: "",
       invalidStateMessage: "",
-      invalidCpfCnpjMessage: "",
+      invalidOperatorIdMessage: "123",
     };
   },
   props: {
-    partner: Object,
+    location: Object,
     showForm: Boolean,
   },
   methods: {
@@ -238,7 +232,7 @@ export default {
 
       var Options = {
         method: method,
-        url: "/api/partner/" + id,
+        url: "/api/location/" + id,
         data: this.form,
         headers: {
           Authorization: `Bearer ${token}`,
@@ -264,8 +258,8 @@ export default {
               this.invalidCityMessage = this.error["city"];
             if (this.error["state"])
               this.invalidStateMessage = this.error["state"];
-            if (this.error["cpfcnpj"])
-              this.invalidCpfCnpjMessage = this.error["cpfcnpj"];
+            if (this.error["operator_id"])
+              this.invalidOperatorIdMessage = this.error["operator_id"];
           }
         });
     },
@@ -274,18 +268,32 @@ export default {
     },
   },
   created() {
-    if (this.partner) {
+    const token = localStorage.getItem("token");
+    var OptionsOperators = {
+      method: "get",
+      url: "/api/operator/available",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    axios(OptionsOperators).then((response) => {
+      this.operators = response.data;
+      if (this.machine && this.machine.operator)
+        this.operators.push(this.machine.operator);
+    });
+
+    if (this.location) {
       this.form = {
-        id: this.partner.id,
-        name: this.partner.name,
-        address: this.partner.address,
-        number: this.partner.number,
-        complement: this.partner.complement,
-        neighborhood: this.partner.neighborhood,
-        city: this.partner.city,
-        state: this.partner.state,
-        postalcode: this.partner.postal_code,
-        cpfcnpj: this.partner.cpf_cnpj,
+        id: this.location.id,
+        name: this.location.name,
+        address: this.location.address,
+        number: this.location.number,
+        complement: this.location.complement,
+        neighborhood: this.location.neighborhood,
+        city: this.location.city,
+        state: this.location.state,
+        postalcode: this.location.postal_code,
+        operator_id: this.location.operator_id,
       };
     }
   },
@@ -315,9 +323,9 @@ export default {
       if (this.error["state"]) return true;
       return false;
     },
-    invalidCpfCnpj() {
+    invalidOperatorId() {
       if (this.error == undefined || this.error == null) return false;
-      if (this.error["cpfcnpj"]) return true;
+      if (this.error["operator_id"]) return true;
       return false;
     },
   },
