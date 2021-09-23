@@ -3,7 +3,7 @@ import Router from "vue-router";
 import store from "../store";
 
 import Users from "../Pages/Admin/Users";
-import Machines from "../Pages/Admin/Machines";
+import Machines from "../Pages/Admin/Machine/Machines";
 import Logs from "../Pages/Admin/Log";
 import PageNotFound from "../Pages/UserPages/404";
 import PageNotPermited from "../Pages/UserPages/403";

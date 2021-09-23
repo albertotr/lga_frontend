@@ -187,7 +187,7 @@
           <div
             class="alert alert-warning"
             role="alert"
-            v-if="machine.location.operator_id !== machine.operator_id"
+            v-if="machine.location !== null && machine.location.operator_id !== machine.operator_id"
           >
             <font-awesome-icon
               icon="exclamation-triangle"
@@ -208,13 +208,15 @@
       </div>
     </div>
     <machine-partner :machine="machine" :partners="partners" />
+    <machine-inventory :machine="machine" />
   </div>
 </template>
 
 <script>
 import axios from "axios";
-import cpfcnpj from "../Components/CpfCnpj.vue";
+import cpfcnpj from "../../Components/CpfCnpj.vue";
 import MachinePartner from "./MachinePartnerForm.vue";
+import MachineInventory from "./MachineInventoryForm.vue";
 
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { faExclamationTriangle } from "@fortawesome/free-solid-svg-icons";
@@ -222,7 +224,7 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 library.add(faExclamationTriangle);
 
 export default {
-  components: { cpfcnpj, MachinePartner, FontAwesomeIcon },
+  components: { cpfcnpj, MachinePartner, MachineInventory, FontAwesomeIcon },
   name: "Machine_Form",
   data() {
     return {
