@@ -207,8 +207,8 @@
         </form>
       </div>
     </div>
-    <machine-partner :machine="machine" :partners="partners" />
     <machine-inventory :machine="machine" />
+    <machine-partner :machine="machine" :partners="partners" />    
   </div>
 </template>
 

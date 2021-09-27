@@ -10,15 +10,15 @@
           </div>
           <div class="col"><strong>Tipo:</strong> {{ machine.type.name }}</div>
           <div class="col">
-            <strong>Modelo:</strong> {{ machine.sample.name }}/{{
+            <strong>Modelo:</strong> {{ machine.sample.name }} | {{
               machine.sample.slot
-            }}.Slots
+            }} Slots
           </div>
           <div class="col">
-            <strong>Cliente:</strong
-            ><template v-if="machine.device">
-              {{ machine.partner.name }}</template
-            >
+            <strong>Parceiro(s):</strong>
+              <span v-for="partner in machine.partners" :key="partner.id">
+                {{ partner.name }};
+              </span>
           </div>
         </div>
         <div class="row" v-if="messages.length > 0">
