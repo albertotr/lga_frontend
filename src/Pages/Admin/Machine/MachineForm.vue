@@ -118,26 +118,6 @@
 
             <div class="col-md-3">
               <div class="position-relative form-group">
-                <label for="labelFormOperator" class="">Operador</label>
-                <select
-                  name="operator"
-                  id="formOperator"
-                  class="form-control"
-                  v-model="form.operator"
-                >
-                  <option value="null">&nbsp;</option>
-                  <option
-                    v-for="operator in operators"
-                    :key="operator.id"
-                    :value="operator.id"
-                    >{{ operator.name }}</option
-                  >
-                </select>
-              </div>
-            </div>
-
-            <div class="col-md-3">
-              <div class="position-relative form-group">
                 <label for="labelFormLocations" class="">Localização</label>
                 <select
                   name="location"
@@ -145,7 +125,7 @@
                   class="form-control"
                   v-model="form.location"
                 >
-                  <option value="null">&nbsp;</option>
+                  <option value="">&nbsp;</option>
                   <option
                     v-for="location in locations"
                     :key="location.id"
@@ -155,46 +135,18 @@
                 </select>
               </div>
             </div>
-
-            <div class="col-md-12" v-if="selectedPartner">
-              <div class="position-relative form-group">
-                <div class="card">
-                  <div class="card-body">
-                    <h5 class="card-title">{{ selectedPartner.name }}</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">
-                      CPF/CNPJ:&nbsp;<cpfcnpj
-                        :value="selectedPartner.cpf_cnpj"
-                      />
-                    </h6>
-                    <p class="card-text">
-                      Endereço:&nbsp;{{ selectedPartner.address }},&nbsp;{{
-                        selectedPartner.number
-                      }},&nbsp;{{ selectedPartner.neigborhood }},&nbsp;{{
-                        selectedPartner.city
-                      }},&nbsp;
-                      {{ selectedPartner.state }}
-                      <br />
-                      Complemento:&nbsp;{{ selectedPartner.complement }}
-                      <br />
-                      CEP:{{ selectedPartner.postal_code }}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
-
           <div
             class="alert alert-warning"
             role="alert"
-            v-if="machine.location !== null && machine.location.operator_id !== machine.operator_id"
+            v-if="operatorLocation"
           >
             <font-awesome-icon
               icon="exclamation-triangle"
               size="2x"
               class="text-warning"
-            /> 
-            Verifique o Operador e a Localização, o operador selecionado não gerencia a localização informada.
+            />
+            Verifique a lista de Operadores, a Localização selecionada não está vinculada a nenhum dos operadores da lista.
           </div>
 
           <button class="mt-2 btn btn-primary" @click.stop="onSubmit">
@@ -208,15 +160,16 @@
       </div>
     </div>
     <machine-inventory :machine="machine" />
-    <machine-partner :machine="machine" :partners="partners" />    
+    <machine-partner :machine="machine" />
+    <machine-operator :machine="machine" />
   </div>
 </template>
 
 <script>
 import axios from "axios";
-import cpfcnpj from "../../Components/CpfCnpj.vue";
 import MachinePartner from "./MachinePartnerForm.vue";
 import MachineInventory from "./MachineInventoryForm.vue";
+import MachineOperator from "./MachineOperatorForm.vue";
 
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { faExclamationTriangle } from "@fortawesome/free-solid-svg-icons";
@@ -224,15 +177,13 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 library.add(faExclamationTriangle);
 
 export default {
-  components: { cpfcnpj, MachinePartner, MachineInventory, FontAwesomeIcon },
+  components: { MachinePartner, MachineInventory, MachineOperator, FontAwesomeIcon },
   name: "Machine_Form",
   data() {
     return {
       devices: [],
       types: [],
       samples: [],
-      partners: [],
-      operators: [],
       locations: [],
       form: {
         id: null,
@@ -241,7 +192,7 @@ export default {
         type: null,
         sample: null,
         partners: [],
-        operator: null,
+        operators: [],
         location: null,
         slot: 0,
       },
@@ -279,7 +230,6 @@ export default {
       axios(Options)
         .then(() => {
           this.$emit("updateDataTable", true);
-          this.$emit("update:showForm", false);
         })
         .catch((msg) => {
           if (msg.response.status == 422) {
@@ -347,17 +297,6 @@ export default {
       this.samples = response.data;
     });
 
-    var OptionsOperators = {
-      method: "get",
-      url: "/api/operator/available",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-    axios(OptionsOperators).then((response) => {
-      this.operators = response.data;
-    });
-
     var OptionsLocations = {
       method: "get",
       url: "/api/location/available",
@@ -369,17 +308,6 @@ export default {
       this.locations = response.data;
     });
 
-    var OptionsPartner = {
-      method: "get",
-      url: "/api/partner/available",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-    axios(OptionsPartner).then((response) => {
-      this.partners = response.data;
-    });
-
     if (this.machine) {
       this.form = {
         id: this.machine.id,
@@ -389,24 +317,11 @@ export default {
         sample: this.machine.sample_id,
         slot: this.machine.sample.slot,
         partners: this.machine.partners,
-        operator: this.machine.operator_id,
         location: this.machine.location_id,
       };
     }
   },
   computed: {
-    selectedPartner() {
-      if (this.form.partner == null || this.partners == null) return null;
-
-      if (this.partners != null && this.form.partner != null) {
-        let part = this.partners.filter((partner) => {
-          return partner.id == this.form.partner;
-        });
-        return part[0];
-      }
-
-      return null;
-    },
     invalidSerial() {
       if (this.error == undefined || this.error == null) return false;
       if (this.error["serial"]) return true;
@@ -422,6 +337,15 @@ export default {
       if (this.error["sample"]) return true;
       return false;
     },
+    operatorLocation() {
+
+      if(!this.machine.location) return false;
+
+      let checkOperatorLocation = this.machine.operators.find( (op) => {
+        return op.id == this.machine.location.operator_id;
+      })
+      return checkOperatorLocation == undefined;
+    }
   },
 };
 </script>

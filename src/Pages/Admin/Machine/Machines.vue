@@ -57,7 +57,7 @@
             size="2x"
             class="text-danger"
             @click="onDeleteMachine(obj.item)"
-            v-if="permissions.includes('delete-machine') &&  obj.item.partners_count == 0"
+            v-if="permissions.includes('delete-machine')"
           />
         </template>
 

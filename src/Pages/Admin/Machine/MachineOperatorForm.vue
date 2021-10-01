@@ -18,22 +18,18 @@
     <div class="main-card mb-3 card">
       <div class="card-body">
         <h5 class="card-title">
-          Parceiros
+          Operadores
         </h5>
         <div class="row" style="margin-bottom:10px">
           <div class="col">
-            <b-button
-              squared
-              variant="primary"
-              @click="openAddPartnerModal()"
-              v-if="totalParticipation"
+            <b-button squared variant="primary" @click="openAddOperatorModal()"
               ><font-awesome-icon icon="plus-circle" size="1x" /> Adicionar
-              Parceiro</b-button
+              Operador</b-button
             >
           </div>
         </div>
         <b-table
-          :items="machine.partners"
+          :items="machine.operators"
           :fields="fields"
           striped
           bordered
@@ -46,7 +42,7 @@
               icon="unlink"
               size="2x"
               class="text-info"
-              @click="onPartnerDetach(obj.item)"
+              @click="onOperatorDetach(obj.item)"
             />
           </template>
 
@@ -61,46 +57,27 @@
     </div>
 
     <b-modal
-      id="informParticipation"
+      id="attachOperatorModal"
       ref="modal"
-      title="Participação"
+      title="Operador"
       @show="resetModal"
       @hidden="resetModal"
       @ok="handleOk"
     >
       <form ref="form" @submit.stop.prevent="handleSubmit">
         <b-form-group
-          label="Nome do Parceiro"
+          label="Nome do Operador"
           label-for="id"
-          :state="partnerState"
+          :state="operatorState"
         >
           <b-form-select
-            v-model="partner.id"
-            :options="optionPartners"
-            :state="partnerState"
+            v-model="operator.id"
+            :options="optionOperators"
+            :state="operatorState"
             required
           ></b-form-select>
-          <b-form-invalid-feedback :state="invalidPartnerValue">
-            {{ validPartnerMessage }}
-          </b-form-invalid-feedback>
-        </b-form-group>
-        <b-form-group
-          label="Participação"
-          label-for="participation"
-          :state="participationState"
-        >
-          <b-form-input
-            id="participation-input"
-            v-model="partner.participation"
-            :state="participationState"
-            type="number"
-            step="0.01"
-            min="0.00"
-            max="100.00"
-            required
-          ></b-form-input>
-          <b-form-invalid-feedback :state="invalidParticipationValue">
-            {{ validParticipationMessage }}
+          <b-form-invalid-feedback :state="invalidOperatorValue">
+            {{ validOperatorMessage }}
           </b-form-invalid-feedback>
         </b-form-group>
       </form>
@@ -120,7 +97,7 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 library.add(faLink, faUnlink, faExclamationCircle);
 
 export default {
-  name: "MachinePartner",
+  name: "MachineOperator",
   components: {
     "font-awesome-icon": FontAwesomeIcon,
   },
@@ -132,16 +109,13 @@ export default {
       fields: [
         { key: "name", label: "Nome" },
         { key: "cpf_cnpj", label: "CPF/CNPJ" },
-        { key: "pivot.participation", label: "Participação %" },
         { key: "action", label: "Ações" },
       ],
 
-      partner: {
+      operator: {
         id: "",
-        participation: "",
       },
-      participationState: null,
-      partnerState: null,
+      operatorState: null,
 
       dismissSecs: 10,
       dismissCountDown: 0,
@@ -149,12 +123,10 @@ export default {
       alertMessage: "",
 
       state: null,
-      validParticipationMessage: "",
-      validPartnerMessage: "",
-      invalidPartnerValue: false,
-      invalidParticipationValue: false,
+      validOperatorMessage: "",
+      invalidOperatorValue: false,
 
-      partners: [],
+      operators: [],
       token: null,
     };
   },
@@ -162,71 +134,35 @@ export default {
     loadingTableResult() {
       return this.machine == null;
     },
-    loadingTablePartnerResult() {
-      return this.partners == null;
+    loadingTableOperatorResult() {
+      return this.operators == null;
     },
-    totalParticipation() {
-      var totalParticipation = 0;
-      this.machine.partners.forEach((machinePartner) => {
-        totalParticipation += parseFloat(machinePartner.pivot.participation);
+    optionOperators() {
+      var listOperators = this.operators.map((operator) => {
+        return { value: operator.id, text: operator.name };
       });
-      return totalParticipation < 100;
-    },
-    optionPartners() {
-      var listPartners = this.partners.map((partner) => {
-        return { value: partner.id, text: partner.name };
-      });
-      return listPartners;
+      return listOperators;
     },
   },
   methods: {
     checkFormValidity() {
-      this.invalidPartnerValue = false;
-      this.partnerState = true;
-      this.validPartnerMessage = "";
-
-      this.invalidParticipationValue = false;
-      this.participationState = true;
-      this.validParticipationMessage = "";
+      this.invalidOperatorValue = false;
+      this.operatorState = true;
+      this.validOperatorsMessage = "";
 
       const valid = this.$refs.form.checkValidity();
       this.state = valid;
 
-      if (valid) {
-        let errors = 0;
-        let percentage = 0;
-        this.machine.partners.forEach((partner) => {
-          percentage += parseFloat(partner.pivot.participation);
-        });
-
-        percentage += parseFloat(this.partner.participation);
-
-        if (percentage > 100) {
-          this.invalidParticipationValue = true;
-          this.validParticipationMessage =
-            "Com este valor, é superado os 100% de participação.";
-          this.participationState = false;
-          errors++;
-        }
-
-        if (errors > 0) return false;
-      } else {
-        if (!this.partner.participation || this.partner.participation > 100) {
-          this.validParticipationMessage = "O valor precisa ser entre 0 e 100.";
-          this.participationState = false;
-        }
-
-        if (!this.partner.id) {
-          this.validPartnerMessage = "O valor nome é obrigatório.";
-          this.partnerState = false;
-        }
+      if (!this.operator.id) {
+        this.validOperatorMessage = "O valor nome é obrigatório.";
+        this.operatorState = false;
       }
 
       return valid;
     },
     resetModal() {
-      this.participation = "";
-      this.participationState = null;
+      this.operator.id = "";
+      this.operatorState = null;
     },
     handleOk(bvModalEvt) {
       // Prevent modal from closing
@@ -242,20 +178,19 @@ export default {
 
       let pivot = new Object();
       pivot.machine_id = this.machine.id;
-      pivot.partner_id = this.partner.id;
-      pivot.participation = this.partner.participation;
+      pivot.operator_id = this.operator.id;
 
-      let newPartner = this.partners.filter((partner) => {
-        return partner.id == this.partner.id;
+      let newOperator = this.operators.filter((operator) => {
+        return operator.id == this.operator.id;
       });
-      newPartner = newPartner[0];
+      newOperator = newOperator[0];
 
       const token = localStorage.getItem("token");
       let method = "POST";
 
       var Options = {
         method: method,
-        url: "/api/machine/attachpartner",
+        url: "/api/machine/attachoperator",
         data: pivot,
         headers: {
           Authorization: `Bearer ${token}`,
@@ -263,20 +198,14 @@ export default {
       };
       axios(Options)
         .then(() => {
-          newPartner.pivot = pivot;
-          this.machine.partners.push(newPartner);
-          --this.machine.partners_count;
+          newOperator.pivot = pivot;
+          this.machine.operators.push(newOperator);
 
-          this.partner.id = null;
-          this.partner.participation  = null;
+          this.operator.id = null;
 
-          this.invalidPartnerValue = false;
-          this.partnerState = null;
-          this.validPartnerMessage = "";
-
-          this.invalidParticipationValue = false;
-          this.participationState = null;
-          this.validParticipationMessage = "";
+          this.invalidOperatorValue = false;
+          this.operatorState = null;
+          this.validOperatorMessage = "";
         })
         .catch((msg) => {
           this.alertMessage = msg.response.data;
@@ -285,17 +214,17 @@ export default {
 
       // Hide the modal manually
       this.$nextTick(() => {
-        this.$bvModal.hide("informParticipation");
+        this.$bvModal.hide("attachOperatorModal");
       });
 
       return false;
     },
 
-    onPartnerDetach(partner) {
+    onOperatorDetach(operator) {
       this.boxTwo = "";
       this.$bvModal
         .msgBoxConfirm(
-          `Deseja realmente desvincular o parceiro ${partner.name}?`,
+          `Deseja realmente desvincular o operador ${operator.name}?`,
           {
             title: "Confirmar",
             size: "sm",
@@ -311,13 +240,13 @@ export default {
           if (confirm) {
             let pivot = new Object();
             pivot.machine_id = this.machine.id;
-            pivot.partner_id = partner.id;
+            pivot.operator_id = operator.id;
 
             let method = "POST";
 
             var Options = {
               method: method,
-              url: "/api/machine/detachpartner",
+              url: "/api/machine/detachoperator",
               data: pivot,
               headers: {
                 Authorization: `Bearer ${this.token}`,
@@ -325,13 +254,12 @@ export default {
             };
             axios(Options)
               .then(() => {
-                delete partner.pivot;
-                this.partners.push(partner);
-                this.machine.partners.splice(
-                  this.machine.partners.indexOf(partner),
+                delete operator.pivot;
+                this.operators.push(operator);
+                this.machine.operators.splice(
+                  this.machine.operators.indexOf(operator),
                   1
                 );
-                --this.machine.partners_count;
               })
               .catch((msg) => {
                 this.alertMessage = msg.response.data;
@@ -345,18 +273,18 @@ export default {
       this.dismissCountDown = dismissCountDown;
     },
 
-    openAddPartnerModal() {
-      var OptionsPartner = {
+    openAddOperatorModal() {
+      var OptionsOperator = {
         method: "get",
-        url: `/api/partner/available/${this.machine.id}`,
+        url: `/api/operator/available/${this.machine.id}`,
         headers: {
           Authorization: `Bearer ${this.token}`,
         },
       };
-      axios(OptionsPartner).then((response) => {
-        this.partners = response.data;
+      axios(OptionsOperator).then((response) => {
+        this.operators = response.data;
       });
-      this.$bvModal.show("informParticipation");
+      this.$bvModal.show("attachOperatorModal");
     },
   },
   created() {
