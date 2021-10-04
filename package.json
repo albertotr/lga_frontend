@@ -23,6 +23,7 @@
     "perfect-scrollbar": "^1.4.0",
     "popper.js": "^1.15.0",
     "sass-loader": "^7.1.0",
+    "v-money": "^0.8.1",
     "vue": "^2.6.10",
     "vue-chartjs": "^3.4.2",
     "vue-perfect-scrollbar": "^0.1.0",
