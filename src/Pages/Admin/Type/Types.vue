@@ -21,18 +21,17 @@
       :icon="icon"
       @clearForm="clearForm"
       :showForm.sync="showForm"
-      @updateDataTable="reloadDataTable"
     ></page-title>
     <div class="content">
-      <partner-form
+      <type-form
         :showForm.sync="showForm"
-        :partner="partner_selected"
+        :type="type_selected"
         @updateDataTable="reloadDataTable"
         v-if="showForm"
-      ></partner-form>
+      ></type-form>
 
       <b-table
-        :items="partners"
+        :items="types"
         :fields="fields"
         striped
         bordered
@@ -46,9 +45,9 @@
             icon="edit"
             size="2x"
             class="text-info"
-            @click="onEditPartner(obj.item)"
+            @click="onEditType(obj.item)"
             v-if="
-              permissions.includes('update-partner') &&
+              permissions.includes('update-device') &&
                 !obj.item.machine &&
                 !obj.item.deleted_at
             "
@@ -58,10 +57,10 @@
             icon="trash"
             size="2x"
             class="text-danger"
-            @click="onDeletePartner(obj.item)"
+            @click="onDeleteType(obj.item)"
             v-if="
-              permissions.includes('delete-partner') &&
-                obj.item.machines_count == 0 &&
+              permissions.includes('delete-device') &&
+                !obj.item.machine &&
                 !obj.item.deleted_at
             "
           />
@@ -70,17 +69,17 @@
             icon="recycle"
             size="2x"
             class="text-warning"
-            @click="onRestorePartner(obj.item)"
-            v-if="permissions.includes('delete-partner') && obj.item.deleted_at"
+            @click="onRestoreType(obj.item)"
+            v-if="permissions.includes('delete-device') && obj.item.deleted_at"
           />
           &nbsp;
           <font-awesome-icon
             icon="bomb"
             size="2x"
             class="text-danger"
-            @click="onForceDeletePartner(obj.item)"
+            @click="onForceDeleteType(obj.item)"
             v-if="
-              permissions.includes('delete-partner') &&
+              permissions.includes('delete-device') &&
                 obj.item.deleted_at &&
                 obj.item.machine_count == '0'
             "
@@ -99,7 +98,7 @@
 </template>
 
 <script>
-import PageTitle from "../../Layout/Components/PageTitleAdd.vue";
+import PageTitle from "../../../Layout/Components/PageTitleAdd.vue";
 import { mapGetters } from "vuex";
 import axios from "axios";
 
@@ -111,24 +110,24 @@ import {
   faBomb,
 } from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import PartnerForm from "./PartnerForm.vue";
+import TypeForm from "./TypeForm.vue";
 
 library.add(faEdit, faTrash, faRecycle, faBomb);
 
 export default {
-  name: "Partners",
+  name: "Types",
   components: {
     PageTitle,
     "font-awesome-icon": FontAwesomeIcon,
-    PartnerForm,
+    TypeForm,
   },
   data() {
     return {
-      heading: "Administração de Parceiros",
+      heading: "Administração de Tipos de Máquinas",
       subheading: "Verifique os dados antes de executar as ações.",
       icon: "clipboard-list",
-      partners: null,
-      partner_selected: null,
+      types: null,
+      type_selected: null,
       fields: [
         { key: "name", label: "Name" },
         { key: "action", label: "Ações" },
@@ -137,21 +136,21 @@ export default {
       dismissSecs: 10,
       dismissCountDown: 0,
       alertType: "success",
-      alertMessage: "",
+      alertMessage: "Verifique o formulário",
     };
   },
   created() {
     this.reloadDataTable();
   },
   methods: {
-    onEditPartner(partner) {
-      this.partner_selected = partner;
+    onEditType(type) {
+      this.type_selected = type;
       this.showForm = true;
     },
-    onDeletePartner(partner) {
+    onDeleteType(type) {
       this.boxTwo = "";
       this.$bvModal
-        .msgBoxConfirm(`Deseja realmente excluir o parceiro ${partner.name}?`, {
+        .msgBoxConfirm(`Deseja realmente excluir o tipo ${type.name}?`, {
           title: "Confirme a exclusão",
           size: "sm",
           buttonSize: "sm",
@@ -166,7 +165,7 @@ export default {
             const token = localStorage.getItem("token");
             var Options = {
               method: "delete",
-              url: `/api/partner/${partner.id}`,
+              url: `/api/type/${type.id}`,
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-type": "Application/Json",
@@ -175,40 +174,37 @@ export default {
             axios(Options).then((response) => {
               if (response.data) {
                 this.alertType = "success";
-                this.alertMessage = "Parceiro excluido com sucesso.";
+                this.alertMessage = "Tipo excluido com sucesso.";
                 this.dismissCountDown = this.dismissSecs;
                 this.reloadDataTable();
               } else {
                 this.alertType = "danger";
-                this.alertMessage = "Problemas ao excluir o Parceiro!";
+                this.alertMessage = "Problemas ao excluir o tipo!";
                 this.dismissCountDown = this.dismissSecs;
               }
             });
           }
         });
     },
-    onRestorePartner(partner) {
+    onRestoreType(type) {
       this.boxTwo = "";
       this.$bvModal
-        .msgBoxConfirm(
-          `Deseja realmente restaurar o parceiro ${partner.name}?`,
-          {
-            title: "Confirme a Restauração",
-            size: "sm",
-            buttonSize: "sm",
-            okVariant: "success",
-            okTitle: "Sim",
-            cancelTitle: "Não",
-            footerClass: "p-2",
-            hideHeaderClose: false,
-          }
-        )
+        .msgBoxConfirm(`Deseja realmente restaurar o tipo ${type.name}?`, {
+          title: "Confirme a Restauração",
+          size: "sm",
+          buttonSize: "sm",
+          okVariant: "success",
+          okTitle: "Sim",
+          cancelTitle: "Não",
+          footerClass: "p-2",
+          hideHeaderClose: false,
+        })
         .then((confirm) => {
           if (confirm) {
             const token = localStorage.getItem("token");
             var Options = {
               method: "get",
-              url: `/api/partner/restore/${partner.id}`,
+              url: `/api/type/restore/${type.id}`,
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-type": "Application/Json",
@@ -217,7 +213,7 @@ export default {
             axios(Options).then((response) => {
               if (response.data) {
                 this.alertType = "success";
-                this.alertMessage = "Parceiro restaurado com sucesso.";
+                this.alertMessage = "Tipo restaurado com sucesso.";
                 this.dismissCountDown = this.dismissSecs;
                 this.reloadDataTable();
               } else {
@@ -229,28 +225,25 @@ export default {
           }
         });
     },
-    onForceDeletePartner(partner) {
+    onForceDeleteType(type) {
       this.boxTwo = "";
       this.$bvModal
-        .msgBoxConfirm(
-          `Deseja excluir permanentemente o parceiro ${partner.name}?`,
-          {
-            title: "Confirme a Exclusão",
-            size: "sm",
-            buttonSize: "sm",
-            okVariant: "success",
-            okTitle: "Sim",
-            cancelTitle: "Não",
-            footerClass: "p-2",
-            hideHeaderClose: false,
-          }
-        )
+        .msgBoxConfirm(`Deseja excluir permanentemente o tipo ${type.name}?`, {
+          title: "Confirme a Exclusão",
+          size: "sm",
+          buttonSize: "sm",
+          okVariant: "success",
+          okTitle: "Sim",
+          cancelTitle: "Não",
+          footerClass: "p-2",
+          hideHeaderClose: false,
+        })
         .then((confirm) => {
           if (confirm) {
             const token = localStorage.getItem("token");
             var Options = {
               method: "delete",
-              url: `/api/partner/forcedelete/${partner.id}`,
+              url: `/api/type/forcedelete/${type.id}`,
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-type": "Application/Json",
@@ -260,19 +253,19 @@ export default {
               .then((response) => {
                 if (response.data) {
                   this.alertType = "success";
-                  this.alertMessage = "Parceiro excluido permanentemente.";
+                  this.alertMessage = "Tipo excluido permanentemente.";
                   this.dismissCountDown = this.dismissSecs;
                   this.reloadDataTable();
                 } else {
                   this.alertType = "danger";
-                  this.alertMessage = "Problemas ao excluir o parceiro!";
+                  this.alertMessage = "Problemas ao excluir o tipo!";
                   this.dismissCountDown = this.dismissSecs;
                 }
               })
               .catch(() => {
                 this.alertType = "danger";
                 this.alertMessage =
-                  "Problemas ao excluir o parceiro, provavelmente existe uma Máquina vinculada a este parceiro!";
+                  "Problemas ao excluir o tipo, provavelmente existe uma Máquina vinculada a este tipo!";
                 this.dismissCountDown = this.dismissSecs;
               });
           }
@@ -282,32 +275,30 @@ export default {
       this.dismissCountDown = dismissCountDown;
     },
     clearForm() {
-      this.partner_selected = null;
+      this.type_selected = null;
       this.showForm = true;
     },
     reloadDataTable(value) {
       if (value !== undefined && value.status) {
         this.alertType = "warning";
-
-        this.alertMessage = "Verifique o formulário ";
         this.dismissCountDown = this.dismissSecs;
       } else if (value || value === undefined) {
         const token = localStorage.getItem("token");
         var Options = {
           method: "get",
-          url: "/api/partner/",
+          url: "/api/type/",
           headers: {
             Authorization: `Bearer ${token}`,
           },
         };
         axios(Options).then((response) => {
-          this.partners = response.data;
+          this.types = response.data;
         });
       }
 
       if (value === true) {
         this.alertType = "success";
-        this.alertMessage = `Parceiro inserido/editado com sucesso.`;
+        this.alertMessage = `Tipo inserido/editado com sucesso.`;
         this.dismissCountDown = this.dismissSecs;
       }
     },
@@ -315,7 +306,7 @@ export default {
   computed: {
     ...mapGetters(["permissions"]),
     loadingTableResult() {
-      return this.partners == null;
+      return this.types == null;
     },
   },
 };

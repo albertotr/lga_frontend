@@ -2,19 +2,19 @@ import Vue from "vue";
 import Router from "vue-router";
 import store from "../store";
 
-import Users from "../Pages/Admin/Users";
+import Users from "../Pages/Admin/User/Users";
 import Machines from "../Pages/Admin/Machine/Machines";
 import Logs from "../Pages/Admin/Log";
 import PageNotFound from "../Pages/UserPages/404";
 import PageNotPermited from "../Pages/UserPages/403";
 import ManageMachines from "../Pages/Manager/Machine/Machines";
 import ManageMessages from "../Pages/Manager/Messages/Messages";
-import Devices from "../Pages/Admin/Devices";
-import Types from "../Pages/Admin/Types";
-import Samples from "../Pages/Admin/Samples";
-import Partners from "../Pages/Admin/Partners";
-import Operators from "../Pages/Admin/Operators";
-import Locations from "../Pages/Admin/Locations";
+import Devices from "../Pages/Admin/Device/Devices";
+import Types from "../Pages/Admin/Type/Types";
+import Samples from "../Pages/Admin/Sample/Samples";
+import Partners from "../Pages/Admin/Partner/Partners";
+import Operators from "../Pages/Admin/Operator/Operators";
+import Locations from "../Pages/Admin/Location/Locations";
 
 Vue.use(Router);
 

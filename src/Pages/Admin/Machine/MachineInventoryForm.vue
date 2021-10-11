@@ -40,26 +40,36 @@
           :busy="loadingTableResult"
           responsive="sm"
         >
+          <template #cell(pivot.price)="obj">
+            {{ obj.item.pivot.price | currency }}
+          </template>
+
           <template #cell(action)="obj">
             <div class="row">
               <font-awesome-icon
                 icon="plus-circle"
                 size="2x"
-                class="col text-info"
+                class="col text-success"
                 @click="onIncrease(obj.item)"
               />
               <font-awesome-icon
                 icon="minus-circle"
                 size="2x"
-                class="col text-info"
+                class="col text-danger"
                 @click="onDecrease(obj.item)"
                 v-if="obj.item.pivot.quantity > 0"
               />
               <font-awesome-icon
                 icon="minus-circle"
                 size="2x"
-                class="col text-light"
+                class="col buttonDisabled"
                 v-else
+              />
+              <font-awesome-icon
+                icon="edit"
+                size="2x"
+                class="col text-info"
+                @click="onEdit(obj.item)"
               />
             </div>
           </template>
@@ -137,6 +147,50 @@
         </div>
       </template>
     </b-modal>
+
+    <b-modal id="editItemModal" title="Editar Item">
+      <div class="row" v-if="selectedItem">
+        <div class="col-md-6">
+          <div class="position-relative form-group">
+            <label for="labelFormCode" class="">Cogido da mensagem</label
+            ><input
+              name="code"
+              id="formCode"
+              placeholder="Codigo do Item na mensagem"
+              type="text"
+              class="form-control"
+              v-model="selectedItem.pivot.code"
+            />
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="position-relative form-group">
+            <label for="labelFormRent" class="">Aluguel</label>
+            <money
+              class="form-control"
+              v-model="selectedItem.pivot.price"
+              v-bind="money"
+            ></money>
+          </div>
+        </div>
+        <div class="col-md-12" v-if="editMsg">
+          <b-alert variant="warning" show>{{ editMsg }}</b-alert>
+        </div>
+      </div>
+
+      <template #modal-footer>
+        <div class="w-100">
+          <b-button-group>
+            <button class="btn btn-primary" @click.stop="onUpdate()">
+              Salvar
+            </button>
+            <button class="btn btn-danger" @click.stop="onCancelUpdate()">
+              Cancelar
+            </button>
+          </b-button-group>
+        </div>
+      </template>
+    </b-modal>
   </div>
 </template>
 
@@ -147,9 +201,10 @@ import {
   faPlusCircle,
   faMinusCircle,
   faRecycle,
+  faEdit,
 } from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
-library.add(faPlusCircle, faMinusCircle, faRecycle);
+library.add(faPlusCircle, faMinusCircle, faRecycle, faEdit);
 export default {
   name: "MachineInventory",
   components: { FontAwesomeIcon },
@@ -161,6 +216,8 @@ export default {
       fields: [
         { key: "name", label: "Nome" },
         { key: "pivot.quantity", label: "estoque" },
+        { key: "pivot.code", label: "codigo" },
+        { key: "pivot.price", label: "preço" },
         { key: "action", label: "Ações" },
       ],
       action: null,
@@ -175,7 +232,20 @@ export default {
       alertType: "warning",
       alertMessage: "",
 
+      selectedItem: null,
+      originalItem: null,
+
       availableItems: [],
+
+      money: {
+        decimal: ",",
+        thousands: ".",
+        prefix: "R$ ",
+        precision: 2,
+        masked: false,
+      },
+
+      editMsg: null,
     };
   },
   computed: {
@@ -199,6 +269,48 @@ export default {
       this.action = `Retirar ${item.name}`;
       this.actionMaxValue = item.pivot.quantity;
       this.$bvModal.show("exchangeModal");
+    },
+    onEdit(item) {
+      this.selectedItem = item;
+      this.originalItem = Object.assign({}, item.pivot);
+      this.editMsg = null;
+      this.$bvModal.show("editItemModal");
+    },
+    onUpdate() {
+      if (
+        this.selectedItem.pivot.code == "C0" ||
+        this.selectedItem.pivot.code == "C1"
+      ) {
+        this.editMsg =
+          "O valor C0 ou C1, são valores reservados e não podem ser utilizados no código";
+        this.selectedItem.pivot.code = this.originalItem.code;
+        this.selectedItem.pivot.price = this.originalItem.price;
+        return false;
+      }
+
+      var Options = {
+        method: "POST",
+        url: `/api/inventory/item`,
+        data: {
+          item: this.selectedItem,
+        },
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+        },
+      };
+      axios(Options)
+        .then(() => {
+          this.$bvModal.hide("editItemModal");
+        })
+        .catch((msg) => {
+          this.alertMessage = msg.response.data;
+          this.dismissCountDown = this.dismissSecs;
+        });
+    },
+    onCancelUpdate() {
+      this.selectedItem.pivot.code = this.originalItem.code;
+      this.selectedItem.pivot.price = this.originalItem.price;
+      this.$bvModal.hide("editItemModal");
     },
     onExchange() {
       this.actionValue = this.actionValue * this.multiplier;
@@ -282,13 +394,32 @@ export default {
   created() {
     this.loadAvaliableItems();
   },
+  filters: {
+    currency(value) {
+      if (typeof value !== "number") {
+        return value;
+      }
+      var formatter = new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+        minimumFractionDigits: 0,
+      });
+      return formatter.format(value);
+    },
+  },
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .modal-body {
   height: 100px;
   overflow: scroll;
   background-color: red;
+}
+.buttonDisabled {
+  color: gray;
+}
+.buttonMinusCircle {
+  color: red;
 }
 </style>
