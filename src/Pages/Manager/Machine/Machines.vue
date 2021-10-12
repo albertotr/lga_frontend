@@ -22,8 +22,7 @@
       :showForm.sync="showForm"
     ></page-title>
     <div class="content">
-
-     <messages
+      <messages
         :machine="machine_selected"
         :messages="machine_messages"
         v-if="showForm"
@@ -39,6 +38,14 @@
         responsive="sm"
         v-show="!showForm"
       >
+        <template #cell(balance)="obj">
+          {{ obj.item.balance | currency }}
+        </template>
+
+        <template #cell(total_balance)="obj">
+          {{ obj.item.total_balance | currency }}
+        </template>
+
         <template #cell(action)="obj">
           <font-awesome-icon
             icon="list-alt"
@@ -93,8 +100,8 @@ export default {
         { key: "type.name", label: "Tipo" },
         { key: "sample.name", label: "Modelo" },
         { key: "device.mac", label: "MAC" },
-        { key: "partner.name", label: "Cliente" },
-        { key: "sample.slot", label: "Slot" },
+        { key: "balance", label: "Saldo" },
+        { key: "total_balance", label: "Saldo Bruto" },
         { key: "action", label: "Ações" },
       ],
       showForm: false,
@@ -147,6 +154,16 @@ export default {
     ...mapGetters(["permissions"]),
     loadingTableResult() {
       return this.machines == null;
+    },
+  },
+  filters: {
+    currency(value) {
+      var formatter = new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+        minimumFractionDigits: 0,
+      });
+      return formatter.format(value);
     },
   },
 };
