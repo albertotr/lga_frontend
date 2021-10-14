@@ -18,18 +18,18 @@
     <div class="main-card mb-3 card">
       <div class="card-body">
         <h5 class="card-title">
-          Operadores
+          Colaboradores
         </h5>
         <div class="row" style="margin-bottom:10px">
           <div class="col">
             <b-button squared variant="primary" @click="openAddOperatorModal()"
               ><font-awesome-icon icon="plus-circle" size="1x" /> Adicionar
-              Operador</b-button
+              Colaborador</b-button
             >
           </div>
         </div>
         <b-table
-          :items="machine.operators"
+          :items="manager.contributors"
           :fields="fields"
           striped
           bordered
@@ -68,12 +68,12 @@
         <b-form-group
           label="Nome do Operador"
           label-for="id"
-          :state="operatorState"
+          :state="contributorState"
         >
           <b-form-select
-            v-model="operator.id"
-            :options="optionOperators"
-            :state="operatorState"
+            v-model="contributor.id"
+            :options="optionContributors"
+            :state="contributorState"
             required
           ></b-form-select>
           <b-form-invalid-feedback :state="invalidOperatorValue">
@@ -97,12 +97,12 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 library.add(faLink, faUnlink, faExclamationCircle);
 
 export default {
-  name: "MachineOperator",
+  name: "Contributors",
   components: {
     "font-awesome-icon": FontAwesomeIcon,
   },
   props: {
-    machine: Object,
+    manager: Object,
   },
   data() {
     return {
@@ -112,10 +112,10 @@ export default {
         { key: "action", label: "Ações" },
       ],
 
-      operator: {
+      contributor: {
         id: "",
       },
-      operatorState: null,
+      contributorState: null,
 
       dismissSecs: 10,
       dismissCountDown: 0,
@@ -126,43 +126,47 @@ export default {
       validOperatorMessage: "",
       invalidOperatorValue: false,
 
-      operators: [],
+      contributors: [],
       token: null,
     };
   },
   computed: {
     loadingTableResult() {
-      return this.machine == null;
+      return this.manager == null;
     },
     loadingTableOperatorResult() {
-      return this.operators == null;
+      return this.contributors == null;
     },
-    optionOperators() {
-      var listOperators = this.operators.map((operator) => {
-        return { value: operator.id, text: operator.name };
+    optionContributors() {
+      var listContributors = this.contributors.filter((contributor) => {
+        return contributor.id !== this.manager.id;
       });
-      return listOperators;
+
+      listContributors = listContributors.map((contributor) => {
+        return { value: contributor.id, text: contributor.name };
+      });
+      return listContributors;
     },
   },
   methods: {
     checkFormValidity() {
       this.invalidOperatorValue = false;
-      this.operatorState = true;
+      this.contributorState = true;
       this.validOperatorsMessage = "";
 
       const valid = this.$refs.form.checkValidity();
       this.state = valid;
 
-      if (!this.operator.id) {
-        this.validOperatorMessage = "O valor nome é obrigatório.";
-        this.operatorState = false;
+      if (!this.contributor.id) {
+        this.validOperatorMessage = "Selecione um colaborador.";
+        this.contributorState = false;
       }
 
       return valid;
     },
     resetModal() {
-      this.operator.id = "";
-      this.operatorState = null;
+      this.contributor.id = "";
+      this.contributorState = null;
     },
     handleOk(bvModalEvt) {
       // Prevent modal from closing
@@ -176,41 +180,36 @@ export default {
         return;
       }
 
-      let pivot = new Object();
-      pivot.machine_id = this.machine.id;
-      pivot.operator_id = this.operator.id;
-
-      let newOperator = this.operators.filter((operator) => {
-        return operator.id == this.operator.id;
+      let newContributor = this.contributors.filter((contributor) => {
+        return contributor.id == this.contributor.id;
       });
-      newOperator = newOperator[0];
+      newContributor = newContributor[0];
 
       let method = "POST";
 
       var Options = {
         method: method,
-        url: "/api/machine/attachoperator",
-        data: pivot,
+        url: `/api/operator/attachcontributor/${this.manager.id}`,
+        data: newContributor,
         headers: {
           Authorization: `Bearer ${this.token}`,
         },
       };
       axios(Options)
         .then(() => {
-          newOperator.pivot = pivot;
-          this.machine.operators.push(newOperator);
+          this.manager.contributors.push(newContributor);
 
-          this.operator.id = null;
+          this.contributor.id = null;
 
-          this.invalidOperatorValue = false;
-          this.operatorState = null;
-          this.validOperatorMessage = "";
+          this.invalidContributorValue = false;
+          this.contributor.State = null;
+          this.validContributorMessage = "";
+          this.$emit("updateDataTable", true);
         })
         .catch((msg) => {
           this.alertMessage = msg.response.data;
           this.dismissCountDown = this.dismissSecs;
         });
-
       // Hide the modal manually
       this.$nextTick(() => {
         this.$bvModal.hide("attachOperatorModal");
@@ -219,11 +218,11 @@ export default {
       return false;
     },
 
-    onOperatorDetach(operator) {
+    onOperatorDetach(contributor) {
       this.boxTwo = "";
       this.$bvModal
         .msgBoxConfirm(
-          `Deseja realmente desvincular o operador ${operator.name}?`,
+          `Deseja realmente desvincular o Colaborador ${contributor.name}?`,
           {
             title: "Confirmar",
             size: "sm",
@@ -237,28 +236,21 @@ export default {
         )
         .then((confirm) => {
           if (confirm) {
-            let pivot = new Object();
-            pivot.machine_id = this.machine.id;
-            pivot.operator_id = operator.id;
-
-            let method = "POST";
-
             var Options = {
-              method: method,
-              url: "/api/machine/detachoperator",
-              data: pivot,
+              method: "POST",
+              url: `/api/operator/detachcontributor/${this.manager.id}`,
+              data: contributor,
               headers: {
                 Authorization: `Bearer ${this.token}`,
               },
             };
             axios(Options)
               .then(() => {
-                delete operator.pivot;
-                this.operators.push(operator);
-                this.machine.operators.splice(
-                  this.machine.operators.indexOf(operator),
+                this.manager.contributors.splice(
+                  this.manager.contributors.indexOf(contributor),
                   1
                 );
+                this.$emit("updateDataTable", true);
               })
               .catch((msg) => {
                 this.alertMessage = msg.response.data;
@@ -273,15 +265,15 @@ export default {
     },
 
     openAddOperatorModal() {
-      var OptionsOperator = {
+      var OptionsContributors = {
         method: "get",
-        url: `/api/operator/available/${this.machine.id}`,
+        url: `/api/operator/contributors`,
         headers: {
           Authorization: `Bearer ${this.token}`,
         },
       };
-      axios(OptionsOperator).then((response) => {
-        this.operators = response.data;
+      axios(OptionsContributors).then((response) => {
+        this.contributors = response.data;
       });
       this.$bvModal.show("attachOperatorModal");
     },

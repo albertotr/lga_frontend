@@ -43,6 +43,14 @@
         responsive="sm"
         v-show="!showForm"
       >
+        <template #cell(balance)="obj">
+          {{ obj.item.balance | currency }}
+        </template>
+
+        <template #cell(total_balance)="obj">
+          {{ obj.item.total_balance | currency }}
+        </template>
+        
         <template #cell(action)="obj">
           <font-awesome-icon
             icon="edit"
@@ -102,8 +110,10 @@ export default {
         { key: "serial", label: "Serial" },
         { key: "type.name", label: "Tipo" },
         { key: "sample.name", label: "Modelo" },
-        { key: "device.mac", label: "MAC" },
         { key: "sample.slot", label: "Slot" },
+        { key: "device.mac", label: "MAC" },
+        { key: "total_balance", label: "Saldo Total" },
+        { key: "balance", label: "Saldo" },
         { key: "action", label: "Ações" },
       ],
       showForm: false,
@@ -200,6 +210,16 @@ export default {
     ...mapGetters(["permissions"]),
     loadingTableResult() {
       return this.machines == null;
+    },
+  },
+  filters: {
+    currency(value) {
+      var formatter = new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+        minimumFractionDigits: 0,
+      });
+      return formatter.format(value);
     },
   },
 };
