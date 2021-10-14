@@ -20,6 +20,18 @@
         <h5 class="card-title">
           Parceiros
         </h5>
+        <div class="row" style="margin-bottom:10px">
+          <div class="col">
+            <b-button
+              squared
+              variant="primary"
+              @click="openAddPartnerModal()"
+              v-if="totalParticipation"
+              ><font-awesome-icon icon="plus-circle" size="1x" /> Adicionar
+              Parceiro</b-button
+            >
+          </div>
+        </div>
         <b-table
           :items="machine.partners"
           :fields="fields"
@@ -45,34 +57,6 @@
             </div>
           </template>
         </b-table>
-
-        <h5>Parceiros Disponiveis</h5>
-        <b-table
-          :items="partners"
-          :fields="fieldsPartner"
-          striped
-          bordered
-          hover
-          :busy="loadingTablePartnerResult"
-          responsive="sm"
-        >
-          <template #cell(action)="obj">
-            <font-awesome-icon
-              icon="link"
-              size="2x"
-              class="text-info"
-              @click="onPartnerAttach(obj.item)"
-              v-b-modal.informParticipation
-            />
-          </template>
-
-          <template #table-busy>
-            <div class="text-center text-danger my-2">
-              <b-spinner class="align-middle"></b-spinner>
-              <strong>Carregando...</strong>
-            </div>
-          </template>
-        </b-table>
       </div>
     </div>
 
@@ -86,13 +70,28 @@
     >
       <form ref="form" @submit.stop.prevent="handleSubmit">
         <b-form-group
+          label="Nome do Parceiro"
+          label-for="id"
+          :state="partnerState"
+        >
+          <b-form-select
+            v-model="partner.id"
+            :options="optionPartners"
+            :state="partnerState"
+            required
+          ></b-form-select>
+          <b-form-invalid-feedback :state="invalidPartnerValue">
+            {{ validPartnerMessage }}
+          </b-form-invalid-feedback>
+        </b-form-group>
+        <b-form-group
           label="Participação"
           label-for="participation"
           :state="participationState"
         >
           <b-form-input
             id="participation-input"
-            v-model="participation"
+            v-model="partner.participation"
             :state="participationState"
             type="number"
             step="0.01"
@@ -100,7 +99,7 @@
             max="100.00"
             required
           ></b-form-input>
-          <b-form-invalid-feedback :state="invalidValue">
+          <b-form-invalid-feedback :state="invalidParticipationValue">
             {{ validParticipationMessage }}
           </b-form-invalid-feedback>
         </b-form-group>
@@ -112,7 +111,11 @@
 <script>
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { faLink, faUnlink, faExclamationCircle } from "@fortawesome/free-solid-svg-icons";
+import {
+  faLink,
+  faUnlink,
+  faExclamationCircle,
+} from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
 library.add(faLink, faUnlink, faExclamationCircle);
 
@@ -123,7 +126,6 @@ export default {
   },
   props: {
     machine: Object,
-    partners: [],
   },
   data() {
     return {
@@ -134,21 +136,26 @@ export default {
         { key: "action", label: "Ações" },
       ],
 
-      fieldsPartner: [
-        { key: "name", label: "Nome" },
-        { key: "cpf_cnpj", label: "CPF/CNPJ" },
-        { key: "action", label: "Ações" },
-      ],
-      participation: "",
+      partner: {
+        id: "",
+        participation: "",
+      },
       participationState: null,
-      submittedNames: [],
-      selectedPartnerAdd: null,
+      partnerState: null,
+
       dismissSecs: 10,
       dismissCountDown: 0,
       alertType: "warning",
       alertMessage: "",
+
+      state: null,
       validParticipationMessage: "",
-      invalidValue: false,
+      validPartnerMessage: "",
+      invalidPartnerValue: false,
+      invalidParticipationValue: false,
+
+      partners: [],
+      token: null,
     };
   },
   computed: {
@@ -158,27 +165,61 @@ export default {
     loadingTablePartnerResult() {
       return this.partners == null;
     },
+    totalParticipation() {
+      var totalParticipation = 0;
+      this.machine.partners.forEach((machinePartner) => {
+        totalParticipation += parseFloat(machinePartner.pivot.participation);
+      });
+      return totalParticipation < 100;
+    },
+    optionPartners() {
+      var listPartners = this.partners.map((partner) => {
+        return { value: partner.id, text: partner.name };
+      });
+      return listPartners;
+    },
   },
   methods: {
     checkFormValidity() {
+      this.invalidPartnerValue = false;
+      this.partnerState = true;
+      this.validPartnerMessage = "";
+
+      this.invalidParticipationValue = false;
+      this.participationState = true;
+      this.validParticipationMessage = "";
+
       const valid = this.$refs.form.checkValidity();
-      this.participationState = valid;
+      this.state = valid;
 
       if (valid) {
+        let errors = 0;
         let percentage = 0;
         this.machine.partners.forEach((partner) => {
           percentage += parseFloat(partner.pivot.participation);
         });
 
-        percentage += parseFloat(this.participation);
+        percentage += parseFloat(this.partner.participation);
 
-        this.validParticipationMessage =
-          "Com este valor, é superado os 100% de participação.";
-        this.validation = true;
-        return 100 >= percentage;
+        if (percentage > 100) {
+          this.invalidParticipationValue = true;
+          this.validParticipationMessage =
+            "Com este valor, é superado os 100% de participação.";
+          this.participationState = false;
+          errors++;
+        }
+
+        if (errors > 0) return false;
       } else {
-        this.validParticipationMessage = "O valor precisa ser entre 0 e 100.";
-        this.validation = true;
+        if (!this.partner.participation || this.partner.participation > 100) {
+          this.validParticipationMessage = "O valor precisa ser entre 0 e 100.";
+          this.participationState = false;
+        }
+
+        if (!this.partner.id) {
+          this.validPartnerMessage = "O valor nome é obrigatório.";
+          this.partnerState = false;
+        }
       }
 
       return valid;
@@ -201,8 +242,13 @@ export default {
 
       let pivot = new Object();
       pivot.machine_id = this.machine.id;
-      pivot.partner_id = this.selectedPartnerAdd.id;
-      pivot.participation = this.participation;
+      pivot.partner_id = this.partner.id;
+      pivot.participation = this.partner.participation;
+
+      let newPartner = this.partners.filter((partner) => {
+        return partner.id == this.partner.id;
+      });
+      newPartner = newPartner[0];
 
       const token = localStorage.getItem("token");
       let method = "POST";
@@ -217,17 +263,20 @@ export default {
       };
       axios(Options)
         .then(() => {
-          this.selectedPartnerAdd.pivot = pivot;
-          this.machine.partners.push(this.selectedPartnerAdd);
+          newPartner.pivot = pivot;
+          this.machine.partners.push(newPartner);
           --this.machine.partners_count;
 
-          this.partners.splice(
-            this.partners.indexOf(this.selectedPartnerAdd),
-            1
-          );
+          this.partner.id = null;
+          this.partner.participation  = null;
 
+          this.invalidPartnerValue = false;
+          this.partnerState = null;
+          this.validPartnerMessage = "";
+
+          this.invalidParticipationValue = false;
+          this.participationState = null;
           this.validParticipationMessage = "";
-          this.validation = false;
         })
         .catch((msg) => {
           this.alertMessage = msg.response.data;
@@ -240,9 +289,6 @@ export default {
       });
 
       return false;
-    },
-    onPartnerAttach(partner) {
-      this.selectedPartnerAdd = partner;
     },
 
     onPartnerDetach(partner) {
@@ -267,7 +313,6 @@ export default {
             pivot.machine_id = this.machine.id;
             pivot.partner_id = partner.id;
 
-            const token = localStorage.getItem("token");
             let method = "POST";
 
             var Options = {
@@ -275,7 +320,7 @@ export default {
               url: "/api/machine/detachpartner",
               data: pivot,
               headers: {
-                Authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${this.token}`,
               },
             };
             axios(Options)
@@ -299,6 +344,23 @@ export default {
     countDownChanged(dismissCountDown) {
       this.dismissCountDown = dismissCountDown;
     },
+
+    openAddPartnerModal() {
+      var OptionsPartner = {
+        method: "get",
+        url: `/api/partner/available/${this.machine.id}`,
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+        },
+      };
+      axios(OptionsPartner).then((response) => {
+        this.partners = response.data;
+      });
+      this.$bvModal.show("informParticipation");
+    },
+  },
+  created() {
+    this.token = localStorage.getItem("token");
   },
 };
 </script>

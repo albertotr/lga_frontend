@@ -24,15 +24,15 @@
       @updateDataTable="reloadDataTable"
     ></page-title>
     <div class="content">
-      <device-form
+      <partner-form
         :showForm.sync="showForm"
-        :device="device_selected"
+        :partner="partner_selected"
         @updateDataTable="reloadDataTable"
         v-if="showForm"
-      ></device-form>
+      ></partner-form>
 
       <b-table
-        :items="devices"
+        :items="partners"
         :fields="fields"
         striped
         bordered
@@ -46,9 +46,9 @@
             icon="edit"
             size="2x"
             class="text-info"
-            @click="onEditDevice(obj.item)"
+            @click="onEditPartner(obj.item)"
             v-if="
-              permissions.includes('update-device') &&
+              permissions.includes('update-partner') &&
                 !obj.item.machine &&
                 !obj.item.deleted_at
             "
@@ -58,31 +58,31 @@
             icon="trash"
             size="2x"
             class="text-danger"
-            @click="onDeleteDevice(obj.item)"
+            @click="onDeletePartner(obj.item)"
             v-if="
-              permissions.includes('delete-device') &&
-                !obj.item.machine &&
+              permissions.includes('delete-partner') &&
+                obj.item.machines_count == 0 &&
                 !obj.item.deleted_at
             "
           />
-          &nbsp;
+
           <font-awesome-icon
             icon="recycle"
             size="2x"
             class="text-warning"
-            @click="onRestoreDevice(obj.item)"
-            v-if="permissions.includes('delete-device') && obj.item.deleted_at"
+            @click="onRestorePartner(obj.item)"
+            v-if="permissions.includes('delete-partner') && obj.item.deleted_at"
           />
           &nbsp;
           <font-awesome-icon
             icon="bomb"
             size="2x"
             class="text-danger"
-            @click="onForceDeleteType(obj.item)"
+            @click="onForceDeletePartner(obj.item)"
             v-if="
-              permissions.includes('delete-device') &&
+              permissions.includes('delete-partner') &&
                 obj.item.deleted_at &&
-                !obj.item.machine
+                obj.item.machine_count == '0'
             "
           />
         </template>
@@ -99,73 +99,74 @@
 </template>
 
 <script>
-import PageTitle from "../../Layout/Components/PageTitleAdd.vue";
+import PageTitle from "../../../Layout/Components/PageTitleAdd.vue";
 import { mapGetters } from "vuex";
 import axios from "axios";
 
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { faEdit, faTrash, faRecycle, faBomb } from "@fortawesome/free-solid-svg-icons";
+import {
+  faEdit,
+  faTrash,
+  faRecycle,
+  faBomb,
+} from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import DeviceForm from "./DeviceForm.vue";
+import PartnerForm from "../Partner/PartnerForm.vue";
 
 library.add(faEdit, faTrash, faRecycle, faBomb);
 
 export default {
-  name: "Devices",
+  name: "Partners",
   components: {
     PageTitle,
     "font-awesome-icon": FontAwesomeIcon,
-    DeviceForm,
+    PartnerForm,
   },
   data() {
     return {
-      heading: "Administração de Dispositivos",
+      heading: "Administração de Parceiros",
       subheading: "Verifique os dados antes de executar as ações.",
-      icon: "cogs",
-      devices: null,
-      device_selected: null,
+      icon: "clipboard-list",
+      partners: null,
+      partner_selected: null,
       fields: [
-        { key: "mac", label: "MAC" },
-        { key: "machine.serial", label: "Maquina (serial)" },
+        { key: "name", label: "Name" },
         { key: "action", label: "Ações" },
       ],
       showForm: false,
       dismissSecs: 10,
       dismissCountDown: 0,
       alertType: "success",
-      alertMessage: "Verifique o formulário",
+      alertMessage: "",
     };
   },
   created() {
     this.reloadDataTable();
   },
   methods: {
-    onEditDevice(device) {
-      this.device_selected = device;
+    onEditPartner(partner) {
+      this.partner_selected = partner;
       this.showForm = true;
     },
-    onDeleteDevice(device) {
+    onDeletePartner(partner) {
       this.boxTwo = "";
       this.$bvModal
-        .msgBoxConfirm(
-          `Deseja realmente excluir o dispositivo de MAC ${device.mac}?`,
-          {
-            title: "Confirme a exclusão",
-            size: "sm",
-            buttonSize: "sm",
-            okVariant: "success",
-            okTitle: "Sim",
-            cancelTitle: "Não",
-            footerClass: "p-2",
-            hideHeaderClose: false,
-          }
-        )
+        .msgBoxConfirm(`Deseja realmente excluir o parceiro ${partner.name}?`, {
+          title: "Confirme a exclusão",
+          size: "sm",
+          buttonSize: "sm",
+          okVariant: "success",
+          okTitle: "Sim",
+          cancelTitle: "Não",
+          footerClass: "p-2",
+          hideHeaderClose: false,
+        })
         .then((confirm) => {
           if (confirm) {
             const token = localStorage.getItem("token");
             var Options = {
               method: "delete",
-              url: `/api/device/${device.id}`,
+              url: `/api/partner/${partner.id}`,
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-type": "Application/Json",
@@ -174,23 +175,23 @@ export default {
             axios(Options).then((response) => {
               if (response.data) {
                 this.alertType = "success";
-                this.alertMessage = "Dispositivo excluido com sucesso.";
+                this.alertMessage = "Parceiro excluido com sucesso.";
                 this.dismissCountDown = this.dismissSecs;
                 this.reloadDataTable();
               } else {
                 this.alertType = "danger";
-                this.alertMessage = "Problemas ao excluir o Dispositivo!";
+                this.alertMessage = "Problemas ao excluir o Parceiro!";
                 this.dismissCountDown = this.dismissSecs;
               }
             });
           }
         });
     },
-    onRestoreDevice(device) {
+    onRestorePartner(partner) {
       this.boxTwo = "";
       this.$bvModal
         .msgBoxConfirm(
-          `Deseja realmente restaurar o dispositivo de MAC ${device.mac}?`,
+          `Deseja realmente restaurar o parceiro ${partner.name}?`,
           {
             title: "Confirme a Restauração",
             size: "sm",
@@ -207,7 +208,7 @@ export default {
             const token = localStorage.getItem("token");
             var Options = {
               method: "get",
-              url: `/api/device/restore/${device.id}`,
+              url: `/api/partner/restore/${partner.id}`,
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-type": "Application/Json",
@@ -216,68 +217,40 @@ export default {
             axios(Options).then((response) => {
               if (response.data) {
                 this.alertType = "success";
-                this.alertMessage = "Dispositivo restaurado com sucesso.";
+                this.alertMessage = "Parceiro restaurado com sucesso.";
                 this.dismissCountDown = this.dismissSecs;
                 this.reloadDataTable();
               } else {
                 this.alertType = "danger";
-                this.alertMessage = "Problemas ao restaurar o Dispositivo!";
+                this.alertMessage = "Problemas ao restaurar o tipo!";
                 this.dismissCountDown = this.dismissSecs;
               }
             });
           }
         });
     },
-    countDownChanged(dismissCountDown) {
-      this.dismissCountDown = dismissCountDown;
-    },
-    clearForm() {
-      this.device_selected = null;
-      this.showForm = true;
-    },
-    reloadDataTable(value) {
-      if (value !== undefined && value.status) {
-        this.alertType = "warning";
-        this.dismissCountDown = this.dismissSecs;
-      } else if (value || value === undefined) {
-        const token = localStorage.getItem("token");
-        var Options = {
-          method: "get",
-          url: "/api/device/",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        };
-        axios(Options).then((response) => {
-          this.devices = response.data;
-        });
-      }
-
-      if (value === true) {
-        this.alertType = "success";
-        this.alertMessage = `Dispositivo inserido/editado com sucesso.`;
-        this.dismissCountDown = this.dismissSecs;
-      }
-    },
-    onForceDeleteType(device) {
+    onForceDeletePartner(partner) {
       this.boxTwo = "";
       this.$bvModal
-        .msgBoxConfirm(`Deseja excluir permanentemente o dispositimo ${device.mac}?`, {
-          title: "Confirme a Exclusão",
-          size: "sm",
-          buttonSize: "sm",
-          okVariant: "success",
-          okTitle: "Sim",
-          cancelTitle: "Não",
-          footerClass: "p-2",
-          hideHeaderClose: false,
-        })
+        .msgBoxConfirm(
+          `Deseja excluir permanentemente o parceiro ${partner.name}?`,
+          {
+            title: "Confirme a Exclusão",
+            size: "sm",
+            buttonSize: "sm",
+            okVariant: "success",
+            okTitle: "Sim",
+            cancelTitle: "Não",
+            footerClass: "p-2",
+            hideHeaderClose: false,
+          }
+        )
         .then((confirm) => {
           if (confirm) {
             const token = localStorage.getItem("token");
             var Options = {
               method: "delete",
-              url: `/api/device/forcedelete/${device.id}`,
+              url: `/api/partner/forcedelete/${partner.id}`,
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-type": "Application/Json",
@@ -287,29 +260,62 @@ export default {
               .then((response) => {
                 if (response.data) {
                   this.alertType = "success";
-                  this.alertMessage = "Dispositivo excluido permanentemente.";
+                  this.alertMessage = "Parceiro excluido permanentemente.";
                   this.dismissCountDown = this.dismissSecs;
                   this.reloadDataTable();
                 } else {
                   this.alertType = "danger";
-                  this.alertMessage = "Problemas ao excluir o Dispositivo!";
+                  this.alertMessage = "Problemas ao excluir o parceiro!";
                   this.dismissCountDown = this.dismissSecs;
                 }
               })
               .catch(() => {
                 this.alertType = "danger";
                 this.alertMessage =
-                  "Problemas ao excluir o tipo, provavelmente existe uma Máquina vinculada a este Dispositivo!";
+                  "Problemas ao excluir o parceiro, provavelmente existe uma Máquina vinculada a este parceiro!";
                 this.dismissCountDown = this.dismissSecs;
               });
           }
         });
-    }
+    },
+    countDownChanged(dismissCountDown) {
+      this.dismissCountDown = dismissCountDown;
+    },
+    clearForm() {
+      this.partner_selected = null;
+      this.showForm = true;
+    },
+    reloadDataTable(value) {
+      if (value !== undefined && value.status) {
+        this.alertType = "warning";
+
+        this.alertMessage = "Verifique o formulário ";
+        this.dismissCountDown = this.dismissSecs;
+      } else if (value || value === undefined) {
+        const token = localStorage.getItem("token");
+        var Options = {
+          method: "get",
+          url: "/api/partner/",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        };
+        axios(Options).then((response) => {
+          this.partners = response.data;
+        });
+      }
+
+      if (value === true) {
+        this.alertType = "success";
+        this.alertMessage = `Parceiro inserido/editado com sucesso.`;
+        this.dismissCountDown = this.dismissSecs;
+      }
+    },
   },
   computed: {
     ...mapGetters(["permissions"]),
     loadingTableResult() {
-      return this.devices == null;
+      return this.partners == null;
     },
   },
 };

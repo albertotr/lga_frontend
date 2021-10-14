@@ -21,17 +21,18 @@
       :icon="icon"
       @clearForm="clearForm"
       :showForm.sync="showForm"
+      @updateDataTable="reloadDataTable"
     ></page-title>
     <div class="content">
-      <sample-form
+      <location-form
         :showForm.sync="showForm"
-        :sample="sample_selected"
+        :location="location_selected"
         @updateDataTable="reloadDataTable"
         v-if="showForm"
-      ></sample-form>
+      ></location-form>
 
       <b-table
-        :items="samples"
+        :items="locations"
         :fields="fields"
         striped
         bordered
@@ -45,9 +46,9 @@
             icon="edit"
             size="2x"
             class="text-info"
-            @click="onEditSample(obj.item)"
+            @click="onEditLocations(obj.item)"
             v-if="
-              permissions.includes('update-device') &&
+              permissions.includes('update-location') &&
                 !obj.item.machine &&
                 !obj.item.deleted_at
             "
@@ -57,10 +58,10 @@
             icon="trash"
             size="2x"
             class="text-danger"
-            @click="onDeleteSample(obj.item)"
+            @click="onDeleteLocations(obj.item)"
             v-if="
-              permissions.includes('delete-device') &&
-                !obj.item.machine &&
+              permissions.includes('delete-location') &&
+                obj.item.machines_count == 0 &&
                 !obj.item.deleted_at
             "
           />
@@ -69,19 +70,19 @@
             icon="recycle"
             size="2x"
             class="text-warning"
-            @click="onRestoreSample(obj.item)"
-            v-if="permissions.includes('delete-device') && obj.item.deleted_at"
+            @click="onRestoreLocations(obj.item)"
+            v-if="permissions.includes('delete-location') && obj.item.deleted_at"
           />
           &nbsp;
           <font-awesome-icon
             icon="bomb"
             size="2x"
             class="text-danger"
-            @click="onForceDeleteSample(obj.item)"
+            @click="onForceDeleteLocations(obj.item)"
             v-if="
-              permissions.includes('delete-device') &&
+              permissions.includes('delete-location') &&
                 obj.item.deleted_at &&
-                obj.item.machine_count == '0'
+                obj.item.machines_count == '0'
             "
           />
         </template>
@@ -97,9 +98,8 @@
   </div>
 </template>
 
-
 <script>
-import PageTitle from "../../Layout/Components/PageTitleAdd.vue";
+import PageTitle from "../../../Layout/Components/PageTitleAdd.vue";
 import { mapGetters } from "vuex";
 import axios from "axios";
 
@@ -111,28 +111,27 @@ import {
   faBomb,
 } from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import SampleForm from "./SampleForm.vue";
+import LocationForm from "./LocationForm.vue";
 
 library.add(faEdit, faTrash, faRecycle, faBomb);
 
 export default {
-  name: "Samples",
+  name: "Locationss",
   components: {
     PageTitle,
     "font-awesome-icon": FontAwesomeIcon,
-    SampleForm,
+    LocationForm,
   },
   data() {
     return {
-      heading: "Administração de Modelos de Máquinas",
+      heading: "Administração de Localizações",
       subheading: "Verifique os dados antes de executar as ações.",
       icon: "clipboard-list",
-      samples: null,
-      sample_selected: null,
+      locations: null,
+      location_selected: null,
       fields: [
         { key: "name", label: "Name" },
-        { key: "slot", label: "Slot" },
-        { key: "machine_count", label: "Maquinas" },
+        { key: "operator.name", label: "Operador" },
         { key: "action", label: "Ações" },
       ],
       showForm: false,
@@ -146,14 +145,14 @@ export default {
     this.reloadDataTable();
   },
   methods: {
-    onEditSample(sample) {
-      this.sample_selected = sample;
+    onEditLocations(location) {
+      this.location_selected = location;
       this.showForm = true;
     },
-    onDeleteSample(sample) {
+    onDeleteLocations(location) {
       this.boxTwo = "";
       this.$bvModal
-        .msgBoxConfirm(`Deseja realmente excluir o modelo ${sample.name}?`, {
+        .msgBoxConfirm(`Deseja realmente excluir o localização ${location.name}?`, {
           title: "Confirme a exclusão",
           size: "sm",
           buttonSize: "sm",
@@ -168,7 +167,7 @@ export default {
             const token = localStorage.getItem("token");
             var Options = {
               method: "delete",
-              url: `/api/sample/${sample.id}`,
+              url: `/api/location/${location.id}`,
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-type": "Application/Json",
@@ -177,37 +176,40 @@ export default {
             axios(Options).then((response) => {
               if (response.data) {
                 this.alertType = "success";
-                this.alertMessage = "Modelo excluido com sucesso.";
+                this.alertMessage = "Localização excluido com sucesso.";
                 this.dismissCountDown = this.dismissSecs;
                 this.reloadDataTable();
               } else {
                 this.alertType = "danger";
-                this.alertMessage = "Problemas ao excluir o Modelo!";
+                this.alertMessage = "Problemas ao excluir a Localização!";
                 this.dismissCountDown = this.dismissSecs;
               }
             });
           }
         });
     },
-    onRestoreSample(sample) {
+    onRestoreLocations(location) {
       this.boxTwo = "";
       this.$bvModal
-        .msgBoxConfirm(`Deseja realmente restaurar o modelo ${sample.name}?`, {
-          title: "Confirme a Restauração",
-          size: "sm",
-          buttonSize: "sm",
-          okVariant: "success",
-          okTitle: "Sim",
-          cancelTitle: "Não",
-          footerClass: "p-2",
-          hideHeaderClose: false,
-        })
+        .msgBoxConfirm(
+          `Deseja realmente restaurar o localização ${location.name}?`,
+          {
+            title: "Confirme a Restauração",
+            size: "sm",
+            buttonSize: "sm",
+            okVariant: "success",
+            okTitle: "Sim",
+            cancelTitle: "Não",
+            footerClass: "p-2",
+            hideHeaderClose: false,
+          }
+        )
         .then((confirm) => {
           if (confirm) {
             const token = localStorage.getItem("token");
             var Options = {
               method: "get",
-              url: `/api/sample/restore/${sample.id}`,
+              url: `/api/location/restore/${location.id}`,
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-type": "Application/Json",
@@ -216,23 +218,23 @@ export default {
             axios(Options).then((response) => {
               if (response.data) {
                 this.alertType = "success";
-                this.alertMessage = "Modelo restaurado com sucesso.";
+                this.alertMessage = "Localização restaurado com sucesso.";
                 this.dismissCountDown = this.dismissSecs;
                 this.reloadDataTable();
               } else {
                 this.alertType = "danger";
-                this.alertMessage = "Problemas ao restaurar o modelo!";
+                this.alertMessage = "Problemas ao restaurar a locaslização!";
                 this.dismissCountDown = this.dismissSecs;
               }
             });
           }
         });
     },
-    onForceDeleteSample(sample) {
+    onForceDeleteLocations(location) {
       this.boxTwo = "";
       this.$bvModal
         .msgBoxConfirm(
-          `Deseja excluir permanentemente o modelo ${sample.name}?`,
+          `Deseja excluir permanentemente o localização ${location.name}?`,
           {
             title: "Confirme a Exclusão",
             size: "sm",
@@ -249,7 +251,7 @@ export default {
             const token = localStorage.getItem("token");
             var Options = {
               method: "delete",
-              url: `/api/sample/forcedelete/${sample.id}`,
+              url: `/api/location/forcedelete/${location.id}`,
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-type": "Application/Json",
@@ -259,19 +261,19 @@ export default {
               .then((response) => {
                 if (response.data) {
                   this.alertType = "success";
-                  this.alertMessage = "Modelo excluido permanentemente.";
+                  this.alertMessage = "Localização excluido permanentemente.";
                   this.dismissCountDown = this.dismissSecs;
                   this.reloadDataTable();
                 } else {
                   this.alertType = "danger";
-                  this.alertMessage = "Problemas ao excluir o modelo!";
+                  this.alertMessage = "Problemas ao excluir a localização!";
                   this.dismissCountDown = this.dismissSecs;
                 }
               })
               .catch(() => {
                 this.alertType = "danger";
                 this.alertMessage =
-                  "Problemas ao excluir o modelo, provavelmente existe uma Máquina vinculada a este modelo!";
+                  "Problemas ao excluir a localização, provavelmente existe uma Máquina vinculada a esta localização!";
                 this.dismissCountDown = this.dismissSecs;
               });
           }
@@ -281,32 +283,32 @@ export default {
       this.dismissCountDown = dismissCountDown;
     },
     clearForm() {
-      this.sample_selected = null;
+      this.location_selected = null;
       this.showForm = true;
     },
     reloadDataTable(value) {
       if (value !== undefined && value.status) {
         this.alertType = "warning";
 
-        this.alertMessage = "Verifique o formulário";
+        this.alertMessage = "Verifique o formulário ";
         this.dismissCountDown = this.dismissSecs;
       } else if (value || value === undefined) {
         const token = localStorage.getItem("token");
         var Options = {
           method: "get",
-          url: "/api/sample/",
+          url: "/api/location/",
           headers: {
             Authorization: `Bearer ${token}`,
           },
         };
         axios(Options).then((response) => {
-          this.samples = response.data;
+          this.locations = response.data;
         });
       }
 
       if (value === true) {
         this.alertType = "success";
-        this.alertMessage = `Modelo inserido/editado com sucesso.`;
+        this.alertMessage = `Localização inserida/editada com sucesso.`;
         this.dismissCountDown = this.dismissSecs;
       }
     },
@@ -314,7 +316,7 @@ export default {
   computed: {
     ...mapGetters(["permissions"]),
     loadingTableResult() {
-      return this.samples == null;
+      return this.locations == null;
     },
   },
 };

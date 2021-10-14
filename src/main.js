@@ -14,6 +14,9 @@ import axios from "axios";
 import VueTheMask from 'vue-the-mask'
 Vue.use(VueTheMask)
 
+import money from 'v-money'
+Vue.use(money, {precision: 4})
+
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = process.env.VUE_APP_API_URL;
 

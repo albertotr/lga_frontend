@@ -99,7 +99,7 @@
 </template>
 
 <script>
-import PageTitle from "../../Layout/Components/PageTitleAdd.vue";
+import PageTitle from "../../../Layout/Components/PageTitleAdd.vue";
 import { mapGetters } from "vuex";
 import axios from "axios";
 
@@ -131,6 +131,7 @@ export default {
       operator_selected: null,
       fields: [
         { key: "name", label: "Name" },
+        { key: "manager.name", label: "Gerente" },
         { key: "action", label: "Ações" },
       ],
       showForm: false,

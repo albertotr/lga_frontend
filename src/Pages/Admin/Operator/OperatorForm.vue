@@ -190,13 +190,17 @@
         </form>
       </div>
     </div>
+    <contributor :manager="operator" @updateDataTable="reloadDataTable" />
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import Contributor from "./Contributor.vue";
 export default {
-  components: {},
+  components: {
+    Contributor,
+  },
   name: "Operator_Form",
   data() {
     return {
@@ -271,6 +275,9 @@ export default {
     },
     onCancel() {
       this.$emit("update:showForm", false);
+    },
+    reloadDataTable() {
+      this.$emit("updateDataTable", true);
     },
   },
   created() {

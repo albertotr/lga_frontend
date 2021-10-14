@@ -20,20 +20,19 @@
       :subheading="subheading"
       :icon="icon"
       @clearForm="clearForm"
-      @updateDataTable="reloadDataTable"
       :showForm.sync="showForm"
+      @updateDataTable="reloadDataTable"
     ></page-title>
     <div class="content">
-      <user-form
-        :form="user_selected"
+      <device-form
         :showForm.sync="showForm"
-        :user="user_selected"
+        :device="device_selected"
         @updateDataTable="reloadDataTable"
         v-if="showForm"
-      ></user-form>
+      ></device-form>
 
       <b-table
-        :items="users"
+        :items="devices"
         :fields="fields"
         striped
         bordered
@@ -47,22 +46,31 @@
             icon="edit"
             size="2x"
             class="text-info"
-            @click="onEditUser(obj.item)"
-            v-if="permissions.includes('update-user') && !obj.item.deleted_at"
+            @click="onEditDevice(obj.item)"
+            v-if="
+              permissions.includes('update-device') &&
+                !obj.item.machine &&
+                !obj.item.deleted_at
+            "
           />
           &nbsp;
           <font-awesome-icon
             icon="trash"
             size="2x"
             class="text-danger"
-            @click="onDeleteUser(obj.item)"
-            v-if="permissions.includes('delete-user') && !obj.item.deleted_at"
+            @click="onDeleteDevice(obj.item)"
+            v-if="
+              permissions.includes('delete-device') &&
+                !obj.item.machine &&
+                !obj.item.deleted_at
+            "
           />
+          &nbsp;
           <font-awesome-icon
             icon="recycle"
             size="2x"
             class="text-warning"
-            @click="onRestoreUser(obj.item)"
+            @click="onRestoreDevice(obj.item)"
             v-if="permissions.includes('delete-device') && obj.item.deleted_at"
           />
           &nbsp;
@@ -70,10 +78,11 @@
             icon="bomb"
             size="2x"
             class="text-danger"
-            @click="onForceDeleteUser(obj.item)"
+            @click="onForceDeleteType(obj.item)"
             v-if="
               permissions.includes('delete-device') &&
-                obj.item.deleted_at
+                obj.item.deleted_at &&
+                !obj.item.machine
             "
           />
         </template>
@@ -90,71 +99,73 @@
 </template>
 
 <script>
-import PageTitle from "../../Layout/Components/PageTitleAdd.vue";
+import PageTitle from "../../../Layout/Components/PageTitleAdd.vue";
 import { mapGetters } from "vuex";
 import axios from "axios";
 
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faTrash, faRecycle, faBomb } from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import UserForm from "./UserForm.vue";
+import DeviceForm from "./DeviceForm.vue";
 
-library.add(faEdit, faTrash);
+library.add(faEdit, faTrash, faRecycle, faBomb);
 
 export default {
-  name: "Users",
+  name: "Devices",
   components: {
     PageTitle,
     "font-awesome-icon": FontAwesomeIcon,
-    UserForm,
+    DeviceForm,
   },
   data() {
     return {
-      heading: "Administração de Usuários",
+      heading: "Administração de Dispositivos",
       subheading: "Verifique os dados antes de executar as ações.",
-      icon: "users-cog",
-      users: null,
-      user_selected: null,
+      icon: "cogs",
+      devices: null,
+      device_selected: null,
       fields: [
-        { key: "name", label: "Nome" },
-        { key: "email", label: "E-Mail" },
-        { key: "role.name", label: "Perfil" },
+        { key: "mac", label: "MAC" },
+        { key: "machine.serial", label: "Maquina (serial)" },
         { key: "action", label: "Ações" },
       ],
       showForm: false,
       dismissSecs: 10,
       dismissCountDown: 0,
       alertType: "success",
-      alertMessage: "",
+      alertMessage: "Verifique o formulário",
     };
   },
   created() {
     this.reloadDataTable();
   },
   methods: {
-    onEditUser(user) {
-      this.user_selected = user;
+    onEditDevice(device) {
+      this.device_selected = device;
       this.showForm = true;
     },
-    onDeleteUser(user) {
+    onDeleteDevice(device) {
       this.boxTwo = "";
       this.$bvModal
-        .msgBoxConfirm(`Deseja realmente excluir o usuário ${user.name}?`, {
-          title: "Confirme a exclusão",
-          size: "sm",
-          buttonSize: "sm",
-          okVariant: "success",
-          okTitle: "Sim",
-          cancelTitle: "Não",
-          footerClass: "p-2",
-          hideHeaderClose: false,
-        })
+        .msgBoxConfirm(
+          `Deseja realmente excluir o dispositivo de MAC ${device.mac}?`,
+          {
+            title: "Confirme a exclusão",
+            size: "sm",
+            buttonSize: "sm",
+            okVariant: "success",
+            okTitle: "Sim",
+            cancelTitle: "Não",
+            footerClass: "p-2",
+            hideHeaderClose: false,
+          }
+        )
         .then((confirm) => {
           if (confirm) {
             const token = localStorage.getItem("token");
             var Options = {
               method: "delete",
-              url: `/api/user/${user.id}`,
+              url: `/api/device/${device.id}`,
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-type": "Application/Json",
@@ -163,23 +174,23 @@ export default {
             axios(Options).then((response) => {
               if (response.data) {
                 this.alertType = "success";
-                this.alertMessage = "Usuário excluido com sucesso.";
+                this.alertMessage = "Dispositivo excluido com sucesso.";
                 this.dismissCountDown = this.dismissSecs;
                 this.reloadDataTable();
               } else {
                 this.alertType = "danger";
-                this.alertMessage = "Problemas ao excluir o usuário!";
+                this.alertMessage = "Problemas ao excluir o Dispositivo!";
                 this.dismissCountDown = this.dismissSecs;
               }
             });
           }
         });
     },
-    onRestoreUser(user) {
+    onRestoreDevice(device) {
       this.boxTwo = "";
       this.$bvModal
         .msgBoxConfirm(
-          `Deseja realmente restaurar o usuario ${user.name}?`,
+          `Deseja realmente restaurar o dispositivo de MAC ${device.mac}?`,
           {
             title: "Confirme a Restauração",
             size: "sm",
@@ -196,7 +207,7 @@ export default {
             const token = localStorage.getItem("token");
             var Options = {
               method: "get",
-              url: `/api/user/restore/${user.id}`,
+              url: `/api/device/restore/${device.id}`,
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-type": "Application/Json",
@@ -205,40 +216,68 @@ export default {
             axios(Options).then((response) => {
               if (response.data) {
                 this.alertType = "success";
-                this.alertMessage = "Cliente restaurado com sucesso.";
+                this.alertMessage = "Dispositivo restaurado com sucesso.";
                 this.dismissCountDown = this.dismissSecs;
                 this.reloadDataTable();
               } else {
                 this.alertType = "danger";
-                this.alertMessage = "Problemas ao restaurar o tipo!";
+                this.alertMessage = "Problemas ao restaurar o Dispositivo!";
                 this.dismissCountDown = this.dismissSecs;
               }
             });
           }
         });
     },
-    onForceDeleteUser(user) {
+    countDownChanged(dismissCountDown) {
+      this.dismissCountDown = dismissCountDown;
+    },
+    clearForm() {
+      this.device_selected = null;
+      this.showForm = true;
+    },
+    reloadDataTable(value) {
+      if (value !== undefined && value.status) {
+        this.alertType = "warning";
+        this.dismissCountDown = this.dismissSecs;
+      } else if (value || value === undefined) {
+        const token = localStorage.getItem("token");
+        var Options = {
+          method: "get",
+          url: "/api/device/",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        };
+        axios(Options).then((response) => {
+          this.devices = response.data;
+        });
+      }
+
+      if (value === true) {
+        this.alertType = "success";
+        this.alertMessage = `Dispositivo inserido/editado com sucesso.`;
+        this.dismissCountDown = this.dismissSecs;
+      }
+    },
+    onForceDeleteType(device) {
       this.boxTwo = "";
       this.$bvModal
-        .msgBoxConfirm(
-          `Deseja excluir permanentemente o usuario ${user.name}?`,
-          {
-            title: "Confirme a Exclusão",
-            size: "sm",
-            buttonSize: "sm",
-            okVariant: "success",
-            okTitle: "Sim",
-            cancelTitle: "Não",
-            footerClass: "p-2",
-            hideHeaderClose: false,
-          }
-        )
+        .msgBoxConfirm(`Deseja excluir permanentemente o dispositimo ${device.mac}?`, {
+          title: "Confirme a Exclusão",
+          size: "sm",
+          buttonSize: "sm",
+          okVariant: "success",
+          okTitle: "Sim",
+          cancelTitle: "Não",
+          footerClass: "p-2",
+          hideHeaderClose: false,
+        })
         .then((confirm) => {
           if (confirm) {
             const token = localStorage.getItem("token");
             var Options = {
               method: "delete",
-              url: `/api/user/forcedelete/${user.id}`,
+              url: `/api/device/forcedelete/${device.id}`,
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-type": "Application/Json",
@@ -248,61 +287,29 @@ export default {
               .then((response) => {
                 if (response.data) {
                   this.alertType = "success";
-                  this.alertMessage = "Cliente excluido permanentemente.";
+                  this.alertMessage = "Dispositivo excluido permanentemente.";
                   this.dismissCountDown = this.dismissSecs;
                   this.reloadDataTable();
                 } else {
                   this.alertType = "danger";
-                  this.alertMessage = "Problemas ao excluir o cliente!";
+                  this.alertMessage = "Problemas ao excluir o Dispositivo!";
                   this.dismissCountDown = this.dismissSecs;
                 }
               })
               .catch(() => {
                 this.alertType = "danger";
                 this.alertMessage =
-                  "Problemas ao excluir o cliente, provavelmente existe uma Máquina vinculada a este cliente!";
+                  "Problemas ao excluir o tipo, provavelmente existe uma Máquina vinculada a este Dispositivo!";
                 this.dismissCountDown = this.dismissSecs;
               });
           }
         });
-    },
-    countDownChanged(dismissCountDown) {
-      this.dismissCountDown = dismissCountDown;
-    },
-    clearForm() {
-      this.user_selected = null;
-      this.showForm = true;
-    },
-    reloadDataTable(value) {
-      if (value || value === undefined) {
-        const token = localStorage.getItem("token");
-        var Options = {
-          method: "get",
-          url: "/api/user/",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        };
-        axios(Options).then((response) => {
-          this.users = response.data;
-        });
-      } else if (value === false) {
-        this.alertType = "warning";
-        this.alertMessage = "Verifique o formulário.";
-        this.dismissCountDown = this.dismissSecs;
-      }
-
-      if (value) {
-        this.alertType = "success";
-        this.alertMessage = `Usuário inserido/editado com sucesso.`;
-        this.dismissCountDown = this.dismissSecs;
-      }
-    },
+    }
   },
   computed: {
     ...mapGetters(["permissions"]),
     loadingTableResult() {
-      return this.users == null;
+      return this.devices == null;
     },
   },
 };

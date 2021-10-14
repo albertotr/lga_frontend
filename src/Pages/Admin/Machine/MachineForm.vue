@@ -118,26 +118,6 @@
 
             <div class="col-md-3">
               <div class="position-relative form-group">
-                <label for="labelFormOperator" class="">Operador</label>
-                <select
-                  name="operator"
-                  id="formOperator"
-                  class="form-control"
-                  v-model="form.operator"
-                >
-                  <option value="null">&nbsp;</option>
-                  <option
-                    v-for="operator in operators"
-                    :key="operator.id"
-                    :value="operator.id"
-                    >{{ operator.name }}</option
-                  >
-                </select>
-              </div>
-            </div>
-
-            <div class="col-md-3">
-              <div class="position-relative form-group">
                 <label for="labelFormLocations" class="">Localização</label>
                 <select
                   name="location"
@@ -145,7 +125,7 @@
                   class="form-control"
                   v-model="form.location"
                 >
-                  <option value="null">&nbsp;</option>
+                  <option value="">&nbsp;</option>
                   <option
                     v-for="location in locations"
                     :key="location.id"
@@ -156,45 +136,96 @@
               </div>
             </div>
 
-            <div class="col-md-12" v-if="selectedPartner">
+            <div class="col-md-4">
               <div class="position-relative form-group">
-                <div class="card">
-                  <div class="card-body">
-                    <h5 class="card-title">{{ selectedPartner.name }}</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">
-                      CPF/CNPJ:&nbsp;<cpfcnpj
-                        :value="selectedPartner.cpf_cnpj"
-                      />
-                    </h6>
-                    <p class="card-text">
-                      Endereço:&nbsp;{{ selectedPartner.address }},&nbsp;{{
-                        selectedPartner.number
-                      }},&nbsp;{{ selectedPartner.neigborhood }},&nbsp;{{
-                        selectedPartner.city
-                      }},&nbsp;
-                      {{ selectedPartner.state }}
-                      <br />
-                      Complemento:&nbsp;{{ selectedPartner.complement }}
-                      <br />
-                      CEP:{{ selectedPartner.postal_code }}
-                    </p>
-                  </div>
+                <label for="labelFormLocations" class="">Aposta</label>
+                <money
+                  class="form-control"
+                  v-model="form.bet"
+                  v-bind="money"
+                  :class="{ 'is-invalid': invalidBet }"
+                ></money>
+                <div class="invalid-feedback">
+                  <ul>
+                    <li v-for="msg in invalidBetMessage" :key="msg">
+                      {{ msg }}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="position-relative form-group">
+                <label for="labelFormRent" class="">Aluguel</label>
+                <money
+                  class="form-control"
+                  v-model="form.fixed_value"
+                  v-bind="money"
+                  :class="{ 'is-invalid': invalidFixedValue }"
+                ></money>
+                <div class="invalid-feedback">
+                  <ul>
+                    <li v-for="msg in invalidFixedValueMessage" :key="msg">
+                      {{ msg }}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="position-relative form-group">
+                <label for="labelFormNetValue" class="">% do Liquido</label>
+                <input
+                  name="netValue"
+                  id="formNetValue"
+                  type="number"
+                  step="0.01"
+                  class="form-control"
+                  v-model="form.net_value"
+                  :class="{ 'is-invalid': invalidNetValue }"
+                />
+                <div class="invalid-feedback">
+                  <ul>
+                    <li v-for="msg in invalidNetValueMessage" :key="msg">
+                      {{ msg }}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="position-relative form-group">
+                <label for="labelFormGrossValue" class="">% do Bruto</label>
+                <input
+                  name="grossValue"
+                  id="formGrossValue"
+                  type="number"
+                  step="0.01"
+                  class="form-control"
+                  v-model="form.gross_value"
+                  :class="{ 'is-invalid': invalidGrossValue }"
+                />
+                <div class="invalid-feedback">
+                  <ul>
+                    <li v-for="msg in invalidGrossValueMessage" :key="msg">
+                      {{ msg }}
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>
           </div>
-
-          <div
-            class="alert alert-warning"
-            role="alert"
-            v-if="machine.location.operator_id !== machine.operator_id"
-          >
+          <div class="alert alert-warning" role="alert" v-if="operatorLocation">
             <font-awesome-icon
               icon="exclamation-triangle"
               size="2x"
               class="text-warning"
-            /> 
-            Verifique o Operador e a Localização, o operador selecionado não gerencia a localização informada.
+            />
+            Verifique a lista de Operadores, a Localização selecionada não está
+            vinculada a nenhum dos operadores da lista.
           </div>
 
           <button class="mt-2 btn btn-primary" @click.stop="onSubmit">
@@ -207,14 +238,17 @@
         </form>
       </div>
     </div>
-    <machine-partner :machine="machine" :partners="partners" />
+    <machine-inventory v-if="machine" :machine="machine" />
+    <machine-partner v-if="machine" :machine="machine" />
+    <machine-operator v-if="machine" :machine="machine" />
   </div>
 </template>
 
 <script>
 import axios from "axios";
-import cpfcnpj from "../Components/CpfCnpj.vue";
 import MachinePartner from "./MachinePartnerForm.vue";
+import MachineInventory from "./MachineInventoryForm.vue";
+import MachineOperator from "./MachineOperatorForm.vue";
 
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { faExclamationTriangle } from "@fortawesome/free-solid-svg-icons";
@@ -222,15 +256,18 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 library.add(faExclamationTriangle);
 
 export default {
-  components: { cpfcnpj, MachinePartner, FontAwesomeIcon },
+  components: {
+    MachinePartner,
+    MachineInventory,
+    MachineOperator,
+    FontAwesomeIcon,
+  },
   name: "Machine_Form",
   data() {
     return {
       devices: [],
       types: [],
       samples: [],
-      partners: [],
-      operators: [],
       locations: [],
       form: {
         id: null,
@@ -239,14 +276,30 @@ export default {
         type: null,
         sample: null,
         partners: [],
-        operator: null,
+        operators: [],
         location: null,
         slot: 0,
+        bet: 0,
+        fixed_value: 0,
+        net_value: 0,
+        gross_value: 0,
       },
       error: [],
       invalidSerialMessage: null,
       invalidTypeMessage: null,
       invalidSampleMessage: null,
+      invalidBetMessage: null,
+      invalidFixedValueMessage: null,
+      invalidNetValueMessage: null,
+      invalidGrossValueMessage: null,
+
+      money: {
+        decimal: ",",
+        thousands: ".",
+        prefix: "R$ ",
+        precision: 2,
+        masked: false,
+      },
     };
   },
   props: {
@@ -277,7 +330,7 @@ export default {
       axios(Options)
         .then(() => {
           this.$emit("updateDataTable", true);
-          this.$emit("update:showForm", false);
+          this.error = [];
         })
         .catch((msg) => {
           if (msg.response.status == 422) {
@@ -290,6 +343,10 @@ export default {
               this.invalidTypeMessage = this.error["type"];
             if (this.error["sample"])
               this.invalidSampleMessage = this.error["sample"];
+            if (this.error["bet"]) this.invalidBetMessage = this.error["bet"];
+            if (this.error["fixed_value"]) this.invalidFixedValueMessage = this.error["fixed_value"];
+            if (this.error["net_value"]) this.invalidNetValueMessage = this.error["net_value"];
+            if (this.error["gross_value"]) this.invalidGrossValueMessage = this.error["gross_value"];
           } else {
             this.$emit("updateDataTable", false);
             this.$emit("update:errorMessage", msg.response.data);
@@ -345,17 +402,6 @@ export default {
       this.samples = response.data;
     });
 
-    var OptionsOperators = {
-      method: "get",
-      url: "/api/operator/available",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-    axios(OptionsOperators).then((response) => {
-      this.operators = response.data;
-    });
-
     var OptionsLocations = {
       method: "get",
       url: "/api/location/available",
@@ -367,17 +413,6 @@ export default {
       this.locations = response.data;
     });
 
-    var OptionsPartner = {
-      method: "get",
-      url: "/api/partner/available",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-    axios(OptionsPartner).then((response) => {
-      this.partners = response.data;
-    });
-
     if (this.machine) {
       this.form = {
         id: this.machine.id,
@@ -387,24 +422,15 @@ export default {
         sample: this.machine.sample_id,
         slot: this.machine.sample.slot,
         partners: this.machine.partners,
-        operator: this.machine.operator_id,
         location: this.machine.location_id,
+        bet: this.machine.bet,
+        fixed_value: this.machine.fixed_value,
+        net_value: this.machine.net_value,
+        gross_value: this.machine.gross_value,
       };
     }
   },
   computed: {
-    selectedPartner() {
-      if (this.form.partner == null || this.partners == null) return null;
-
-      if (this.partners != null && this.form.partner != null) {
-        let part = this.partners.filter((partner) => {
-          return partner.id == this.form.partner;
-        });
-        return part[0];
-      }
-
-      return null;
-    },
     invalidSerial() {
       if (this.error == undefined || this.error == null) return false;
       if (this.error["serial"]) return true;
@@ -419,6 +445,34 @@ export default {
       if (this.error == undefined || this.error == null) return false;
       if (this.error["sample"]) return true;
       return false;
+    },
+    invalidBet() {
+      if (this.error == undefined || this.error == null) return false;
+      if (this.error["bet"]) return true;
+      return false;
+    },
+    invalidFixedValue() {
+      if (this.error == undefined || this.error == null) return false;
+      if (this.error["fixed_value"]) return true;
+      return false;
+    },
+    invalidNetValue() {
+      if (this.error == undefined || this.error == null) return false;
+      if (this.error["net_value"]) return true;
+      return false;
+    },
+    invalidGrossValue() {
+      if (this.error == undefined || this.error == null) return false;
+      if (this.error["gross_value"]) return true;
+      return false;
+    },
+    operatorLocation() {
+      if (this.machine == null || !this.machine.location) return false;
+
+      let checkOperatorLocation = this.machine.operators.find((op) => {
+        return op.id == this.machine.location.operator_id;
+      });
+      return checkOperatorLocation == undefined;
     },
   },
 };
