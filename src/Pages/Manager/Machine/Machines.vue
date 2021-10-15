@@ -38,6 +38,21 @@
         responsive="sm"
         v-show="!showForm"
       >
+        <template #cell(machine)="obj">
+          {{ obj.item.serial }}
+        </template>
+
+        <template #cell(inventory)="obj">
+          <div class="row">
+            <div
+              class="col"
+              v-for="inventoryItem in obj.item.inventory.items" :key="inventoryItem.id"
+            >
+              {{ inventoryItem.name }}:{{ inventoryItem.pivot.quantity}}
+            </div>
+          </div>
+        </template>
+
         <template #cell(balance)="obj">
           {{ obj.item.balance | currency }}
         </template>
@@ -96,10 +111,9 @@ export default {
       machine_selected: null,
       machine_messages: null,
       fields: [
-        { key: "serial", label: "Serial" },
-        { key: "type.name", label: "Tipo" },
-        { key: "sample.name", label: "Modelo" },
-        { key: "device.mac", label: "MAC" },
+        { key: "machine", label: "Maquina" },
+        { key: "device.mac", label: "MAC", thClass:"d-none d-sm-block", tdClass:"d-none d-sm-block"},
+        { key: "inventory", label: "Inventário" },
         { key: "balance", label: "Saldo" },
         { key: "total_balance", label: "Saldo Bruto" },
         { key: "action", label: "Ações" },
