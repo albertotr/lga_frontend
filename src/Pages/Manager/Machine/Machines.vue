@@ -28,6 +28,17 @@
         v-if="showForm"
       ></messages>
 
+      <div class="row" v-show="!showForm">
+        <div class="col">
+          <b-button block variant="primary" @click="reloadDataTable">
+            <span v-if="lastreload">{{ lastreload }}</span>
+            <span v-else>
+              <b-spinner small type="grow"></b-spinner> Carregando...
+            </span>
+          </b-button>
+        </div>
+      </div>
+
       <b-table
         :items="machines"
         :fields="fields"
@@ -46,9 +57,10 @@
           <div class="row">
             <div
               class="col"
-              v-for="inventoryItem in obj.item.inventory.items" :key="inventoryItem.id"
+              v-for="inventoryItem in obj.item.inventory.items"
+              :key="inventoryItem.id"
             >
-              {{ inventoryItem.name }}:{{ inventoryItem.pivot.quantity}}
+              {{ inventoryItem.name }}:{{ inventoryItem.pivot.quantity }}
             </div>
           </div>
         </template>
@@ -112,7 +124,12 @@ export default {
       machine_messages: null,
       fields: [
         { key: "machine", label: "Maquina" },
-        { key: "device.mac", label: "MAC", thClass:"d-none d-sm-block", tdClass:"d-none d-sm-block"},
+        {
+          key: "device.mac",
+          label: "MAC",
+          thClass: "d-none d-sm-block",
+          tdClass: "d-none d-sm-block",
+        },
         { key: "inventory", label: "Inventário" },
         { key: "balance", label: "Saldo" },
         { key: "total_balance", label: "Saldo Bruto" },
@@ -123,6 +140,7 @@ export default {
       dismissCountDown: 0,
       alertType: "success",
       alertMessage: "",
+      lastreload: null,
     };
   },
   created() {
@@ -137,6 +155,7 @@ export default {
       this.showForm = true;
     },
     reloadDataTable() {
+      this.lastreload = null;
       const token = localStorage.getItem("token");
       var Options = {
         method: "get",
@@ -146,6 +165,8 @@ export default {
         },
       };
       axios(Options).then((response) => {
+        let localDate = new Date();
+        this.lastreload  = localDate.toLocaleDateString('pt-BR')+" "+localDate.toLocaleTimeString('pt-BR');
         this.machines = response.data;
       });
     },
