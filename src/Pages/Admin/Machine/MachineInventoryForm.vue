@@ -165,7 +165,7 @@
         </div>
         <div class="col-md-6">
           <div class="position-relative form-group">
-            <label for="labelFormRent" class="">Aluguel</label>
+            <label for="labelFormPrice" class="">Preço</label>
             <money
               class="form-control"
               v-model="selectedItem.pivot.price"

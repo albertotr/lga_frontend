@@ -144,7 +144,7 @@
           </div>
 
           <div class="form-row">
-            <div class="col-md-6">
+            <div class="col-md-4">
               <div class="position-relative form-group">
                 <label for="labelFormPostalCode" class="">CEP</label
                 ><the-mask
@@ -157,7 +157,7 @@
                 />
               </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
               <div class="position-relative form-group">
                 <label for="labelFormCpfCnpj" class="">Cpf/Cnpj</label
                 ><the-mask
@@ -176,6 +176,25 @@
                     </li>
                   </ul>
                 </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="position-relative form-group">
+                <label for="labelFormUser" class="">Usuario</label>
+                <select
+                  name="user"
+                  id="formUser"
+                  class="form-control"
+                  v-model="form.user_id"
+                >
+                  <option value="null">&nbsp;</option>
+                  <option
+                    v-for="user in users"
+                    :key="user.id"
+                    :value="user.id"
+                    >{{ user.name }}</option
+                  >
+                </select>
               </div>
             </div>
           </div>
@@ -215,6 +234,7 @@ export default {
         state: "",
         postalcode: "",
         cpfcnpj: "",
+        user_id:"",
       },
       error: null,
       invalidNameMessage: "",
@@ -223,6 +243,8 @@ export default {
       invalidCityMessage: "",
       invalidStateMessage: "",
       invalidCpfCnpjMessage: "",
+      users:[],
+      token: null,
     };
   },
   props: {
@@ -231,8 +253,6 @@ export default {
   },
   methods: {
     onSubmit() {
-      const token = localStorage.getItem("token");
-
       let method = "POST";
       let id = "";
       if (this.form.id) {
@@ -245,7 +265,7 @@ export default {
         url: "/api/operator/" + id,
         data: this.form,
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${this.token}`,
         },
       };
       axios(Options)
@@ -281,6 +301,8 @@ export default {
     },
   },
   created() {
+    this.token = localStorage.getItem("token");
+
     if (this.operator) {
       this.form = {
         id: this.operator.id,
@@ -293,8 +315,22 @@ export default {
         state: this.operator.state,
         postalcode: this.operator.postal_code,
         cpfcnpj: this.operator.cpf_cnpj,
+        user_id: this.operator.user_id,
       };
     }
+
+    var Options = {
+      method: "GET",
+      url: "/api/operator/user",
+      headers: {
+        Authorization: `Bearer ${this.token}`,
+      },
+    };
+    axios(Options).then((response) => {
+      this.users = response.data;
+      if (this.operator && this.operator.user)
+        this.users.push(this.operator.user);
+    });
   },
   computed: {
     invalidName() {

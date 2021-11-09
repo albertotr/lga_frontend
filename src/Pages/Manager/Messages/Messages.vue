@@ -31,7 +31,7 @@
           <div class="row text-white bg-gradient-dark">
             Mensagens recebidas até {{ lastReload.toLocaleString("pt-BR") }}
           </div>
-          <div class="row" v-if="messages.length > 0">
+          <div class="row" v-if="messages">
             <ul
               class="list-group list-group-flush list-stripped"
               style="width:100%"
@@ -39,14 +39,14 @@
               <li
                 class="list-group-item list-group-item-action"
                 :class="{ unknownDevice: message.device == null }"
-                v-for="message in messages"
+                v-for="message in messages.data"
                 :key="message.id"
               >
                 <div class="row">
                   <div class="col">
                     {{ message.created_at | friendlyDate }}
                   </div>
-                  <div class="col">{{ message.mac}}</div>
+                  <div class="col">{{ message.mac }}</div>
                   <div class="col">{{ message.type.code }}</div>
                 </div>
                 <div class="row" v-if="message.type_id !== 1">
@@ -64,11 +64,19 @@
               </li>
             </ul>
           </div>
-          <div class="row" v-else>
-            <ul class="list-group list-group-flush" style="width:100%">
-              <li class="list-group-item">Sem mensagens recebidas</li>
-            </ul>
-          </div>
+          <b-row>
+            <b-col md="12" v-if="messages.last_page > 1">
+              <b-pagination
+                size="md"
+                :total-rows="messages.total"
+                v-model="messages.current_page"
+                :per-page="messages.per_page"
+                align="center"
+                @change="updatePage"
+              >
+              </b-pagination>
+            </b-col>
+          </b-row>
         </div>
         <div class="card-body" v-else>
           <div class="text-center text-danger my-2">
@@ -103,14 +111,14 @@ export default {
     };
   },
   created() {
-    this.reloadDataTable();
+    this.reloadDataTable(1);
   },
   methods: {
-    reloadDataTable() {
+    reloadDataTable(currentPage) {
       const token = localStorage.getItem("token");
       var Options = {
         method: "get",
-        url: `/api/message/${this.numMessages}`,
+        url: `/api/message/${this.numMessages}?page=${currentPage}`,
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -118,6 +126,9 @@ export default {
       axios(Options).then((response) => {
         this.messages = response.data;
       });
+    },
+    updatePage(value) {
+      this.reloadDataTable(value);
     },
   },
   computed: {

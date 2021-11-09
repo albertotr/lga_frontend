@@ -76,6 +76,19 @@
                 </div>
               </div>
             </div>
+            <div class="col-md-6" v-if="form.operator">
+              <div class="position-relative form-group">
+                <label for="labelFormOperator" class="">Operador</label
+                ><input
+                  name="operator"
+                  id="formOperator"
+                  type="text"
+                  class="form-control"
+                  v-model="form.operator.name"
+                  disabled
+                />
+              </div>
+            </div>
           </div>
 
           <div class="text-center text-danger my-2" v-if="recording">
@@ -185,6 +198,7 @@ export default {
         name: this.user.name,
         email: this.user.email,
         role: this.user.role.id,
+        operator: this.user.operator
       };
     }
   },
