@@ -21,7 +21,6 @@
       :icon="icon"
     ></page-title>
     <div class="content">
-      
       <div class="row">
         <div class="col">
           <b-button block variant="primary" @click="reloadDataTable">
@@ -75,26 +74,33 @@
         </template>
 
         <template #cell(action)="obj">
-          <router-link :to="{name:'managemachinemessages', params: { machine: obj.item }}">
-          <font-awesome-icon
-            icon="list-alt"
-            size="1x"
-            class="text-info"
-          /></router-link>&nbsp;&nbsp;&nbsp;
-          <font-awesome-icon
-            icon="dollar-sign"
-            size="1x"
-            class="text-success"
-            @click="onTransaction(obj.item)"
+          <button
+            class="btn btn-info btn-lg"
+            :to="{
+              name: 'managemachinemessages',
+              params: { machine: obj.item },
+            }"
+          >
+            <font-awesome-icon style="color:white" icon="list-alt" size="1x" /> </button
+          >&nbsp;&nbsp;&nbsp;
+
+          <button class="btn btn-info btn-lg" @click="onTransaction(obj.item)" :disabled="!obj.item.device" v-if="permissions.includes('view-machine')">
+            <font-awesome-icon style="color:white"
+              icon="dollar-sign"
+              size="1x"              
+            /> </button
+          >&nbsp;&nbsp;&nbsp;
+
+          <button
+            class="btn btn-info btn-lg"
+            :to="{
+              name: 'managemachinetransactions',
+              params: { machine: obj.item },
+            }"
             v-if="permissions.includes('view-machine')"
-          />&nbsp;&nbsp;&nbsp;
-          <router-link :to="{name:'managemachinetransactions', params: { machine: obj.item }}" v-if="permissions.includes('view-machine')">
-          <font-awesome-icon
-            icon="clipboard-list"
-            size="1x"
-            color="orange"            
-          />
-          </router-link>
+          >
+            <font-awesome-icon style="color:white" icon="clipboard-list" size="1x" />
+          </button>
         </template>
 
         <template #table-busy>
@@ -241,7 +247,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
 
-
 library.add(faEdit, faTrash, faListAlt, faDollarSign, faClipboardList);
 
 export default {
@@ -253,7 +258,7 @@ export default {
   },
   data() {
     return {
-      token:null,
+      token: null,
       heading: "Gerenciamento de Máquinas",
       subheading: "Verifique os dados antes de executar as ações.",
       icon: "pe-7s-server text-warning",
@@ -323,7 +328,7 @@ export default {
           localDate.toLocaleTimeString("pt-BR");
         this.machines = response.data;
       });
-    },    
+    },
     onTransaction(machine) {
       this.machine_selected = machine;
       this.value = machine.balance;
@@ -339,7 +344,9 @@ export default {
       );
     },
     onTransactionCreate() {
-      const invent = this.calculateTotalInventory(this.machine_selected.inventory.items);
+      const invent = this.calculateTotalInventory(
+        this.machine_selected.inventory.items
+      );
       var Options = {
         method: "post",
         data: {
@@ -348,7 +355,7 @@ export default {
           comment: this.comment,
           match: this.match,
           zerobalance: this.zeroBalance,
-          inventory: invent
+          inventory: invent,
         },
         url: "/api/transaction/",
         headers: {
@@ -360,7 +367,7 @@ export default {
           let newBalance =
             parseFloat(this.machine_selected.balance) - parseFloat(this.value);
 
-          if(newBalance < 0) newBalance = 0;
+          if (newBalance < 0) newBalance = 0;
 
           this.machine_selected.balance = this.zeroBalance ? 0 : newBalance;
           this.machine_selected.cost = 0;
@@ -373,7 +380,6 @@ export default {
           this.$bvModal.hide("transactionModal");
         });
     },
-    
   },
   computed: {
     ...mapGetters(["permissions"]),
