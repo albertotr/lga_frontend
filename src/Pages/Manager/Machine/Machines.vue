@@ -74,14 +74,14 @@
         </template>
 
         <template #cell(action)="obj">
-          <button
+          <router-link
             class="btn btn-info btn-lg"
             :to="{
               name: 'managemachinemessages',
               params: { machine: obj.item },
             }"
           >
-            <font-awesome-icon style="color:white" icon="list-alt" size="1x" /> </button
+            <font-awesome-icon style="color:white" icon="list-alt" size="1x" /> </router-link
           >&nbsp;&nbsp;&nbsp;
 
           <button class="btn btn-info btn-lg" @click="onTransaction(obj.item)" :disabled="!obj.item.device" v-if="permissions.includes('view-machine')">
@@ -91,7 +91,7 @@
             /> </button
           >&nbsp;&nbsp;&nbsp;
 
-          <button
+          <router-link
             class="btn btn-info btn-lg"
             :to="{
               name: 'managemachinetransactions',
@@ -100,7 +100,7 @@
             v-if="permissions.includes('view-machine')"
           >
             <font-awesome-icon style="color:white" icon="clipboard-list" size="1x" />
-          </button>
+          </router-link>
         </template>
 
         <template #table-busy>
