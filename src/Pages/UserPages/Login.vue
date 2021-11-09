@@ -93,8 +93,8 @@ export default {
   data() {
     return {
       form: {
-        email: "alberto@email.com",
-        password: "password",
+        email: "",
+        password: "",
       },
       message: null,
       dismissSecs: 5,
@@ -105,7 +105,6 @@ export default {
   methods: {
     ...mapActions({
       signIn: "signIn",
-      teste: "teste",
     }),
     countDownChanged(dismissCountDown) {
       this.dismissCountDown = dismissCountDown;
