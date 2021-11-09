@@ -15,6 +15,8 @@ import Samples from "../Pages/Admin/Sample/Samples";
 import Partners from "../Pages/Admin/Partner/Partners";
 import Operators from "../Pages/Admin/Operator/Operators";
 import Locations from "../Pages/Admin/Location/Locations";
+import MachineMessages from "../Pages/Manager/Machine/Messages";
+import MachineTransactions from "../Pages/Manager/Machine/Transactions";
 
 Vue.use(Router);
 
@@ -98,6 +100,18 @@ function configRoutes () {
       path: "/manage/machine",
       name: "managemachines",
       component: ManageMachines,
+    },
+
+    {
+      path: "/manage/machine/messages",
+      name: "managemachinemessages",
+      component: MachineMessages,
+    },
+
+    {
+      path: "/manage/machine/transactions",
+      name: "managemachinetransactions",
+      component: MachineTransactions,
     },
 
     // Manage pages

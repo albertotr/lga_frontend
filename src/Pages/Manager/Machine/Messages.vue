@@ -1,7 +1,13 @@
 <template>
   <div class="content">
+    <page-title
+      :heading="heading"
+      :subheading="subheading"
+      :icon="icon"
+      :showForm.sync="showForm"
+    ></page-title>
     <div class="main-card mb-3 card">
-      <div class="card-body">
+      <div class="card-body" v-if="messages">
         <h5>Mensagens da Maquina</h5>
         <div class="row text-white bg-gradient-dark">
           <div class="col">
@@ -10,15 +16,14 @@
           </div>
           <div class="col"><strong>Tipo:</strong> {{ machine.type.name }}</div>
           <div class="col">
-            <strong>Modelo:</strong> {{ machine.sample.name }} | {{
-              machine.sample.slot
-            }} Slots
+            <strong>Modelo:</strong> {{ machine.sample.name }} |
+            {{ machine.sample.slot }} Slots
           </div>
           <div class="col">
             <strong>Parceiro(s):</strong>
-              <span v-for="partner in machine.partners" :key="partner.id">
-                {{ partner.name }};
-              </span>
+            <span v-for="partner in machine.partners" :key="partner.id">
+              {{ partner.name }};
+            </span>
           </div>
         </div>
         <div class="row" v-if="messages.length > 0">
@@ -59,17 +64,56 @@
 </template>
 
 <script>
+import PageTitle from "../../../Layout/Components/PageTitle.vue";
+import axios from "axios";
 export default {
   name: "Machine_Messages",
   data() {
-    return {};
+    return {
+      machine: null,
+      messages: null,
+
+      token: null,
+      heading: "Mensagens da Máquinas",
+      subheading: "Verifique os dados antes de executar as ações.",
+      icon: "pe-7s-server text-warning",
+
+      showForm: true,
+    };
   },
-  props: {
-    machine: null,
-    messages: null,
+  components: {
+    PageTitle,
   },
-  methods: {},
-  created() {},
+  methods: {
+    loadMessages(){
+      var Options = {
+        method: "get",
+        url: `/api/machine/messages/${this.machine.id}/10`,
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+        },
+      };
+      axios(Options).then((response) => {
+        this.messages = response.data;
+      });
+    }
+  },
+  created() {
+    
+    if(!this.$route.params.machine){
+      this.$router.push('/manage/machine');
+      return false;
+    } 
+
+    this.token = localStorage.getItem("token");
+    this.machine = this.$route.params.machine;
+    this.loadMessages();
+  },
+  watch:{
+    showForm(value){
+      if(!value) this.$router.go(-1);
+    },
+  },
   filters: {
     friendlyDate: (date) => {
       let novaData = new Date(date);
