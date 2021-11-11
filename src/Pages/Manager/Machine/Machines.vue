@@ -256,8 +256,8 @@ export default {
         {
           key: "device.mac",
           label: "MAC",
-          tdClass: "d-sm-none d-md-block",
-          thClass: "d-sm-none d-md-block",
+          tdClass: "d-none d-sm-none d-md-block",
+          thClass: "d-none d-sm-none d-md-block",
         },
         { key: "balance", label: "Saldo" },
         { key: "total_balance", label: "Saldo Bruto" },
