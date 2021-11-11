@@ -45,18 +45,6 @@
           {{ obj.item.serial }}
         </template>
 
-        <template #cell(inventory)="obj">
-          <div class="row">
-            <div
-              class="col"
-              v-for="inventoryItem in obj.item.inventory.items"
-              :key="inventoryItem.id"
-            >
-              {{ inventoryItem.name }}:{{ inventoryItem.pivot.quantity }}
-            </div>
-          </div>
-        </template>
-
         <template #cell(balance)="obj">
           {{ obj.item.balance | currency }}
         </template>
@@ -81,14 +69,24 @@
               params: { machine: obj.item },
             }"
           >
-            <font-awesome-icon style="color:white" icon="list-alt" size="1x" /> </router-link
+            <font-awesome-icon
+              style="color:white"
+              icon="list-alt"
+              size="1x"
+            /> </router-link
           >&nbsp;&nbsp;&nbsp;
 
-          <button class="btn btn-info btn-lg" @click="onTransaction(obj.item)" :disabled="!obj.item.device" v-if="permissions.includes('view-machine')">
-            <font-awesome-icon style="color:white"
+          <button
+            class="btn btn-info btn-lg"
+            @click="onTransaction(obj.item)"
+            :disabled="!obj.item.device"
+            v-if="permissions.includes('view-machine')"
+          >
+            <font-awesome-icon
+              style="color:white"
               icon="dollar-sign"
-              size="1x"              
-            /> </button
+              size="1x"
+            /></button
           >&nbsp;&nbsp;&nbsp;
 
           <router-link
@@ -99,7 +97,11 @@
             }"
             v-if="permissions.includes('view-machine')"
           >
-            <font-awesome-icon style="color:white" icon="clipboard-list" size="1x" />
+            <font-awesome-icon
+              style="color:white"
+              icon="clipboard-list"
+              size="1x"
+            />
           </router-link>
         </template>
 
@@ -269,10 +271,7 @@ export default {
         {
           key: "device.mac",
           label: "MAC",
-          thClass: "d-none d-sm-block",
-          tdClass: "d-none d-sm-block",
         },
-        { key: "inventory", label: "Inventário" },
         { key: "balance", label: "Saldo" },
         { key: "total_balance", label: "Saldo Bruto" },
         { key: "cost", label: "Custo" },
