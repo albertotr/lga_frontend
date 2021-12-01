@@ -131,6 +131,11 @@ export default {
             href: "/manage/machine",
           },
           {
+            title: "Localização",
+            icon: "pe-7s-map-2",
+            href: "/manage/location",
+          },
+          {
             title: "Mensagens",
             icon: "pe-7s-mail",
             href: "/manage/message",

@@ -19,6 +19,7 @@
                   class="form-control"
                   :class="{ 'is-invalid': invalidSerial }"
                   v-model="form.serial"
+                  :disabled="user.role.level >= 3"
                 />
                 <div class="invalid-feedback">
                   <ul>
@@ -37,6 +38,7 @@
                   id="formDevice"
                   class="form-control"
                   v-model="form.device"
+                  :disabled="user.role.level >= 3"
                 >
                   <option value="null">&nbsp;</option>
                   <option
@@ -57,6 +59,7 @@
                   class="form-control"
                   :class="{ 'is-invalid': invalidType }"
                   v-model="form.type"
+                  :disabled="user.role.level >= 3"
                 >
                   <option
                     v-for="type in types"
@@ -84,6 +87,7 @@
                   :class="{ 'is-invalid': invalidSample }"
                   v-model="form.sample"
                   @change="updateSlot($event)"
+                  :disabled="user.role.level >= 3"
                 >
                   <option
                     v-for="sample in samples"
@@ -144,6 +148,7 @@
                   v-model="form.bet"
                   v-bind="money"
                   :class="{ 'is-invalid': invalidBet }"
+                  :disabled="user.role.level >= 3"
                 ></money>
                 <div class="invalid-feedback">
                   <ul>
@@ -163,6 +168,7 @@
                   v-model="form.fixed_value"
                   v-bind="money"
                   :class="{ 'is-invalid': invalidFixedValue }"
+                  :disabled="user.role.level >= 3"
                 ></money>
                 <div class="invalid-feedback">
                   <ul>
@@ -185,6 +191,7 @@
                   class="form-control"
                   v-model="form.net_value"
                   :class="{ 'is-invalid': invalidNetValue }"
+                  :disabled="user.role.level >= 3"
                 />
                 <div class="invalid-feedback">
                   <ul>
@@ -207,6 +214,7 @@
                   class="form-control"
                   v-model="form.gross_value"
                   :class="{ 'is-invalid': invalidGrossValue }"
+                  :disabled="user.role.level >= 3"
                 />
                 <div class="invalid-feedback">
                   <ul>
@@ -232,15 +240,15 @@
             Salvar
           </button>
 
-          <button class="mt-2 btn btn-danger" @click.stop="onCancel">
-            Cancelar
+          <button class="mt-2 btn btn-warning" @click.stop="onCancel">
+            Retornar
           </button>
         </form>
       </div>
     </div>
     <machine-inventory v-if="machine" :machine="machine" />
-    <machine-partner v-if="machine" :machine="machine" />
-    <machine-operator v-if="machine" :machine="machine" />
+    <machine-partner v-if="machine && user.role.level < 3" :machine="machine" />
+    <machine-operator v-if="machine && user.role.level < 3" :machine="machine" />
   </div>
 </template>
 
@@ -254,6 +262,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { faExclamationTriangle } from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
 library.add(faExclamationTriangle);
+import { mapGetters } from "vuex";
 
 export default {
   components: {
@@ -355,7 +364,7 @@ export default {
         });
     },
     onCancel() {
-      this.$emit("update:showForm", false);
+      this.$router.go(-1);
     },
     updateSlot(event) {
       let sampleId = event.target.value;
@@ -474,6 +483,7 @@ export default {
       });
       return checkOperatorLocation == undefined;
     },
+    ...mapGetters(["user"]),
   },
 };
 </script>

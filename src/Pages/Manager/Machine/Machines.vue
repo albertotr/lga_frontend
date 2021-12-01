@@ -68,13 +68,14 @@
               params: { machine: obj.item },
             }"
           >
-            <font-awesome-icon style="color:white" icon="list-alt" size="1x" /> </router-link
+            <font-awesome-icon style="color:white" icon="list-alt" size="1x" class="btn-width" /> </router-link
           >&nbsp;&nbsp;&nbsp;
 
           <button class="btn btn-info btn-sm" @click="onTransaction(obj.item)" :disabled="!obj.item.device" v-if="permissions.includes('view-machine')">
             <font-awesome-icon style="color:white"
               icon="dollar-sign"
-              size="1x"              
+              size="1x" 
+              class="btn-width"             
             /> </button
           >&nbsp;&nbsp;&nbsp;
 
@@ -86,8 +87,19 @@
             }"
             v-if="permissions.includes('view-machine')"
           >
-            <font-awesome-icon style="color:white" icon="clipboard-list" size="1x" />
-          </router-link>
+            <font-awesome-icon style="color:white" icon="clipboard-list" size="1x" class="btn-width" />
+          </router-link>&nbsp;&nbsp;&nbsp;
+
+          <router-link
+            class="btn btn-info btn-sm"
+            :to="{
+              name: 'managemachineedit',
+              params: { machine: obj.item.id },
+            }"
+            v-if="permissions.includes('update-machine')"
+          >
+            <font-awesome-icon style="color:white" icon="pencil-alt" size="1x" class="btn-width" />
+          </router-link> 
         </template>
 
         <template #table-busy>
@@ -231,10 +243,11 @@ import {
   faListAlt,
   faDollarSign,
   faClipboardList,
+  faPencilAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
 
-library.add(faEdit, faTrash, faListAlt, faDollarSign, faClipboardList);
+library.add(faEdit, faTrash, faListAlt, faDollarSign, faClipboardList, faPencilAlt);
 
 export default {
   name: "ManageMachines",
@@ -392,4 +405,8 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+.btn-width{
+  width:20px;
+}
+</style>

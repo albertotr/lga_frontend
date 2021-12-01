@@ -17,6 +17,9 @@ import Operators from "../Pages/Admin/Operator/Operators";
 import Locations from "../Pages/Admin/Location/Locations";
 import MachineMessages from "../Pages/Manager/Machine/Messages";
 import MachineTransactions from "../Pages/Manager/Machine/Transactions";
+import MachineEditForm from "../Pages/Manager/Machine/Machine";
+import ManageLocations from "../Pages/Manager/Location/Locations";
+import LocationEditForm from "../Pages/Manager/Location/Location";
 
 Vue.use(Router);
 
@@ -109,6 +112,12 @@ function configRoutes () {
     },
 
     {
+      path: "/manage/machine/edit/:machine",
+      name: "managemachineedit",
+      component: MachineEditForm,
+    },    
+
+    {
       path: "/manage/machine/transactions",
       name: "managemachinetransactions",
       component: MachineTransactions,
@@ -120,6 +129,18 @@ function configRoutes () {
       name: "managemessages",
       component: ManageMessages,
     },
+
+    {
+      path: "/manage/location",
+      name: "managelocations",
+      component: ManageLocations
+    },
+
+    {
+      path: "/manage/location/edit/:location",
+      name: "managelocationedit",
+      component: LocationEditForm,
+    },  
 
     // Sistem pages
     {

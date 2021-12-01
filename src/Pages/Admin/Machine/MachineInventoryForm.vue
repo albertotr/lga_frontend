@@ -20,7 +20,7 @@
         <h5 class="card-title">
           Inventario
         </h5>
-        <div class="row" style="margin-bottom:10px">
+        <div class="row" style="margin-bottom:10px" v-if="user.role.level < 3">
           <div class="col">
             <b-button
               squared
@@ -46,31 +46,38 @@
 
           <template #cell(action)="obj">
             <div class="row">
-              <font-awesome-icon
-                icon="plus-circle"
-                size="2x"
-                class="col text-success"
-                @click="onIncrease(obj.item)"
-              />
-              <font-awesome-icon
-                icon="minus-circle"
-                size="2x"
-                class="col text-danger"
-                @click="onDecrease(obj.item)"
-                v-if="obj.item.pivot.quantity > 0"
-              />
-              <font-awesome-icon
-                icon="minus-circle"
-                size="2x"
-                class="col buttonDisabled"
-                v-else
-              />
-              <font-awesome-icon
-                icon="edit"
-                size="2x"
-                class="col text-info"
-                @click="onEdit(obj.item)"
-              />
+              <div class="col btn">
+                <font-awesome-icon
+                  icon="plus-circle"
+                  size="2x"
+                  class="text-success"
+                  @click="onIncrease(obj.item)"
+                />
+              </div>
+              <div class="col btn" v-if="obj.item.pivot.quantity > 0">
+                <font-awesome-icon
+                  icon="minus-circle"
+                  size="2x"
+                  class="text-danger"
+                  @click="onDecrease(obj.item)"
+                />
+              </div>
+              <div class="col btn" v-else>
+                <font-awesome-icon
+                  icon="minus-circle"
+                  size="2x"
+                  class="buttonDisabled"
+                />
+              </div>
+              <div class="col btn">
+                <font-awesome-icon
+                  icon="edit"
+                  size="2x"
+                  class="text-info"
+                  @click="onEdit(obj.item)"
+                  v-if="user.role.level < 3"
+                />
+              </div>
             </div>
           </template>
 
@@ -205,6 +212,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
 library.add(faPlusCircle, faMinusCircle, faRecycle, faEdit);
+import { mapGetters } from "vuex";
 export default {
   name: "MachineInventory",
   components: { FontAwesomeIcon },
@@ -252,6 +260,7 @@ export default {
     loadingTableResult() {
       return this.machine == null;
     },
+    ...mapGetters(["user"]),
   },
   methods: {
     onIncrease(item) {

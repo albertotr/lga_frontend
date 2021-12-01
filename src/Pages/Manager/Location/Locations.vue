@@ -43,6 +43,7 @@
       >
         <template #cell(action)="obj">
           <router-link
+            class="btn btn-info btn-sm"
             :to="{
               name: 'managelocationedit',
               params: { location: obj.item.id },
@@ -53,20 +54,20 @@
                 !obj.item.deleted_at
             "
           >
-            <font-awesome-icon icon="edit" size="2x" class="text-info" />
+            <font-awesome-icon icon="edit" size="2x" style="color:white" />
           </router-link>
           &nbsp;
-          <font-awesome-icon
-            icon="trash"
-            size="2x"
-            class="text-danger"
+          <button
+            class="btn btn-danger btn-sm"
             @click="onDeleteLocations(obj.item)"
             v-if="
               permissions.includes('delete-location') &&
                 obj.item.machines_count == 0 &&
                 !obj.item.deleted_at
             "
-          />
+          >
+            <font-awesome-icon icon="trash" size="2x" style="color:white" />
+          </button>
 
           <font-awesome-icon
             icon="recycle"
@@ -115,7 +116,7 @@ import {
   faBomb,
 } from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import LocationForm from "./LocationForm.vue";
+import LocationForm from "./Location.vue";
 
 library.add(faEdit, faTrash, faRecycle, faBomb);
 
@@ -149,10 +150,6 @@ export default {
     this.reloadDataTable();
   },
   methods: {
-    onEditLocations(location) {
-      this.location_selected = location;
-      this.showForm = true;
-    },
     onDeleteLocations(location) {
       this.boxTwo = "";
       this.$bvModal

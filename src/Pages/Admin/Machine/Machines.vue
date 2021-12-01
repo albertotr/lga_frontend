@@ -52,13 +52,20 @@
         </template>
         
         <template #cell(action)="obj">
-          <font-awesome-icon
+          <router-link
+            :to="{
+              name: 'managemachineedit',
+              params: { machine: obj.item.id },
+            }"
+            v-if="permissions.includes('update-machine')"
+          >
+           <font-awesome-icon
             icon="edit"
             size="2x"
-            class="text-info"
-            @click="onEditMachine(obj.item)"
+            class="text-info"            
             v-if="permissions.includes('update-machine')"
-          />
+          /> 
+          </router-link>          
           &nbsp;
           <font-awesome-icon
             icon="trash"

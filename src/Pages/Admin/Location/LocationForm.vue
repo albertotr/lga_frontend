@@ -153,6 +153,7 @@
                   class="form-control"
                   :class="{ 'is-invalid': invalidOperatorId }"
                   v-model="form.operator_id"
+                  :disabled="user.role.level >= 3"
                 >
                   <option value="null">&nbsp;</option>
                   <option
@@ -177,8 +178,8 @@
             Salvar
           </button>
 
-          <button class="mt-2 btn btn-danger" @click.stop="onCancel">
-            Cancelar
+          <button class="mt-2 btn btn-warning" @click.stop="onCancel">
+            Retornar
           </button>
         </form>
       </div>
@@ -188,6 +189,7 @@
 
 <script>
 import axios from "axios";
+import { mapGetters } from "vuex";
 export default {
   components: {},
   name: "Location_Form",
@@ -264,7 +266,7 @@ export default {
         });
     },
     onCancel() {
-      this.$emit("update:showForm", false);
+      this.$router.go(-1);
     },
   },
   created() {
@@ -328,6 +330,7 @@ export default {
       if (this.error["operator_id"]) return true;
       return false;
     },
+    ...mapGetters(["user"]),
   },
 };
 </script>
