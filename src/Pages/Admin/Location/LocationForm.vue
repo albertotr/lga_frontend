@@ -143,7 +143,7 @@
             </div>
           </div>
 
-          <div class="form-row">
+          <div class="form-row" v-if="user.role.level < 3">
             <div class="col-md-6">
               <div class="position-relative form-group">
                 <label for="labelFormOperator" class="">Operador</label>
@@ -152,10 +152,9 @@
                   id="formOperator"
                   class="form-control"
                   :class="{ 'is-invalid': invalidOperatorId }"
-                  v-model="form.operator_id"
-                  :disabled="user.role.level >= 3"
+                  v-model="form.operator_id"                  
                 >
-                  <option value="null">&nbsp;</option>
+                  <option :value="null">&nbsp;</option>
                   <option
                     v-for="operator in operators"
                     :key="operator.id"
@@ -207,6 +206,7 @@ export default {
         state: "",
         postalcode: "",
         location_id: "",
+        operator_id: null,
       },
       error: null,
       invalidNameMessage: "",
@@ -215,6 +215,8 @@ export default {
       invalidCityMessage: "",
       invalidStateMessage: "",
       invalidOperatorIdMessage: "123",
+
+      token:null,
     };
   },
   props: {
@@ -246,7 +248,7 @@ export default {
           this.$emit("update:showForm", false);
         })
         .catch((msg) => {
-          this.$emit("updateDataTable", msg.response);
+          this.$emit("updateDataTable", false);
           if (msg.response.status == 422) {
             this.error = msg.response.data.errors;
 
@@ -263,6 +265,7 @@ export default {
             if (this.error["operator_id"])
               this.invalidOperatorIdMessage = this.error["operator_id"];
           }
+          this.$emit("update:countdown", 10);
         });
     },
     onCancel() {
@@ -270,34 +273,26 @@ export default {
     },
   },
   created() {
-    const token = localStorage.getItem("token");
-    var OptionsOperators = {
-      method: "get",
-      url: "/api/operator/available",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-    axios(OptionsOperators).then((response) => {
-      this.operators = response.data;
-      if (this.machine && this.machine.operator)
-        this.operators.push(this.machine.operator);
-    });
+    this.token = localStorage.getItem("token");
 
-    if (this.location) {
-      this.form = {
-        id: this.location.id,
-        name: this.location.name,
-        address: this.location.address,
-        number: this.location.number,
-        complement: this.location.complement,
-        neighborhood: this.location.neighborhood,
-        city: this.location.city,
-        state: this.location.state,
-        postalcode: this.location.postal_code,
-        operator_id: this.location.operator_id,
+    if (this.user.role.level >= 3) {
+      this.form.operator_id = this.user.id;
+    } else {      
+      var OptionsOperators = {
+        method: "get",
+        url: "/api/operator/available",
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+        },
       };
+      axios(OptionsOperators).then((response) => {
+        this.operators = response.data;
+        if (this.machine && this.machine.operator)
+          this.operators.push(this.machine.operator);
+      });
     }
+
+    
   },
   computed: {
     invalidName() {
@@ -332,6 +327,29 @@ export default {
     },
     ...mapGetters(["user"]),
   },
+  mounted(){
+    var OptionsOperators = {
+      method: "get",
+      url: `/api/location/${this.$route.params.location}`,
+      headers: {
+        Authorization: `Bearer ${this.token}`,
+      },
+    };
+    axios(OptionsOperators).then((response) => { 
+      this.form = {
+        id: response.data[0].id,
+        name: response.data[0].name,
+        address: response.data[0].address,
+        number: response.data[0].number,
+        complement: response.data[0].complement,
+        neighborhood: response.data[0].neighborhood,
+        city: response.data[0].city,
+        state: response.data[0].state,
+        postalcode: response.data[0].postal_code,
+        operator_id: response.data[0].operator_id,
+      };
+    });
+  }
 };
 </script>
 

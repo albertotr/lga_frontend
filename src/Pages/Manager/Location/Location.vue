@@ -18,8 +18,9 @@
     <location-form
       :showForm.sync="showForm"
       :location="location"
+      :errorMessage.sync="alertMessage"
+      :countdown.sync="dismissCountDown"
       @updateDataTable="reloadDataTable"
-      v-if="location"
     />
   </div>
 </template>
@@ -49,22 +50,37 @@ export default {
     countDownChanged(dismissCountDown) {
       this.dismissCountDown = dismissCountDown;
     },
+    loadData(){
+      this.token = localStorage.getItem("token");
+      var Options = {
+        method: "get",
+        url: `/api/location/${this.$route.params.location}/`,
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+        },
+      };
+      axios(Options).then((response) => {
+        this.location = response.data[0];
+      });
+    },
     reloadDataTable(value) {
-      console.info(value);
+      if (value || value === undefined) {
+        this.loadData();
+      } else if (value === false) {
+        this.alertType = "warning";
+        this.alertMessage = "Verifique o formulário";
+        this.dismissCountDown = this.dismissSecs;
+      }
+
+      if (value) {
+        this.alertType = "success";
+        this.alertMessage = `Localização inserida/editada com sucesso.`;
+        this.dismissCountDown = this.dismissSecs;
+      }
     },
   },
   created() {
-    this.token = localStorage.getItem("token");
-    var Options = {
-      method: "get",
-      url: `/api/location/${this.$route.params.location}/`,
-      headers: {
-        Authorization: `Bearer ${this.token}`,
-      },
-    };
-    axios(Options).then((response) => {
-      this.location = response.data[0];
-    });
+    if(this.location) this.loadData()
   },
 };
 </script>

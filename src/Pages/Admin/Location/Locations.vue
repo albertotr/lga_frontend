@@ -25,6 +25,7 @@
     ></page-title>
     <div class="content">
       <location-form
+        :countdown.sync="dismissCountDown"
         :showForm.sync="showForm"
         :location="location_selected"
         @updateDataTable="reloadDataTable"

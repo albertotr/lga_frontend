@@ -26,7 +26,6 @@
     <div class="content">
       <location-form
         :showForm.sync="showForm"
-        :location="location_selected"
         @updateDataTable="reloadDataTable"
         v-if="showForm"
       ></location-form>
@@ -121,7 +120,7 @@ import LocationForm from "./Location.vue";
 library.add(faEdit, faTrash, faRecycle, faBomb);
 
 export default {
-  name: "Locationss",
+  name: "Locations",
   components: {
     PageTitle,
     "font-awesome-icon": FontAwesomeIcon,
@@ -133,7 +132,6 @@ export default {
       subheading: "Verifique os dados antes de executar as ações.",
       icon: "clipboard-list",
       locations: null,
-      location_selected: null,
       fields: [
         { key: "name", label: "Name" },
         { key: "operator.name", label: "Operador" },
@@ -287,7 +285,6 @@ export default {
       this.dismissCountDown = dismissCountDown;
     },
     clearForm() {
-      this.location_selected = null;
       this.showForm = true;
     },
     reloadDataTable(value) {
