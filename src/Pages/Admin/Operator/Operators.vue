@@ -19,18 +19,9 @@
       :heading="heading"
       :subheading="subheading"
       :icon="icon"
-      @clearForm="clearForm"
-      :showForm.sync="showForm"
-      @updateDataTable="reloadDataTable"
+      @addForm="addForm"
     ></page-title>
     <div class="content">
-      <operator-form
-        :showForm.sync="showForm"
-        :operator="operator_selected"
-        @updateDataTable="reloadDataTable"
-        v-if="showForm"
-      ></operator-form>
-
       <b-table
         :items="operators"
         :fields="fields"
@@ -39,20 +30,18 @@
         hover
         :busy="loadingTableResult"
         responsive="sm"
-        v-show="!showForm"
       >
         <template #cell(action)="obj">
-          <font-awesome-icon
-            icon="edit"
-            size="2x"
-            class="text-info"
-            @click="onEditOperator(obj.item)"
+          <router-link
+            :to="{path: `/admin/operator/edit/${obj.item.id}`}"
             v-if="
               permissions.includes('update-operator') &&
                 !obj.item.machine &&
                 !obj.item.deleted_at
             "
-          />
+          >
+            <font-awesome-icon icon="edit" size="2x" class="text-info" />
+          </router-link> 
           &nbsp;
           <font-awesome-icon
             icon="trash"
@@ -111,8 +100,6 @@ import {
   faBomb,
 } from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import OperatorForm from "./OperatorForm.vue";
-
 library.add(faEdit, faTrash, faRecycle, faBomb);
 
 export default {
@@ -120,7 +107,6 @@ export default {
   components: {
     PageTitle,
     "font-awesome-icon": FontAwesomeIcon,
-    OperatorForm,
   },
   data() {
     return {
@@ -128,13 +114,11 @@ export default {
       subheading: "Verifique os dados antes de executar as ações.",
       icon: "clipboard-list",
       operators: null,
-      operator_selected: null,
       fields: [
         { key: "name", label: "Name" },
         { key: "manager.name", label: "Gerente" },
         { key: "action", label: "Ações" },
       ],
-      showForm: false,
       dismissSecs: 10,
       dismissCountDown: 0,
       alertType: "success",
@@ -145,9 +129,8 @@ export default {
     this.reloadDataTable();
   },
   methods: {
-    onEditOperator(operator) {
-      this.operator_selected = operator;
-      this.showForm = true;
+    addForm() {
+      this.$router.push({path: `/admin/operator/edit`});
     },
     onDeleteOperator(operator) {
       this.boxTwo = "";

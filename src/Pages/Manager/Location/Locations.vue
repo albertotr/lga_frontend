@@ -19,8 +19,7 @@
       :heading="heading"
       :subheading="subheading"
       :icon="icon"
-      @clearForm="clearForm"
-      :showForm.sync="showForm"
+      @addForm="addForm"
       @updateDataTable="reloadDataTable"
     ></page-title>
     <div class="content">
@@ -284,8 +283,11 @@ export default {
     countDownChanged(dismissCountDown) {
       this.dismissCountDown = dismissCountDown;
     },
-    clearForm() {
-      this.showForm = true;
+    addForm() {
+      this.$router.push({
+              name: 'managelocationedit',
+              params: { location: null },
+            });
     },
     reloadDataTable(value) {
       if (value !== undefined && value.status) {

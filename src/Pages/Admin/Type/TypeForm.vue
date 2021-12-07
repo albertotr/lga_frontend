@@ -34,8 +34,8 @@
             Salvar
           </button>
 
-          <button class="mt-2 btn btn-danger" @click.stop="onCancel">
-            Cancelar
+          <button class="mt-2 btn btn-warning" @click.stop="$router.go(-1)">
+            Retornar
           </button>
         </form>
       </div>
@@ -83,8 +83,7 @@ export default {
       };
       axios(Options)
         .then(() => {
-          this.$emit("updateDataTable", true);
-          this.$emit("update:showForm", false);
+          this.$router.go(-1);
         })
         .catch((msg) => {
           this.$emit("updateDataTable", msg.response);
@@ -96,16 +95,23 @@ export default {
           }
         });
     },
-    onCancel() {
-      this.$emit("update:showForm", false);
-    },
   },
   created() {
-    if (this.type) {
-      this.form = {
-        id: this.type.id,
-        name: this.type.name,
+    if (this.$route.params.type) {
+      const token = localStorage.getItem("token");
+      var Options = {
+        method: "get",
+        url: `/api/type/${this.$route.params.type}`,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       };
+      axios(Options).then((response) => {
+        this.form = {
+          id: response.data.id,
+          name: response.data.name,
+        };
+      });
     }
   },
   computed: {

@@ -28,6 +28,19 @@
                 </div>
               </div>
             </div>
+            <div class="col-md-4">
+              <div class="position-relative form-group">
+                <label for="labelFormPostalCode" class="">CEP</label
+                ><the-mask
+                  name="postalcode"
+                  id="formPostalCode"
+                  type="text"
+                  class="form-control"
+                  v-model="form.postalcode"
+                  :mask="['#####-###']"
+                />
+              </div>
+            </div>
           </div>
 
           <div class="form-row">
@@ -177,7 +190,7 @@
             Salvar
           </button>
 
-          <button class="mt-2 btn btn-warning" @click.stop="onCancel">
+          <button class="mt-2 btn btn-warning" @click.stop="$router.go(-1)">
             Retornar
           </button>
         </form>
@@ -244,8 +257,7 @@ export default {
       };
       axios(Options)
         .then(() => {
-          this.$emit("updateDataTable", true);
-          this.$emit("update:showForm", false);
+          this.$router.go(-1);
         })
         .catch((msg) => {
           this.$emit("updateDataTable", false);
@@ -268,15 +280,12 @@ export default {
           this.$emit("update:countdown", 10);
         });
     },
-    onCancel() {
-      this.$router.go(-1);
-    },
   },
   created() {
     this.token = localStorage.getItem("token");
 
     if (this.user.role.level >= 3) {
-      this.form.operator_id = this.user.id;
+      this.form.operator_id = this.user.operator.id;
     } else {      
       var OptionsOperators = {
         method: "get",
@@ -328,27 +337,30 @@ export default {
     ...mapGetters(["user"]),
   },
   mounted(){
-    var OptionsOperators = {
-      method: "get",
-      url: `/api/location/${this.$route.params.location}`,
-      headers: {
-        Authorization: `Bearer ${this.token}`,
-      },
-    };
-    axios(OptionsOperators).then((response) => { 
-      this.form = {
-        id: response.data[0].id,
-        name: response.data[0].name,
-        address: response.data[0].address,
-        number: response.data[0].number,
-        complement: response.data[0].complement,
-        neighborhood: response.data[0].neighborhood,
-        city: response.data[0].city,
-        state: response.data[0].state,
-        postalcode: response.data[0].postal_code,
-        operator_id: response.data[0].operator_id,
+
+    if(this.$route.params.location){
+      var OptionsOperators = {
+        method: "get",
+        url: `/api/location/${this.$route.params.location}`,
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+        },
       };
-    });
+      axios(OptionsOperators).then((response) => { 
+        this.form = {
+          id: response.data[0].id,
+          name: response.data[0].name,
+          address: response.data[0].address,
+          number: response.data[0].number,
+          complement: response.data[0].complement,
+          neighborhood: response.data[0].neighborhood,
+          city: response.data[0].city,
+          state: response.data[0].state,
+          postalcode: response.data[0].postal_code,
+          operator_id: response.data[0].operator_id,
+        };
+      });
+    }
   }
 };
 </script>

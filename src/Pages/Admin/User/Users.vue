@@ -19,9 +19,8 @@
       :heading="heading"
       :subheading="subheading"
       :icon="icon"
-      @clearForm="clearForm"
+      @addForm="addForm"
       @updateDataTable="reloadDataTable"
-      :showForm.sync="showForm"
     ></page-title>
     <div class="content">
       <user-form
@@ -43,13 +42,12 @@
         v-show="!showForm"
       >
         <template #cell(action)="obj">
-          <font-awesome-icon
-            icon="edit"
-            size="2x"
-            class="text-info"
-            @click="onEditUser(obj.item)"
+          <router-link
+            :to="{path: `/admin/user/edit/${obj.item.id}`}"
             v-if="permissions.includes('update-user') && !obj.item.deleted_at"
-          />
+          >
+            <font-awesome-icon icon="edit" size="2x" class="text-info" />
+          </router-link>
           &nbsp;
           <font-awesome-icon
             icon="trash"
@@ -133,8 +131,7 @@ export default {
   },
   methods: {
     onEditUser(user) {
-      this.user_selected = user;
-      this.showForm = true;
+      this.$router.push({path: `/admin/user/edit/${user.id}`});
     },
     onDeleteUser(user) {
       this.boxTwo = "";
@@ -269,9 +266,8 @@ export default {
     countDownChanged(dismissCountDown) {
       this.dismissCountDown = dismissCountDown;
     },
-    clearForm() {
-      this.user_selected = null;
-      this.showForm = true;
+    addForm() {
+      this.$router.push({path: `/admin/user/edit`});
     },
     reloadDataTable(value) {
       if (value || value === undefined) {

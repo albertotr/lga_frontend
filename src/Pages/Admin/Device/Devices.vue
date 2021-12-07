@@ -19,17 +19,9 @@
       :heading="heading"
       :subheading="subheading"
       :icon="icon"
-      @clearForm="clearForm"
-      :showForm.sync="showForm"
-      @updateDataTable="reloadDataTable"
+      @addForm="addForm"
     ></page-title>
     <div class="content">
-      <device-form
-        :showForm.sync="showForm"
-        :device="device_selected"
-        @updateDataTable="reloadDataTable"
-        v-if="showForm"
-      ></device-form>
 
       <b-table
         :items="devices"
@@ -42,17 +34,16 @@
         v-show="!showForm"
       >
         <template #cell(action)="obj">
-          <font-awesome-icon
-            icon="edit"
-            size="2x"
-            class="text-info"
-            @click="onEditDevice(obj.item)"
+          <router-link
+            :to="{path: `/admin/device/edit/${obj.item.id}`}"
             v-if="
               permissions.includes('update-device') &&
                 !obj.item.machine &&
                 !obj.item.deleted_at
             "
-          />
+          >
+            <font-awesome-icon icon="edit" size="2x" class="text-info" />
+          </router-link>          
           &nbsp;
           <font-awesome-icon
             icon="trash"
@@ -106,7 +97,6 @@ import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { faEdit, faTrash, faRecycle, faBomb } from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import DeviceForm from "./DeviceForm.vue";
 
 library.add(faEdit, faTrash, faRecycle, faBomb);
 
@@ -115,7 +105,6 @@ export default {
   components: {
     PageTitle,
     "font-awesome-icon": FontAwesomeIcon,
-    DeviceForm,
   },
   data() {
     return {
@@ -140,9 +129,8 @@ export default {
     this.reloadDataTable();
   },
   methods: {
-    onEditDevice(device) {
-      this.device_selected = device;
-      this.showForm = true;
+    addForm() {
+      this.$router.push({path: `/admin/device/edit`});
     },
     onDeleteDevice(device) {
       this.boxTwo = "";

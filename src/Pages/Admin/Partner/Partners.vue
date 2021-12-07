@@ -19,17 +19,9 @@
       :heading="heading"
       :subheading="subheading"
       :icon="icon"
-      @clearForm="clearForm"
-      :showForm.sync="showForm"
-      @updateDataTable="reloadDataTable"
+      @addForm="addForm"
     ></page-title>
     <div class="content">
-      <partner-form
-        :showForm.sync="showForm"
-        :partner="partner_selected"
-        @updateDataTable="reloadDataTable"
-        v-if="showForm"
-      ></partner-form>
 
       <b-table
         :items="partners"
@@ -39,20 +31,18 @@
         hover
         :busy="loadingTableResult"
         responsive="sm"
-        v-show="!showForm"
       >
         <template #cell(action)="obj">
-          <font-awesome-icon
-            icon="edit"
-            size="2x"
-            class="text-info"
-            @click="onEditPartner(obj.item)"
+          <router-link
+            :to="{path: `/admin/partner/edit/${obj.item.id}`}"
             v-if="
               permissions.includes('update-partner') &&
                 !obj.item.machine &&
                 !obj.item.deleted_at
             "
-          />
+          >
+            <font-awesome-icon icon="edit" size="2x" class="text-info" />
+          </router-link> 
           &nbsp;
           <font-awesome-icon
             icon="trash"
@@ -82,7 +72,7 @@
             v-if="
               permissions.includes('delete-partner') &&
                 obj.item.deleted_at &&
-                obj.item.machine_count == '0'
+                obj.item.machines_count == 0
             "
           />
         </template>
@@ -111,7 +101,6 @@ import {
   faBomb,
 } from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import PartnerForm from "../Partner/PartnerForm.vue";
 
 library.add(faEdit, faTrash, faRecycle, faBomb);
 
@@ -120,7 +109,6 @@ export default {
   components: {
     PageTitle,
     "font-awesome-icon": FontAwesomeIcon,
-    PartnerForm,
   },
   data() {
     return {
@@ -128,12 +116,10 @@ export default {
       subheading: "Verifique os dados antes de executar as ações.",
       icon: "clipboard-list",
       partners: null,
-      partner_selected: null,
       fields: [
         { key: "name", label: "Name" },
         { key: "action", label: "Ações" },
       ],
-      showForm: false,
       dismissSecs: 10,
       dismissCountDown: 0,
       alertType: "success",
@@ -144,9 +130,8 @@ export default {
     this.reloadDataTable();
   },
   methods: {
-    onEditPartner(partner) {
-      this.partner_selected = partner;
-      this.showForm = true;
+    addForm() {
+      this.$router.push({path: `/admin/partner/edit`});
     },
     onDeletePartner(partner) {
       this.boxTwo = "";
@@ -280,10 +265,6 @@ export default {
     },
     countDownChanged(dismissCountDown) {
       this.dismissCountDown = dismissCountDown;
-    },
-    clearForm() {
-      this.partner_selected = null;
-      this.showForm = true;
     },
     reloadDataTable(value) {
       if (value !== undefined && value.status) {

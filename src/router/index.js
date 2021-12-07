@@ -3,18 +3,26 @@ import Router from "vue-router";
 import store from "../store";
 
 import Users from "../Pages/Admin/User/Users";
+import User from "../Pages/Admin/User/UserForm";
 import Machines from "../Pages/Admin/Machine/Machines";
+import Machine from "../Pages/Admin/Machine/MachineForm";
 import Logs from "../Pages/Admin/Log";
 import PageNotFound from "../Pages/UserPages/404";
 import PageNotPermited from "../Pages/UserPages/403";
 import ManageMachines from "../Pages/Manager/Machine/Machines";
 import ManageMessages from "../Pages/Manager/Messages/Messages";
 import Devices from "../Pages/Admin/Device/Devices";
+import Device from "../Pages/Admin/Device/DeviceForm";
 import Types from "../Pages/Admin/Type/Types";
+import Type from "../Pages/Admin/Type/TypeForm";
 import Samples from "../Pages/Admin/Sample/Samples";
+import Sample from "../Pages/Admin/Sample/SampleForm";
 import Partners from "../Pages/Admin/Partner/Partners";
+import Partner from "../Pages/Admin/Partner/PartnerForm";
 import Operators from "../Pages/Admin/Operator/Operators";
+import Operator from "../Pages/Admin/Operator/OperatorForm";
 import Locations from "../Pages/Admin/Location/Locations";
+import Location from "../Pages/Admin/Location/LocationForm";
 import MachineMessages from "../Pages/Manager/Machine/Messages";
 import MachineTransactions from "../Pages/Manager/Machine/Transactions";
 import MachineEditForm from "../Pages/Manager/Machine/Machine";
@@ -55,11 +63,21 @@ function configRoutes () {
       name: "users",
       component: Users,
     },
+    {
+      path: "/admin/user/edit/:user?",
+      name: "adminuseredit",
+      component: User,
+    },
 
     {
       path: "/admin/machine",
       name: "machines",
       component: Machines,
+    },
+    {
+      path: "/admin/machine/edit/:machine?",
+      name: "adminmachineedit",
+      component: Machine,
     },
 
     {
@@ -67,11 +85,21 @@ function configRoutes () {
       name: "devices",
       component: Devices,
     },
+    {
+      path: "/admin/device/edit/:device?",
+      name: "device",
+      component: Device,
+    },
 
     {
       path: "/admin/type",
       name: "types",
       component: Types,
+    },
+    {
+      path: "/admin/type/edit/:type?",
+      name: "type",
+      component: Type,
     },
 
     {
@@ -79,11 +107,21 @@ function configRoutes () {
       name: "samples",
       component: Samples
     },
+    {
+      path: "/admin/sample/edit/:sample?",
+      name: "sample",
+      component: Sample,
+    },
 
     {
       path: "/admin/parner",
       name: "partners",
       component: Partners
+    },
+    {
+      path: "/admin/partner/edit/:partner?",
+      name: "partner",
+      component: Partner
     },
 
     {
@@ -91,11 +129,21 @@ function configRoutes () {
       name: "operators",
       component: Operators
     },
+    {
+      path: "/admin/operator/edit/:operator?",
+      name: "operator",
+      component: Operator
+    },
 
     {
       path: "/admin/location",
       name: "locations",
       component: Locations
+    },
+    {
+      path: "/admin/location/edit/:location?",
+      name: "location",
+      component: Location
     },
 
     // Manage pages
@@ -123,7 +171,6 @@ function configRoutes () {
       component: MachineTransactions,
     },
 
-    // Manage pages
     {
       path: "/manage/message",
       name: "managemessages",
@@ -154,8 +201,8 @@ function configRoutes () {
 
     {
       path: "/",
-      name: "analytics",
-      component: () => import("../Pages/Dashboards/Analytics.vue"),
+      name: "initial",
+      component: () => import("../Pages/Dashboards/initial.vue"),
     },
 
     // Pages

@@ -19,18 +19,9 @@
       :heading="heading"
       :subheading="subheading"
       :icon="icon"
-      @clearForm="clearForm"
-      :showForm.sync="showForm"
-      @updateDataTable="reloadDataTable"
+      @addForm="addForm"
     ></page-title>
     <div class="content">
-      <location-form
-        :countdown.sync="dismissCountDown"
-        :showForm.sync="showForm"
-        :location="location_selected"
-        @updateDataTable="reloadDataTable"
-        v-if="showForm"
-      ></location-form>
 
       <b-table
         :items="locations"
@@ -116,8 +107,6 @@ import {
   faBomb,
 } from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import LocationForm from "./LocationForm.vue";
-
 library.add(faEdit, faTrash, faRecycle, faBomb);
 
 export default {
@@ -125,7 +114,6 @@ export default {
   components: {
     PageTitle,
     "font-awesome-icon": FontAwesomeIcon,
-    LocationForm,
   },
   data() {
     return {
@@ -150,6 +138,9 @@ export default {
     this.reloadDataTable();
   },
   methods: {
+    addForm() {
+      this.$router.push({path: `/admin/location/edit`});
+    },
     onEditLocations(location) {
       this.location_selected = location;
       this.showForm = true;

@@ -8,9 +8,23 @@
         </h5>
         <form class="" @submit.prevent>
           <div class="form-row">
-            <div class="col-md-6">
+            <div class="col-md-4">
               <div class="position-relative form-group">
-                <label for="labelFormName" class="">Serial</label
+                <label for="labelFormName" class="">Nome</label
+                ><input
+                  name="name"
+                  id="formName"
+                  placeholder="Digite o name da máquina"
+                  type="text"
+                  class="form-control"
+                  v-model="form.name"
+                  :disabled="user.role.level >= 3"
+                />
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="position-relative form-group">
+                <label for="labelFormSerial" class="">Serial</label
                 ><input
                   name="serial"
                   id="formSerial"
@@ -50,7 +64,7 @@
                 </select>
               </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
               <div class="position-relative form-group">
                 <label for="labelFormType" class="">Tipo</label>
                 <select
@@ -248,7 +262,10 @@
     </div>
     <machine-inventory v-if="machine" :machine="machine" />
     <machine-partner v-if="machine && user.role.level < 3" :machine="machine" />
-    <machine-operator v-if="machine && user.role.level < 3" :machine="machine" />
+    <machine-operator
+      v-if="machine && user.role.level < 3"
+      :machine="machine"
+    />
   </div>
 </template>
 
@@ -280,6 +297,7 @@ export default {
       locations: [],
       form: {
         id: null,
+        name: "",
         serial: "",
         device: null,
         type: null,
@@ -340,6 +358,7 @@ export default {
         .then(() => {
           this.$emit("updateDataTable", true);
           this.error = [];
+          if (method == 'POST') this.$router.go(-1);
         })
         .catch((msg) => {
           if (msg.response.status == 422) {
@@ -353,9 +372,12 @@ export default {
             if (this.error["sample"])
               this.invalidSampleMessage = this.error["sample"];
             if (this.error["bet"]) this.invalidBetMessage = this.error["bet"];
-            if (this.error["fixed_value"]) this.invalidFixedValueMessage = this.error["fixed_value"];
-            if (this.error["net_value"]) this.invalidNetValueMessage = this.error["net_value"];
-            if (this.error["gross_value"]) this.invalidGrossValueMessage = this.error["gross_value"];
+            if (this.error["fixed_value"])
+              this.invalidFixedValueMessage = this.error["fixed_value"];
+            if (this.error["net_value"])
+              this.invalidNetValueMessage = this.error["net_value"];
+            if (this.error["gross_value"])
+              this.invalidGrossValueMessage = this.error["gross_value"];
           } else {
             this.$emit("updateDataTable", false);
             this.$emit("update:errorMessage", msg.response.data);
@@ -425,6 +447,7 @@ export default {
     if (this.machine) {
       this.form = {
         id: this.machine.id,
+        name: this.machine.name,
         serial: this.machine.serial,
         device: this.machine.device_id,
         type: this.machine.type_id,

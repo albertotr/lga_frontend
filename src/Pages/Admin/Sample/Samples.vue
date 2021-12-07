@@ -19,16 +19,9 @@
       :heading="heading"
       :subheading="subheading"
       :icon="icon"
-      @clearForm="clearForm"
-      :showForm.sync="showForm"
+      @addForm="addForm"
     ></page-title>
     <div class="content">
-      <sample-form
-        :showForm.sync="showForm"
-        :sample="sample_selected"
-        @updateDataTable="reloadDataTable"
-        v-if="showForm"
-      ></sample-form>
 
       <b-table
         :items="samples"
@@ -38,20 +31,18 @@
         hover
         :busy="loadingTableResult"
         responsive="sm"
-        v-show="!showForm"
       >
         <template #cell(action)="obj">
-          <font-awesome-icon
-            icon="edit"
-            size="2x"
-            class="text-info"
-            @click="onEditSample(obj.item)"
+          <router-link
+            :to="{path: `/admin/sample/edit/${obj.item.id}`}"
             v-if="
-              permissions.includes('update-device') &&
+              permissions.includes('update-sample') &&
                 !obj.item.machine &&
                 !obj.item.deleted_at
             "
-          />
+          >
+            <font-awesome-icon icon="edit" size="2x" class="text-info" />
+          </router-link>
           &nbsp;
           <font-awesome-icon
             icon="trash"
@@ -59,7 +50,7 @@
             class="text-danger"
             @click="onDeleteSample(obj.item)"
             v-if="
-              permissions.includes('delete-device') &&
+              permissions.includes('delete-sample') &&
                 !obj.item.machine &&
                 !obj.item.deleted_at
             "
@@ -70,7 +61,7 @@
             size="2x"
             class="text-warning"
             @click="onRestoreSample(obj.item)"
-            v-if="permissions.includes('delete-device') && obj.item.deleted_at"
+            v-if="permissions.includes('delete-sample') && obj.item.deleted_at"
           />
           &nbsp;
           <font-awesome-icon
@@ -79,7 +70,7 @@
             class="text-danger"
             @click="onForceDeleteSample(obj.item)"
             v-if="
-              permissions.includes('delete-device') &&
+              permissions.includes('delete-sample') &&
                 obj.item.deleted_at &&
                 obj.item.machine_count == '0'
             "
@@ -111,7 +102,6 @@ import {
   faBomb,
 } from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import SampleForm from "../Sample/SampleForm.vue";
 
 library.add(faEdit, faTrash, faRecycle, faBomb);
 
@@ -120,7 +110,6 @@ export default {
   components: {
     PageTitle,
     "font-awesome-icon": FontAwesomeIcon,
-    SampleForm,
   },
   data() {
     return {
@@ -128,27 +117,21 @@ export default {
       subheading: "Verifique os dados antes de executar as ações.",
       icon: "clipboard-list",
       samples: null,
-      sample_selected: null,
       fields: [
         { key: "name", label: "Name" },
         { key: "slot", label: "Slot" },
         { key: "machine_count", label: "Maquinas" },
         { key: "action", label: "Ações" },
       ],
-      showForm: false,
       dismissSecs: 10,
       dismissCountDown: 0,
       alertType: "success",
       alertMessage: "",
     };
   },
-  created() {
-    this.reloadDataTable();
-  },
   methods: {
-    onEditSample(sample) {
-      this.sample_selected = sample;
-      this.showForm = true;
+    addForm() {
+      this.$router.push({path: `/admin/sample/edit`});
     },
     onDeleteSample(sample) {
       this.boxTwo = "";
@@ -280,10 +263,6 @@ export default {
     countDownChanged(dismissCountDown) {
       this.dismissCountDown = dismissCountDown;
     },
-    clearForm() {
-      this.sample_selected = null;
-      this.showForm = true;
-    },
     reloadDataTable(value) {
       if (value !== undefined && value.status) {
         this.alertType = "warning";
@@ -316,6 +295,9 @@ export default {
     loadingTableResult() {
       return this.samples == null;
     },
+  },
+  created() {
+    this.reloadDataTable();
   },
 };
 </script>
