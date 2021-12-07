@@ -203,13 +203,13 @@
             Salvar
           </button>
 
-          <button class="mt-2 btn btn-danger" @click.stop="onCancel">
-            Cancelar
+          <button class="mt-2 btn btn-warning" @click.stop="$router.go(-1)">
+            Retornar
           </button>
         </form>
       </div>
     </div>
-    <contributor :manager="operator" @updateDataTable="reloadDataTable" />
+    <contributor v-if="operator" :manager="operator" />
   </div>
 </template>
 
@@ -234,7 +234,7 @@ export default {
         state: "",
         postalcode: "",
         cpfcnpj: "",
-        user_id:"",
+        user_id: "",
       },
       error: null,
       invalidNameMessage: "",
@@ -243,7 +243,7 @@ export default {
       invalidCityMessage: "",
       invalidStateMessage: "",
       invalidCpfCnpjMessage: "",
-      users:[],
+      users: [],
       token: null,
     };
   },
@@ -270,11 +270,9 @@ export default {
       };
       axios(Options)
         .then(() => {
-          this.$emit("updateDataTable", true);
-          this.$emit("update:showForm", false);
+          this.$router.go(-1);
         })
         .catch((msg) => {
-          this.$emit("updateDataTable", msg.response);
           if (msg.response.status == 422) {
             this.error = msg.response.data.errors;
 
@@ -293,33 +291,37 @@ export default {
           }
         });
     },
-    onCancel() {
-      this.$emit("update:showForm", false);
-    },
-    reloadDataTable() {
-      this.$emit("updateDataTable", true);
-    },
   },
   created() {
     this.token = localStorage.getItem("token");
 
-    if (this.operator) {
-      this.form = {
-        id: this.operator.id,
-        name: this.operator.name,
-        address: this.operator.address,
-        number: this.operator.number,
-        complement: this.operator.complement,
-        neighborhood: this.operator.neighborhood,
-        city: this.operator.city,
-        state: this.operator.state,
-        postalcode: this.operator.postal_code,
-        cpfcnpj: this.operator.cpf_cnpj,
-        user_id: this.operator.user_id,
+    if (this.$route.params.operator) {
+      const token = localStorage.getItem("token");
+      var Options = {
+        method: "get",
+        url: `/api/operator/${this.$route.params.operator}`,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       };
+      axios(Options).then((response) => {
+        this.form = {
+          id: response.data.id,
+          name: response.data.name,
+          address: response.data.address,
+          number: response.data.number,
+          complement: response.data.complement,
+          neighborhood: response.data.neighborhood,
+          city: response.data.city,
+          state: response.data.state,
+          postalcode: response.data.postal_code,
+          cpfcnpj: response.data.cpf_cnpj,
+          user_id: response.data.user_id,
+        };
+      });
     }
 
-    var Options = {
+    Options = {
       method: "GET",
       url: "/api/operator/user",
       headers: {

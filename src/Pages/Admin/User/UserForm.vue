@@ -101,8 +101,8 @@
               Salvar
             </button>
 
-            <button class="mt-2 btn btn-danger" @click.stop="onCancel">
-              Cancelar
+            <button class="mt-2 btn btn-warning" @click.stop="onCancel">
+              Retornar
             </button>
           </template>
         </form>
@@ -132,7 +132,6 @@ export default {
     };
   },
   props: {
-    user: Object,
     showForm: Boolean,
   },
   methods: {
@@ -157,8 +156,7 @@ export default {
       };
       axios(Options)
         .then(() => {
-          this.$emit("updateDataTable", true);
-          this.$emit("update:showForm", false);
+          this.$router.go(-1);
         })
         .catch((msg) => {
           this.$emit("updateDataTable", false);
@@ -176,7 +174,7 @@ export default {
         });
     },
     onCancel() {
-      this.$emit("update:showForm", false);
+      this.$router.go(-1);
     },
   },
   created() {
@@ -192,14 +190,23 @@ export default {
       this.roles = response.data;
     });
 
-    if (this.user) {
+    if (this.$route.params.user) {
+      Options = {
+      method: "get",
+      url: `/api/user/${this.$route.params.user}`,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    axios(Options).then((response) => {
       this.form = {
-        id: this.user.id,
-        name: this.user.name,
-        email: this.user.email,
-        role: this.user.role.id,
-        operator: this.user.operator
+        id: response.data.id,
+        name: response.data.name,
+        email: response.data.email,
+        role: response.data.role.id,
+        operator: response.data.operator
       };
+    });
     }
   },
   computed: {

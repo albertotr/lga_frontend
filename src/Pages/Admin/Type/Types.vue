@@ -19,17 +19,9 @@
       :heading="heading"
       :subheading="subheading"
       :icon="icon"
-      @clearForm="clearForm"
-      :showForm.sync="showForm"
+      @addForm="addForm"
     ></page-title>
     <div class="content">
-      <type-form
-        :showForm.sync="showForm"
-        :type="type_selected"
-        @updateDataTable="reloadDataTable"
-        v-if="showForm"
-      ></type-form>
-
       <b-table
         :items="types"
         :fields="fields"
@@ -38,20 +30,18 @@
         hover
         :busy="loadingTableResult"
         responsive="sm"
-        v-show="!showForm"
       >
         <template #cell(action)="obj">
-          <font-awesome-icon
-            icon="edit"
-            size="2x"
-            class="text-info"
-            @click="onEditType(obj.item)"
+          <router-link
+            :to="{path: `/admin/type/edit/${obj.item.id}`}"
             v-if="
-              permissions.includes('update-device') &&
+              permissions.includes('update-type') &&
                 !obj.item.machine &&
                 !obj.item.deleted_at
             "
-          />
+          >
+            <font-awesome-icon icon="edit" size="2x" class="text-info" />
+          </router-link>
           &nbsp;
           <font-awesome-icon
             icon="trash"
@@ -59,7 +49,7 @@
             class="text-danger"
             @click="onDeleteType(obj.item)"
             v-if="
-              permissions.includes('delete-device') &&
+              permissions.includes('delete-type') &&
                 !obj.item.machine &&
                 !obj.item.deleted_at
             "
@@ -70,7 +60,7 @@
             size="2x"
             class="text-warning"
             @click="onRestoreType(obj.item)"
-            v-if="permissions.includes('delete-device') && obj.item.deleted_at"
+            v-if="permissions.includes('delete-type') && obj.item.deleted_at"
           />
           &nbsp;
           <font-awesome-icon
@@ -79,7 +69,7 @@
             class="text-danger"
             @click="onForceDeleteType(obj.item)"
             v-if="
-              permissions.includes('delete-device') &&
+              permissions.includes('delete-type') &&
                 obj.item.deleted_at &&
                 obj.item.machine_count == '0'
             "
@@ -110,7 +100,6 @@ import {
   faBomb,
 } from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import TypeForm from "./TypeForm.vue";
 
 library.add(faEdit, faTrash, faRecycle, faBomb);
 
@@ -119,7 +108,6 @@ export default {
   components: {
     PageTitle,
     "font-awesome-icon": FontAwesomeIcon,
-    TypeForm,
   },
   data() {
     return {
@@ -127,25 +115,19 @@ export default {
       subheading: "Verifique os dados antes de executar as ações.",
       icon: "clipboard-list",
       types: null,
-      type_selected: null,
       fields: [
         { key: "name", label: "Name" },
         { key: "action", label: "Ações" },
       ],
-      showForm: false,
       dismissSecs: 10,
       dismissCountDown: 0,
       alertType: "success",
       alertMessage: "Verifique o formulário",
     };
-  },
-  created() {
-    this.reloadDataTable();
-  },
+  },  
   methods: {
-    onEditType(type) {
-      this.type_selected = type;
-      this.showForm = true;
+    addForm() {
+      this.$router.push({path: `/admin/type/edit`});
     },
     onDeleteType(type) {
       this.boxTwo = "";
@@ -276,7 +258,6 @@ export default {
     },
     clearForm() {
       this.type_selected = null;
-      this.showForm = true;
     },
     reloadDataTable(value) {
       if (value !== undefined && value.status) {
@@ -308,6 +289,9 @@ export default {
     loadingTableResult() {
       return this.types == null;
     },
+  },
+  created() {
+    this.reloadDataTable();
   },
 };
 </script>

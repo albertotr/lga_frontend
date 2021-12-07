@@ -19,9 +19,7 @@
       :heading="heading"
       :subheading="subheading"
       :icon="icon"
-      @clearForm="clearForm"
-      :showForm.sync="showForm"
-      @updateDataTable="reloadDataTable"
+      @addForm="addForm"      
     ></page-title>
     <div class="content">
       <machine-form
@@ -29,7 +27,6 @@
         :errorMessage.sync="alertMessage"
         :countdown.sync="dismissCountDown"
         :machine="machine_selected"
-        @updateDataTable="reloadDataTable"
         v-if="showForm"
       ></machine-form>
 
@@ -52,13 +49,20 @@
         </template>
         
         <template #cell(action)="obj">
-          <font-awesome-icon
+          <router-link
+            :to="{
+              name: 'managemachineedit',
+              params: { machine: obj.item.id },
+            }"
+            v-if="permissions.includes('update-machine')"
+          >
+           <font-awesome-icon
             icon="edit"
             size="2x"
-            class="text-info"
-            @click="onEditMachine(obj.item)"
+            class="text-info"            
             v-if="permissions.includes('update-machine')"
-          />
+          /> 
+          </router-link>          
           &nbsp;
           <font-awesome-icon
             icon="trash"
@@ -107,6 +111,7 @@ export default {
       machines: null,
       machine_selected: null,
       fields: [
+        { key: "name", label: "Nome" },
         { key: "serial", label: "Serial" },
         { key: "type.name", label: "Tipo" },
         { key: "sample.name", label: "Modelo" },
@@ -176,9 +181,8 @@ export default {
     countDownChanged(dismissCountDown) {
       this.dismissCountDown = dismissCountDown;
     },
-    clearForm() {
-      this.machine_selected = null;
-      this.showForm = true;
+    addForm() {
+      this.$router.push({path: `/admin/machine/edit`});
     },
     reloadDataTable(value) {
       if (value || value === undefined) {

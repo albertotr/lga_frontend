@@ -19,17 +19,9 @@
       :heading="heading"
       :subheading="subheading"
       :icon="icon"
-      @clearForm="clearForm"
-      :showForm.sync="showForm"
-      @updateDataTable="reloadDataTable"
+      @addForm="addForm"
     ></page-title>
     <div class="content">
-      <location-form
-        :showForm.sync="showForm"
-        :location="location_selected"
-        @updateDataTable="reloadDataTable"
-        v-if="showForm"
-      ></location-form>
 
       <b-table
         :items="locations"
@@ -42,17 +34,19 @@
         v-show="!showForm"
       >
         <template #cell(action)="obj">
-          <font-awesome-icon
-            icon="edit"
-            size="2x"
-            class="text-info"
-            @click="onEditLocations(obj.item)"
+          <router-link
+            :to="{
+              name: 'managelocationedit',
+              params: { location: obj.item.id },
+            }"
             v-if="
               permissions.includes('update-location') &&
                 !obj.item.machine &&
                 !obj.item.deleted_at
             "
-          />
+          >
+            <font-awesome-icon icon="edit" size="2x" class="text-info" />
+          </router-link>
           &nbsp;
           <font-awesome-icon
             icon="trash"
@@ -71,7 +65,9 @@
             size="2x"
             class="text-warning"
             @click="onRestoreLocations(obj.item)"
-            v-if="permissions.includes('delete-location') && obj.item.deleted_at"
+            v-if="
+              permissions.includes('delete-location') && obj.item.deleted_at
+            "
           />
           &nbsp;
           <font-awesome-icon
@@ -111,8 +107,6 @@ import {
   faBomb,
 } from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import LocationForm from "./LocationForm.vue";
-
 library.add(faEdit, faTrash, faRecycle, faBomb);
 
 export default {
@@ -120,7 +114,6 @@ export default {
   components: {
     PageTitle,
     "font-awesome-icon": FontAwesomeIcon,
-    LocationForm,
   },
   data() {
     return {
@@ -145,6 +138,9 @@ export default {
     this.reloadDataTable();
   },
   methods: {
+    addForm() {
+      this.$router.push({path: `/admin/location/edit`});
+    },
     onEditLocations(location) {
       this.location_selected = location;
       this.showForm = true;
@@ -152,16 +148,19 @@ export default {
     onDeleteLocations(location) {
       this.boxTwo = "";
       this.$bvModal
-        .msgBoxConfirm(`Deseja realmente excluir o localização ${location.name}?`, {
-          title: "Confirme a exclusão",
-          size: "sm",
-          buttonSize: "sm",
-          okVariant: "success",
-          okTitle: "Sim",
-          cancelTitle: "Não",
-          footerClass: "p-2",
-          hideHeaderClose: false,
-        })
+        .msgBoxConfirm(
+          `Deseja realmente excluir o localização ${location.name}?`,
+          {
+            title: "Confirme a exclusão",
+            size: "sm",
+            buttonSize: "sm",
+            okVariant: "success",
+            okTitle: "Sim",
+            cancelTitle: "Não",
+            footerClass: "p-2",
+            hideHeaderClose: false,
+          }
+        )
         .then((confirm) => {
           if (confirm) {
             const token = localStorage.getItem("token");

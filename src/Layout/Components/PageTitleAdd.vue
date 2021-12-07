@@ -51,7 +51,7 @@ export default {
   },
   methods: {
     onCreate() {
-      this.$emit("clearForm");
+      this.$emit("addForm");
     },
   },
 };

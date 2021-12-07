@@ -36,8 +36,8 @@
             Salvar
           </button>
 
-          <button class="mt-2 btn btn-danger" @click.stop="onCancel">
-            Cancelar
+          <button class="mt-2 btn btn-warning" @click.stop="$router.go(-1)">
+            Retornar
           </button>
         </form>
       </div>
@@ -57,13 +57,10 @@ export default {
         mac: "",
       },
       invalidMacMessage: "",
-      error:[],
+      error: [],
     };
   },
-  props: {
-    device: Object,
-    showForm: Boolean,
-  },
+  props: {},
   methods: {
     onSubmit() {
       const token = localStorage.getItem("token");
@@ -85,29 +82,34 @@ export default {
       };
       axios(Options)
         .then(() => {
-          this.$emit("updateDataTable", true);
-          this.$emit("update:showForm", false);
+          this.$router.go(-1);
         })
         .catch((msg) => {
           this.$emit("updateDataTable", msg.response);
           if (msg.response.status == 422) {
             this.error = msg.response.data.errors;
 
-            if (this.error["mac"])
-              this.invalidMacMessage = this.error["mac"];
+            if (this.error["mac"]) this.invalidMacMessage = this.error["mac"];
           }
         });
     },
-    onCancel() {
-      this.$emit("update:showForm", false);
-    },
   },
   created() {
-    if (this.device) {
-      this.form = {
-        id: this.device.id,
-        mac: this.device.mac,
+    if (this.$route.params.device) {
+      const token = localStorage.getItem("token");
+      var Options = {
+        method: "get",
+        url: `/api/device/${this.$route.params.device}`,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       };
+      axios(Options).then((response) => {
+        this.form = {
+          id: response.data.id,
+          mac: response.data.mac,
+        };
+      });
     }
   },
   computed: {

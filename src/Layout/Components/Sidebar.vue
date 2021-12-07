@@ -106,6 +106,11 @@ export default {
             title: "Localização",
             icon: "pe-7s-map-2",
             href: "/admin/location",
+          },
+          {
+            title: "Mensagens",
+            icon: "pe-7s-mail",
+            href: "/manage/message",
           }
           /* {
             header: true,
@@ -131,10 +136,10 @@ export default {
             href: "/manage/machine",
           },
           {
-            title: "Mensagens",
-            icon: "pe-7s-mail",
-            href: "/manage/message",
-          }
+            title: "Localização",
+            icon: "pe-7s-map-2",
+            href: "/manage/location",
+          },          
         );
       }
 

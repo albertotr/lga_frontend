@@ -184,8 +184,8 @@
             Salvar
           </button>
 
-          <button class="mt-2 btn btn-danger" @click.stop="onCancel">
-            Cancelar
+          <button class="mt-2 btn btn-warning" @click.stop="$router.go(-1)">
+            Retornar
           </button>
         </form>
       </div>
@@ -246,8 +246,7 @@ export default {
       };
       axios(Options)
         .then(() => {
-          this.$emit("updateDataTable", true);
-          this.$emit("update:showForm", false);
+          this.$router.go(-1)
         })
         .catch((msg) => {
           this.$emit("updateDataTable", msg.response);
@@ -269,24 +268,31 @@ export default {
           }
         });
     },
-    onCancel() {
-      this.$emit("update:showForm", false);
-    },
   },
   created() {
-    if (this.partner) {
-      this.form = {
-        id: this.partner.id,
-        name: this.partner.name,
-        address: this.partner.address,
-        number: this.partner.number,
-        complement: this.partner.complement,
-        neighborhood: this.partner.neighborhood,
-        city: this.partner.city,
-        state: this.partner.state,
-        postalcode: this.partner.postal_code,
-        cpfcnpj: this.partner.cpf_cnpj,
+    if (this.$route.params.partner) {
+      const token = localStorage.getItem("token");
+      var Options = {
+        method: "get",
+        url: `/api/partner/${this.$route.params.partner}`,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       };
+      axios(Options).then((response) => {
+        this.form = {
+          id: response.data.id,
+          name: response.data.name,
+          address: response.data.address,
+          number: response.data.number,
+          complement: response.data.complement,
+          neighborhood: response.data.neighborhood,
+          city: response.data.city,
+          state: response.data.state,
+          postalcode: response.data.postal_code,
+          cpfcnpj: response.data.cpf_cnpj,
+        };
+      });
     }
   },
   computed: {
