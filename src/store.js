@@ -92,7 +92,7 @@ const actions = {
     localStorage.removeItem("token");
 
     var postOptions = {
-      method: "post",
+      method: "get",
       url: "/api/logout/",
       headers: {
         Authorization: `Bearer ${token}`,
