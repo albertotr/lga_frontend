@@ -30,6 +30,7 @@
 <script>
 import Machine from "./gadget/machine";
 import axios from "axios";
+import { mapGetters } from "vuex";
 export default {
   components: { Machine },
   name: "initial",
@@ -55,6 +56,9 @@ export default {
   },
   created() {
     this.loadMachine();
+  },
+  computed: {
+    ...mapGetters(["user"]),
   },
 };
 </script>

@@ -1,6 +1,14 @@
 <template>
   <div>
     <div class="row" v-if="machine">
+      <div
+        class="alert alert-warning col-12"
+        v-if="rentalDays == 0"
+        role="alert"
+      >
+        Já foi efetuado uma transação hoje.
+      </div>
+
       <b-col sm="6">
         <label class="">Maquina:&nbsp;</label
         ><span>{{ this.machine.serial }}</span>
@@ -23,6 +31,16 @@
         ><span>{{ this.machine.cost | currency }}</span>
       </b-col>
 
+      <b-col sm="4">
+        <label class="">Aluguel:&nbsp;</label
+        ><span>{{ this.totalRent | currency }}</span>
+      </b-col>
+
+      <b-col sm="4">
+        <label class="">Comissão:&nbsp;</label
+        ><span>{{ totalComission | currency }}</span>
+      </b-col>
+
       <b-col sm="12">
         <b-row>
           <b-col>
@@ -30,10 +48,7 @@
             ><span>{{ this.totalInventory }}</span>
           </b-col>
           <b-col
-            ><button
-              class="btn btn-sm btn-primary"
-              v-b-modal.inventoryModal
-            >
+            ><button class="btn btn-sm btn-primary" v-b-modal.inventoryModal>
               Editar Estoque
             </button></b-col
           >
@@ -88,7 +103,11 @@
 
     <div class="w-100">
       <b-button-group>
-        <button class="btn btn-primary" @click.stop="onTransactionCreate">
+        <button
+          class="btn btn-primary"
+          @click.stop="onTransactionCreate"
+          :disabled="rentalDays == 0"
+        >
           Sacar
         </button>
         <button
@@ -127,6 +146,13 @@ export default {
         precision: 2,
         masked: false,
       },
+      rent: {
+        decimal: ",",
+        thousands: ".",
+        prefix: "R$ ",
+        precision: 2,
+        masked: false,
+      },
       value: 0,
       comment: "",
       match: true,
@@ -135,6 +161,8 @@ export default {
       invalidValueMessage: 0,
 
       objeto: null,
+      rentalDays: 0,
+      lastTransaction: null,
     };
   },
   components: {
@@ -142,14 +170,40 @@ export default {
   },
   props: {
     machine: Object,
+    transaction: Object,
   },
   computed: {
-    ...mapGetters(["permissions"]),
+    ...mapGetters(["permissions", "user"]),
     totalInventory() {
       return this.machine.inventory.items.reduce(
         (partial_sum, item) => partial_sum + item.pivot.quantity,
         0
       );
+    },
+    totalRent() {
+      let rent = this.machine.fixed_value;
+      let days = this.rentalDays;
+      return (parseFloat(rent) / 30) * parseInt(days);
+    },
+    totalComission() {
+      const operator = this.machine.operators.filter((operator) => {
+        return operator.user_id == this.user.id;
+      });
+
+      var totalComission = 0;
+
+      //usuario autenticado não é o operador
+      if (operator.length == 0) {
+        if (this.user.role.level == 0) {
+          return this.machine.balance - this.totalRent - this.machine.cost;
+        } else return totalComission;
+      }
+
+      totalComission =
+        (this.machine.balance - this.totalRent - this.machine.cost) *
+        parseFloat(operator[0].pivot.participation / 100);
+
+      return totalComission;
     },
   },
   filters: {
@@ -207,6 +261,26 @@ export default {
   },
   mounted() {
     this.value = this.machine.balance;
+    var Options = {
+      method: "get",
+      url: `/api/transaction/last/${this.machine.id}`,
+      headers: {
+        Authorization: `Bearer ${this.token}`,
+      },
+    };
+    axios(Options)
+      .then((result) => {
+        this.lastTransaction = result.data;
+        let now = new Date(Date.now());
+        let transact = result.data.created_at
+          ? new Date(result.data.created_at)
+          : new Date(now.getFullYear(), now.getMonth(), 1);
+        var diffDays = now.getDate() - transact.getDate();
+        this.rentalDays = diffDays;
+      })
+      .catch((msg) => {
+        console.log(msg);
+      });
   },
 };
 </script>
