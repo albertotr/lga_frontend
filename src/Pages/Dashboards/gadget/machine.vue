@@ -17,8 +17,21 @@
         </div>
         <div class="widget-subheading" v-else>&nbsp;</div>
         <div class="widget-numbers">R${{ machine.balance }}</div>
-        <div class="widget-subheading">{{machine.location.name}}</div>
-        <div class="widget-description opacity-8 text-focus" style="margin-top:0px;">
+        <div class="widget-subheading" v-if="machine.location">
+          <font-awesome-icon icon="map-marker-alt" class="text-purple" />
+          {{ machine.location.name }}
+        </div>
+        <div class="widget-subheading" v-if="machine.operators">
+          <font-awesome-icon icon="users-cog" class="text-teal" />&nbsp;
+          <span v-for="operator in machine.operators" :key="operator.id"
+            >{{ operator.name }} {{ operator.pivot.participation }}%;&nbsp;
+          </span>
+        </div>
+        <div class="widget-subheading" v-else>Sem localização</div>
+        <div
+          class="widget-description opacity-8 text-focus"
+          style="margin-top:0px;"
+        >
           <div class="column">
             <div class="col" style="padding:0px">
               <div class="d-inline text-info pr-1">
@@ -45,6 +58,7 @@
                 <b-button
                   class="btn-info"
                   style="color:white"
+                  :disabled="cantEditMachine"
                   @click="
                     $router.push({
                       name: 'managemachineedit',
@@ -85,6 +99,8 @@ import {
   faThumbsUp,
   faThumbsDown,
   faEdit,
+  faMapMarkerAlt,
+  faUsersCog,
 } from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
 library.add(
@@ -96,10 +112,13 @@ library.add(
   faDollarSign,
   faThumbsUp,
   faThumbsDown,
-  faEdit
+  faEdit,
+  faMapMarkerAlt,
+  faUsersCog
 );
 import { mapGetters } from "vuex";
 import Transaction from "../../Manager/Machine/Transaction.vue";
+
 export default {
   name: "machine_gadget",
   components: {
@@ -116,14 +135,29 @@ export default {
         0
       );
     },
+    cantEditMachine() {
+      return !this.permissions.includes("update-machine");
+    },
     ...mapGetters(["permissions"]),
   },
-  methods:{
-    onShowTransaction(id){
+  methods: {
+    onShowTransaction(id) {
       this.$refs[id].show();
-    }
-  }
+    },
+  },
 };
 </script>
 
-<style></style>
+<style lang="css">
+.text-purple {
+  color: #6f42c1;
+}
+
+.text-indigo {
+  color: #6610f2;
+}
+
+.text-teal {
+  color: #20c997;
+}
+</style>

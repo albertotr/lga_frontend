@@ -80,6 +80,25 @@
             {{ validOperatorMessage }}
           </b-form-invalid-feedback>
         </b-form-group>
+        <b-form-group
+          label="Participação"
+          label-for="participation"
+          :state="participationState"
+        >
+          <b-form-input
+            id="participation-input"
+            v-model="operator.participation"
+            :state="participationState"
+            type="number"
+            step="0.01"
+            min="0.00"
+            max="100.00"
+            required
+          ></b-form-input>
+          <b-form-invalid-feedback :state="invalidParticipationValue">
+            {{ validParticipationMessage }}
+          </b-form-invalid-feedback>
+        </b-form-group>
       </form>
     </b-modal>
   </div>
@@ -109,13 +128,16 @@ export default {
       fields: [
         { key: "name", label: "Nome" },
         { key: "cpf_cnpj", label: "CPF/CNPJ" },
+        { key: "pivot.participation", label: "Participação %" },
         { key: "action", label: "Ações" },
       ],
 
       operator: {
         id: "",
+        participation: "",
       },
       operatorState: null,
+      participationState: null,
 
       dismissSecs: 10,
       dismissCountDown: 0,
@@ -124,7 +146,9 @@ export default {
 
       state: null,
       validOperatorMessage: "",
+      validParticipationMessage: "",
       invalidOperatorValue: false,
+      invalidParticipationValue: false,
 
       operators: [],
       token: null,
@@ -143,6 +167,13 @@ export default {
       });
       return listOperators;
     },
+    totalParticipation() {
+      var totalParticipation = 0;
+      this.machine.operator.forEach((machineOperator) => {
+        totalParticipation += parseFloat(machineOperator.pivot.participation);
+      });
+      return totalParticipation < 100;
+    },
   },
   methods: {
     checkFormValidity() {
@@ -150,12 +181,40 @@ export default {
       this.operatorState = true;
       this.validOperatorsMessage = "";
 
+      this.invalidParticipationValue = false;
+      this.participationState = true;
+      this.validParticipationMessage = "";
+
       const valid = this.$refs.form.checkValidity();
       this.state = valid;
 
-      if (!this.operator.id) {
-        this.validOperatorMessage = "O valor nome é obrigatório.";
-        this.operatorState = false;
+      if (valid) {
+        let errors = 0;
+        let percentage = 0;
+        this.machine.operators.forEach((operator) => {
+          percentage += parseFloat(operator.pivot.participation);
+        });
+
+        percentage += parseFloat(this.operator.participation);
+
+        if (percentage > 100) {
+          this.invalidParticipationValue = true;
+          this.validParticipationMessage =
+            "Com este valor, é superado os 100% de participação.";
+          this.participationState = false;
+          errors++;
+        }
+
+        if (errors > 0) return false;
+      } else {
+        if (!this.operator.participation || this.operator.participation > 100) {
+          this.validParticipationMessage = "O valor precisa ser entre 0 e 100.";
+          this.participationState = false;
+        }
+        if (!this.operator.id) {
+          this.validOperatorMessage = "O valor nome é obrigatório.";
+          this.operatorState = false;
+        }
       }
 
       return valid;
@@ -179,6 +238,7 @@ export default {
       let pivot = new Object();
       pivot.machine_id = this.machine.id;
       pivot.operator_id = this.operator.id;
+      pivot.participation = this.operator.participation;
 
       let newOperator = this.operators.filter((operator) => {
         return operator.id == this.operator.id;
@@ -201,10 +261,15 @@ export default {
           this.machine.operators.push(newOperator);
 
           this.operator.id = null;
+          this.operator.participation  = null;
 
           this.invalidOperatorValue = false;
           this.operatorState = null;
           this.validOperatorMessage = "";
+
+          this.invalidParticipationValue = false;
+          this.participationState = null;
+          this.validParticipationMessage = "";
         })
         .catch((msg) => {
           this.alertMessage = msg.response.data;

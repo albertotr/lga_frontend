@@ -235,6 +235,7 @@ export default {
         postalcode: "",
         cpfcnpj: "",
         user_id: "",
+        user:[],
       },
       error: null,
       invalidNameMessage: "",
@@ -245,11 +246,8 @@ export default {
       invalidCpfCnpjMessage: "",
       users: [],
       token: null,
+      operator: null,
     };
-  },
-  props: {
-    operator: Object,
-    showForm: Boolean,
   },
   methods: {
     onSubmit() {
@@ -305,6 +303,7 @@ export default {
         },
       };
       axios(Options).then((response) => {
+        this.operator = response.data;
         this.form = {
           id: response.data.id,
           name: response.data.name,
@@ -317,6 +316,7 @@ export default {
           postalcode: response.data.postal_code,
           cpfcnpj: response.data.cpf_cnpj,
           user_id: response.data.user_id,
+          user:response.data.user,
         };
       });
     }
