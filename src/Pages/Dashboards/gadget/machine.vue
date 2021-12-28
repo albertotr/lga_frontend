@@ -15,7 +15,18 @@
           />
           {{ machine.name }}
         </div>
-        <div class="widget-subheading" v-else>&nbsp;</div>
+        <div class="widget-subheading" v-else>
+          <font-awesome-icon
+            icon="thumbs-up"
+            class="text-success fa-1x"
+            v-if="machine.online"
+          />
+          <font-awesome-icon
+            icon="thumbs-down"
+            class="text-danger fa-1x"
+            v-else
+          />
+        </div>
         <div class="widget-numbers">R${{ machine.balance }}</div>
         <div class="widget-subheading" v-if="machine.location">
           <font-awesome-icon icon="map-marker-alt" class="text-purple" />
