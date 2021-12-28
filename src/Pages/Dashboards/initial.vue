@@ -63,8 +63,8 @@ export default {
     return {
       machines: [],
       operators: [],
-      isShowMachine: false,
-      isShowOperators: true,
+      isShowMachine: true,
+      isShowOperators: false,
     };
   },
   methods: {
