@@ -17,42 +17,69 @@
         <label class="">MAC:&nbsp;</label
         ><span>{{ this.machine.device.mac }}</span>
       </b-col>
-
-      <b-col sm="4">
+      <b-col sm="6">
         <label class="">Saldo Bruto:&nbsp;</label
         ><span>{{ this.machine.total_balance | currency }}</span>
       </b-col>
-      <b-col sm="4">
+      <b-col sm="6">
         <label class="">Saldo:&nbsp;</label
         ><span>{{ this.machine.balance | currency }}</span>
       </b-col>
-      <b-col sm="4">
-        <label class="">Custo:&nbsp;</label
-        ><span>{{ this.machine.cost | currency }}</span>
-      </b-col>
 
-      <b-col sm="4">
+      <div class="b-col">&nbsp;</div>
+
+      <b-col
+        sm="12"
+        v-for="item in this.machine.inventory.items"
+        :key="item.id"
+      >
+        <b-row>
+          <b-col class="col-12"
+            ><label class="">Item:&nbsp;</label
+            ><span>{{ item.name }}</span></b-col
+          >
+          <b-col class="col-xs-4 col-sm-4"
+            ><label class="">Estoque:&nbsp;</label
+            ><span>{{ item.pivot.quantity }}</span></b-col
+          >
+
+          <b-col class="col-xs-4 col-sm-4"
+            ><label class="">Saida:&nbsp;</label
+            ><span>{{ outItem(item.id) }}</span></b-col
+          >
+
+          <b-col class="col-xs-4 col-sm-4"
+            ><label class="">Custo:&nbsp;</label
+            ><span>{{ costItem(item.id) | currency }}</span></b-col
+          >
+        </b-row>
+      </b-col>
+      <b-col
+        ><button class="btn btn-sm btn-primary" v-b-modal.inventoryModal>
+          Editar Estoque
+        </button></b-col
+      >
+
+      <b-col sm="12">&nbsp;</b-col>
+
+      <b-col sm="6">
         <label class="">Aluguel:&nbsp;</label
-        ><span>{{ this.totalRent | currency }}</span>
+        ><span>{{ this.totalRent | currency }} / {{ rentalDays }} dias</span>
       </b-col>
 
-      <b-col sm="4">
+      <b-col sm="6">
+        <label class="">Custo Total:&nbsp;</label
+        ><span>{{ totalCost | currency }}</span>
+      </b-col>
+
+      <b-col sm="6">
         <label class="">Comissão:&nbsp;</label
         ><span>{{ totalComission | currency }}</span>
       </b-col>
 
-      <b-col sm="12">
-        <b-row>
-          <b-col>
-            <label class="">Estoque esperado:&nbsp;</label
-            ><span>{{ this.totalInventory }}</span>
-          </b-col>
-          <b-col
-            ><button class="btn btn-sm btn-primary" v-b-modal.inventoryModal>
-              Editar Estoque
-            </button></b-col
-          >
-        </b-row>
+      <b-col sm="6">
+        <label class="">Estoque total esperado:&nbsp;</label
+        ><span>{{ this.totalInventory }}</span>
       </b-col>
 
       <b-col sm="12">
@@ -195,7 +222,7 @@ export default {
       //usuario autenticado não é o operador
       if (operator.length == 0) {
         if (this.user.role.level == 0) {
-          return this.machine.balance - this.totalRent - this.machine.cost;
+          return this.machine.balance - this.totalRent - this.totalCost;
         } else return totalComission;
       }
 
@@ -204,6 +231,13 @@ export default {
         parseFloat(operator[0].pivot.participation / 100);
 
       return totalComission;
+    },
+    totalCost() {
+      return this.machine.inventory.items.reduce(
+        (acumulador, item) =>
+          acumulador + this.outItem(item.id) * item.pivot.price,
+        0
+      );
     },
   },
   filters: {
@@ -218,7 +252,6 @@ export default {
   },
   methods: {
     onTransactionCreate() {
-      const invent = this.calculateTotalInventory(this.machine.inventory.items);
       var Options = {
         method: "post",
         data: {
@@ -227,7 +260,6 @@ export default {
           comment: this.comment,
           match: this.match,
           zerobalance: this.zeroBalance,
-          inventory: invent,
         },
         url: "/api/transaction/",
         headers: {
@@ -252,11 +284,38 @@ export default {
           this.$bvModal.hide("transactionModal");
         });
     },
-    calculateTotalInventory(inventory) {
-      return inventory.reduce(
-        (partial_sum, item) => partial_sum + item.pivot.quantity,
-        0
-      );
+    outItem(itemId) {
+      let itemAtual = this.machine.inventory.items.filter((item) => {
+        return item.id == itemId;
+      });
+
+      let itemTransaction = null;
+      let itemExchanges = null;
+      if (this.lastTransaction !== null) {
+        itemTransaction = this.lastTransaction.inventory.filter((item) => {
+          return item.id == itemId;
+        });
+
+        if (this.lastTransaction.exchanges !== null) {
+          itemExchanges = this.lastTransaction.exchanges.filter((exchange) => {
+            return exchange.item_id == itemId;
+          });
+        }
+      }
+
+      const totalExchange = (itemExchanges)?itemExchanges.reduce( (soma, value) =>  soma + value.quantity,0):0;
+      
+      return itemTransaction == null
+        ? itemAtual[0].pivot.base_quantity - itemAtual[0].pivot.quantity
+        : itemTransaction[0].pivot.quantity + totalExchange - itemAtual[0].pivot.quantity;
+    },
+
+    costItem(itemId) {
+      let qtdItem = this.outItem(itemId);
+      let item = this.machine.inventory.items.filter((item) => {
+        return item.id == itemId;
+      });
+      return parseFloat(qtdItem * item[0].pivot.price);
     },
   },
   mounted() {
@@ -270,13 +329,25 @@ export default {
     };
     axios(Options)
       .then((result) => {
-        this.lastTransaction = result.data;
-        let now = new Date(Date.now());
-        let transact = result.data.created_at
-          ? new Date(result.data.created_at)
-          : new Date(now.getFullYear(), now.getMonth(), 1);
-        var diffDays = now.getDate() - transact.getDate();
-        this.rentalDays = diffDays;
+        this.lastTransaction = result.data == "" ? null : result.data;
+
+        let now = null;
+        let dt = null;
+
+        if (this.lastTransaction !== null) {
+          this.lastTransaction.inventory = JSON.parse(
+            this.lastTransaction.inventory
+          );
+          now = new Date(Date.now()).setHours(0, 0, 1, 0);
+          dt = new Date(this.lastTransaction.created_at).setHours(0, 0, 0, 0);
+        } else {
+          now = new Date(Date.now()).setHours(0, 0, 1, 0);
+          dt = new Date(this.machine.created_at).setHours(0, 0, 0, 0);
+        }
+
+        let diffMs = now - dt;
+        let diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+        this.rentalDays = diffDays - 1;
       })
       .catch((msg) => {
         console.log(msg);
