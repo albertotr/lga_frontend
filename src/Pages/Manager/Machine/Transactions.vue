@@ -79,7 +79,7 @@
                   <div class="col-4">
                     <b-form-group label="Itens em inventário">
                       <b-form-input
-                        :value="transaction.inventory"
+                        :value="inventoryText(transaction.inventory)"
                         disabled
                       ></b-form-input>
                     </b-form-group>
@@ -150,6 +150,13 @@ export default {
     updatePage(value) {
       this.loadTransactions(value);
     },
+    inventoryText(inventory){
+      inventory = JSON.parse(inventory);
+      let text = inventory.reduce( (description, value) => {
+        return `${description} ${value.name}:${value.pivot.quantity};`;
+      },'')
+      return text;
+    }
   },
   created() {
     if (!this.$route.params.machine) {
