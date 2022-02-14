@@ -1,14 +1,6 @@
 <template>
   <div>
     <div class="row" v-if="machine">
-      <div
-        class="alert alert-warning col-12"
-        v-if="rentalDays == 0"
-        role="alert"
-      >
-        Já foi efetuado uma transação hoje.
-      </div>
-
       <b-col sm="6">
         <label class="">Maquina:&nbsp;</label
         ><span>{{ this.machine.serial }}</span>
@@ -133,7 +125,6 @@
         <button
           class="btn btn-primary"
           @click.stop="onTransactionCreate"
-          :disabled="rentalDays == 0"
         >
           Sacar
         </button>
@@ -216,18 +207,21 @@ export default {
       const operator = this.machine.operators.filter((operator) => {
         return operator.user_id == this.user.id;
       });
-
       var totalComission = 0;
+      const custo = this.machine.inventory.items.reduce(
+        (acumulador, item) =>
+          acumulador + this.outItem(item.id) * item.pivot.price,
+        0
+      );
 
       //usuario autenticado não é o operador
       if (operator.length == 0) {
-        if (this.user.role.level == 0) {
-          return this.machine.balance - this.totalRent - this.totalCost;
+        if (this.user.role.level < 4) {
+          return this.machine.balance - this.totalRent - custo;
         } else return totalComission;
       }
-
       totalComission =
-        (this.machine.balance - this.totalRent - this.machine.cost) *
+        (this.machine.balance - this.totalRent - custo) *
         parseFloat(operator[0].pivot.participation / 100);
 
       return totalComission;
@@ -303,11 +297,15 @@ export default {
         }
       }
 
-      const totalExchange = (itemExchanges)?itemExchanges.reduce( (soma, value) =>  soma + value.quantity,0):0;
-      
+      const totalExchange = itemExchanges
+        ? itemExchanges.reduce((soma, value) => soma + value.quantity, 0)
+        : 0;
+
       return itemTransaction == null
         ? itemAtual[0].pivot.base_quantity - itemAtual[0].pivot.quantity
-        : itemTransaction[0].pivot.quantity + totalExchange - itemAtual[0].pivot.quantity;
+        : itemTransaction[0].pivot.quantity +
+            totalExchange -
+            itemAtual[0].pivot.quantity;
     },
 
     costItem(itemId) {

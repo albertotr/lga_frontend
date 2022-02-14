@@ -3,16 +3,28 @@
     <b-col xs-12>
       <b-card>
         <div class="row mb-1">
-          <div class="col-xs-12 col-sm-4 col-lg-4 mb-1">
-            <h5 class="card-title">
-              <font-awesome-icon
-                icon="database"
-                size="1x"
-                class="text-info"
-              />&nbsp;Maquinas
-            </h5>
+          <div class="col-xs-12 col-sm-6 mb-1">
+            <div class="row">
+              <div class="col">
+                <h5 class="card-title">
+                  <font-awesome-icon
+                    icon="database"
+                    size="1x"
+                    class="text-info"
+                  />&nbsp;Maquinas
+                </h5>
+              </div>
+
+              <div class="co">
+                <b-form-select
+                  id="qtdMachines"
+                  v-model="selected"
+                  :options="options"
+                ></b-form-select>
+              </div>
+            </div>
           </div>
-          <div class="col-xs-3 col-sm-5 col-lg-4 mb-1">
+          <div class="col-xs-3 col-sm-6 mb-1">
             <b-form-radio-group
               id="machineStatus"
               v-model="selectedStatus"
@@ -20,9 +32,9 @@
               name="radiosStatus"
               buttons
               :disabled="machines == null"
+              style="margin-right:10px;"
             ></b-form-radio-group>
-          </div>
-          <div class="col-xs-3 col-sm-5 col-lg-2 mb-1">
+
             <b-form-radio-group
               id="orderBy"
               v-model="selectedOrder"
@@ -31,14 +43,42 @@
               buttons
             ></b-form-radio-group>
           </div>
-          <div class="col-xs-3 col-sm-2 col-lg-1 mb-1">
-            <b-form-select
-              id="qtdMachines"
-              v-model="selected"
-              :options="options"
-            ></b-form-select>
+        </div>
+
+        <div class="row mb-1" v-if="totals">
+          <div class="col-4 col-lg-3 mb-1">
+            <b-badge class="label-total" variant="info">Entradas</b-badge><br />
+            <span class="machine-content">{{ totals.inValue | currency }}</span>
+          </div>
+          <div class="col-4 col-lg-3 mb-1">
+            <b-badge class="label-total" variant="info">Saidas</b-badge><br />
+            <span class="machine-content"
+              >{{ totals.outValue | currency }} | 15</span
+            >
+          </div>
+          <div class="col-4 col-lg-3 mb-1">
+            <b-badge class="label-total" variant="info">Lucro</b-badge><br />
+            <span class="machine-content">{{
+              (totals.inValue - totals.outValue) | currency
+            }}</span>
+          </div>
+          <div class="col-12 col-lg-3 mb-1">
+            <b-badge class="label-total" variant="info">Melhor Maquina</b-badge
+            ><br />
+            <span class="machine-content"
+              >{{ totals.bestName }} &nbsp;{{ totals.bestValue | currency }} -
+              {{ totals.bestCost | currency }} ({{ totals.bestQtd }}) =
+              {{ totals.bestValue - totals.bestCost | currency}}
+            </span>
           </div>
         </div>
+        <div class="row mb-1" v-else>
+          <div class="text-center text-danger my-2">
+            <b-spinner class="align-middle"></b-spinner>
+            <strong>Carregando...</strong>
+          </div>
+        </div>
+
         <div v-if="machines">
           <b-list-group
             v-for="machine in machines.data"
@@ -63,49 +103,43 @@
                     }}</small></span
                   >
                 </div>
-                <div class="col-xs-6 col-sm-6 col-lg-2">
-                  <b-badge class="label">Saldo</b-badge><br />
+
+                <div class="col-6 col-lg-2">
+                  <b-badge class="label">Entrada</b-badge><br />
                   <span class="machine-content">{{
                     machine.balance | currency
                   }}</span>
                 </div>
-                <div class="col-xs-6 col-sm-6 col-lg-2">
-                  <b-badge
-                    class="label"
-                    :class="{ 'bg-danger': inventario(machine) <= 0 }"
-                    >Inventário</b-badge
-                  ><br />
-                  <span class="machine-content">{{ inventario(machine) }}</span>
+                <div class="col-6 col-lg-2">
+                  <b-badge class="label">Saida</b-badge><br />
+                  <span class="machine-content">
+                    {{ totalCostList(machine) | currency }} |
+                    {{ inventario(machine) }}
+                  </span>
                 </div>
-                <div class="col-xs-6 col-sm-6 col-lg-2">
-                  <b-badge class="label">Custo atual</b-badge><br />
-                  <span class="machine-content">{{
-                    totalCostList(machine) | currency
-                  }}</span>
-                </div>
+
                 <div class="col-xs-6 col-sm-6 col-lg-2">
                   <b-badge class="label">Aposta</b-badge><br />
                   <span class="machine-content">{{
                     machine.bet | currency
                   }}</span>
                 </div>
-                <div
-                  class="col-xs-6 col-sm-6 col-lg-2"
-                  v-if="machine.last_message"
-                >
+                <div class="col-6 col-lg-2" v-if="machine.last_message">
                   <b-badge class="label">Ultima com.</b-badge><br />
                   <span class="machine-content">{{
                     machine.last_message.created_at | friendlyDate
                   }}</span>
                 </div>
-                <div
-                  class="col-xs-6 col-sm-6 col-lg-2"
-                  v-if="machine.last_transaction"
-                >
+                <div class="col-6 col-lg-2">
                   <b-badge class="label">Coleta</b-badge><br />
-                  <span class="machine-content">{{
-                    machine.last_transaction.created_at | friendlyDate
-                  }}</span>
+                  <span
+                    class="machine-content"
+                    v-if="machine.last_transaction"
+                    >{{
+                      machine.last_transaction.created_at | friendlyDate
+                    }}</span
+                  >
+                  <span class="machine-content" v-else>sem coleta</span>
                 </div>
               </div>
             </b-list-group-item>
@@ -191,6 +225,8 @@ export default {
         { value: "offline", text: "Offline" },
       ],
 
+      totals: null,
+
       machine_selected: null,
     };
   },
@@ -207,6 +243,19 @@ export default {
       };
       axios(Options).then((response) => {
         this.machines = response.data;
+      });
+    },
+    loadMachineTotal() {
+      var Options = {
+        method: "get",
+        data: this.data,
+        url: `/api/machine/totals?status=${this.selectedStatus}`,
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+        },
+      };
+      axios(Options).then((response) => {
+        this.totals = response.data;
       });
     },
     updatePage(value) {
@@ -229,21 +278,29 @@ export default {
   created() {
     this.token = localStorage.getItem("token");
     this.loadMachines(1);
+    this.loadMachineTotal();
   },
   computed: {
     ...mapGetters(["user", "permissions"]),
   },
   watch: {
     selected(next, prev) {
-      if (next !== prev) this.loadMachines(1);
+      if (next !== prev) {
+        this.loadMachines(1);
+        this.loadMachineTotal();
+      }
     },
     selectedOrder(next, prev) {
       if (this.machines == null) return false;
       if (next !== prev) this.loadMachines(this.machines.current_page);
     },
+
     selectedStatus(next, prev) {
       if (this.machines == null) return false;
-      if (next !== prev) this.loadMachines(this.machines.current_page);
+      if (next !== prev) {
+        this.loadMachines(this.machines.current_page);
+        this.loadMachineTotal();
+      }
     },
   },
   filters: {
@@ -273,6 +330,13 @@ export default {
   background-color: #ced4da;
   line-height: 0.6em;
 }
+
+.label-total {
+  color: white;
+  font-size: 0.5em;
+  line-height: 0.6em;
+}
+
 .machine-name {
   font-size: medium;
 }
