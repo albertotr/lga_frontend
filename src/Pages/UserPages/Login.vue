@@ -58,7 +58,7 @@
               </div>
               <div class="modal-footer clearfix">
                 <div class="float-left">
-                  <a href="/forgot-password" class="btn-lg btn btn-link"
+                  <a href="forgot-password" class="btn-lg btn btn-link"
                     >Recuperar senha</a
                   >
                 </div>

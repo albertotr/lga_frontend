@@ -2,89 +2,42 @@
   <div class="content row mb-3">
     <b-col xs-12>
       <b-card>
-        <h5 class="card-title">
-          <font-awesome-icon
-            icon="lightbulb"
-            size="1x"
-            class="text-info"
-          />&nbsp;Status
-        </h5>
-        <div class="no-gutters row" v-if="machines">
-          <div class="col-md-12 col-lg-4">
-            <ul class="list-group list-group-flush">
-              <li class="bg-transparent list-group-item">
-                <div class="widget-content p-0">
-                  <div class="widget-content-outer">
-                    <div class="widget-content-wrapper">
-                      <div class="widget-content-left">
-                        <div class="widget-heading">Maquinas</div>
-                        <div class="widget-subheading">
-                          Total de maquinas vinculadas
-                        </div>
-                      </div>
-                      <div class="widget-content-right">
-                        <div class="widget-numbers text-info" v-if="machines">
-                          {{ machines.total }}
-                        </div>
-                        <div class="widget-numbers text-info" v-else>*</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </li>
-            </ul>
+        <div class="row no-gutters">
+          <div class="col-4">
+            <h5 class="card-title">
+              <font-awesome-icon
+                icon="lightbulb"
+                size="1x"
+                class="text-info"
+              />&nbsp;Status
+            </h5>
           </div>
-          <div class="col-md-12 col-lg-4">
-            <ul class="list-group list-group-flush">
-              <li class="bg-transparent list-group-item">
-                <div class="widget-content p-0">
-                  <div class="widget-content-outer">
-                    <div class="widget-content-wrapper">
-                      <div class="widget-content-left">
-                        <div class="widget-heading">Online</div>
-                        <div class="widget-subheading">
-                          Total de maquinas online
-                        </div>
-                      </div>
-                      <div class="widget-content-right">
-                        <div class="widget-numbers text-success">
-                          {{ machines.online }}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+          <div class="col-8">
+            <div class="row" v-if="machines">
+              <div class="col-4">
+                <div class="widget-numbers text-info" v-if="machines">
+                  Total {{ machines.total }}
                 </div>
-              </li>
-            </ul>
-          </div>
-          <div class="col-md-12 col-lg-4">
-            <ul class="list-group list-group-flush">
-              <li class="bg-transparent list-group-item">
-                <div class="widget-content p-0">
-                  <div class="widget-content-outer">
-                    <div class="widget-content-wrapper">
-                      <div class="widget-content-left">
-                        <div class="widget-heading">Offline</div>
-                        <div class="widget-subheading">
-                          Total de Maquinas offline
-                        </div>
-                      </div>
-                      <div class="widget-content-right">
-                        <div class="widget-numbers text-danger">
-                          {{ machines.offline }}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                <div class="widget-numbers text-info" v-else>*</div>
+              </div>
+
+              <div class="col-4">
+                <div class="widget-numbers text-success">
+                  Online {{ machines.online }}
                 </div>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div v-else>
-          <div class="text-center text-danger my-2">
-            <b-spinner class="align-middle"></b-spinner>
-            <strong>Carregando...</strong>
+              </div>
+              <div class="col-4">
+                <div class="widget-numbers text-danger">
+                  Offline {{ machines.offline }}
+                </div>
+              </div>
+            </div>
+            <div v-else>
+              <div class="text-center text-danger my-2">
+                <b-spinner class="align-middle"></b-spinner>
+                <strong>Carregando...</strong>
+              </div>
+            </div>
           </div>
         </div>
       </b-card>
