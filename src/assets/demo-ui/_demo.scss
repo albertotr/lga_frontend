@@ -2,6 +2,8 @@
 
 // Icons demo
 
+@use "sass:math";
+
 .font-icon-wrapper {
   text-align: center;
   border: $gray-200 solid 1px;
@@ -36,7 +38,7 @@
 
   p {
     color: $gray-500;
-    font-size: ($font-size-sm / 1.2);
+    font-size: math.div($font-size-sm, 1.2);
     margin: 5px 0 0;
   }
 }
