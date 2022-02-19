@@ -15,11 +15,24 @@
                 </h5>
               </div>
 
-              <div class="co">
+              <div class="col">
                 <b-form-select
                   id="qtdMachines"
                   v-model="selected"
                   :options="options"
+                  size="sm"
+                ></b-form-select>
+              </div>
+              <div class="col">
+                <b-form-select
+                  id="radio-group-1"
+                  v-model="operator_selected"
+                  :options="operators"
+                  name="radio-options"
+                  v-if="contributors && contributors.length > 1"
+                  buttons
+                  stacked
+                  size="sm"
                 ></b-form-select>
               </div>
             </div>
@@ -53,7 +66,7 @@
           <div class="col-4 col-lg-3 mb-1">
             <b-badge class="label-total" variant="info">Saidas</b-badge><br />
             <span class="machine-content"
-              >{{ totals.outValue | currency }} | 15</span
+              >{{ totals.outValue | currency }} | {{ totals.outQtd }}</span
             >
           </div>
           <div class="col-4 col-lg-3 mb-1">
@@ -68,7 +81,7 @@
             <span class="machine-content"
               >{{ totals.bestName }} &nbsp;{{ totals.bestValue | currency }} -
               {{ totals.bestCost | currency }} ({{ totals.bestQtd }}) =
-              {{ totals.bestValue - totals.bestCost | currency}}
+              {{ (totals.bestValue - totals.bestCost) | currency }}
             </span>
           </div>
         </div>
@@ -106,15 +119,16 @@
 
                 <div class="col-6 col-lg-2">
                   <b-badge class="label">Entrada</b-badge><br />
-                  <span class="machine-content">{{
-                    machine.balance | currency
-                  }}</span>
+                  <span class="machine-content"
+                    >{{ machine.balance | currency }}
+                    {{ inventario(machine) }}</span
+                  >
                 </div>
                 <div class="col-6 col-lg-2">
                   <b-badge class="label">Saida</b-badge><br />
                   <span class="machine-content">
-                    {{ totalCostList(machine) | currency }} |
-                    {{ inventario(machine) }}
+                    {{ totalCostList(machine) | currency }}
+                    {{ getMachineItemOut(machine) }}
                   </span>
                 </div>
 
@@ -140,6 +154,17 @@
                     }}</span
                   >
                   <span class="machine-content" v-else>sem coleta</span>
+                </div>
+
+                <div class="col-12 col-lg-2" v-if="machine.last_message">
+                  <b-badge class="label">Operador(s)</b-badge><br />
+                  <span
+                    class="machine-content"
+                    v-for="operator in machine.operators"
+                    :key="operator.id"
+                  >
+                    {{ operator.name }};
+                  </span>
                 </div>
               </div>
             </b-list-group-item>
@@ -228,6 +253,8 @@ export default {
       totals: null,
 
       machine_selected: null,
+      operator_selected: "all",
+      contributors: null,
     };
   },
   methods: {
@@ -236,7 +263,7 @@ export default {
       var Options = {
         method: "post",
         data: this.data,
-        url: `/api/machine/paginate/${this.selected}?page=${currentPage}&orderby=${this.selectedOrder}&status=${this.selectedStatus}`,
+        url: `/api/machine/paginate/${this.selected}?page=${currentPage}&orderby=${this.selectedOrder}&status=${this.selectedStatus}&operator=${this.operator_selected}`,
         headers: {
           Authorization: `Bearer ${this.token}`,
         },
@@ -249,7 +276,7 @@ export default {
       var Options = {
         method: "get",
         data: this.data,
-        url: `/api/machine/totals?status=${this.selectedStatus}`,
+        url: `/api/machine/totals?status=${this.selectedStatus}&operator=${this.operator_selected}`,
         headers: {
           Authorization: `Bearer ${this.token}`,
         },
@@ -258,13 +285,25 @@ export default {
         this.totals = response.data;
       });
     },
+    loadContributors() {
+      var Options = {
+        method: "get",
+        url: `/api/operator/contributors/${this.user.id}`,
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+        },
+      };
+      axios(Options).then((response) => {
+        this.contributors = response.data;
+      });
+    },
     updatePage(value) {
       this.loadMachines(value);
     },
     inventario(machine) {
-      let totalInventory = machine.inventory.items.reduce(function(prev, next) {
-        return prev + next.pivot.quantity;
-      }, 0);
+      let totalInventory = machine.inventory.items.map(function(item) {
+        return item.pivot.quantity;
+      });
       return totalInventory;
     },
     detailMachine(machine) {
@@ -274,14 +313,26 @@ export default {
     totalCostList(machine) {
       return helper.getMachineCost(machine);
     },
+    getMachineItemOut(machine) {
+      return helper.getMachineItemOut(machine);
+    },
   },
   created() {
     this.token = localStorage.getItem("token");
     this.loadMachines(1);
     this.loadMachineTotal();
+    this.loadContributors();
+    this.operator_selected = "all";
   },
   computed: {
     ...mapGetters(["user", "permissions"]),
+    operators() {
+      let optionList = this.contributors.map((contributor) => {
+        return { text: contributor.name, value: contributor.user_id };
+      });
+
+      return [{ text: "Todos operadores", value: "all" }, ...optionList];
+    },
   },
   watch: {
     selected(next, prev) {
@@ -296,6 +347,13 @@ export default {
     },
 
     selectedStatus(next, prev) {
+      if (this.machines == null) return false;
+      if (next !== prev) {
+        this.loadMachines(this.machines.current_page);
+        this.loadMachineTotal();
+      }
+    },
+    operator_selected(next, prev) {
       if (this.machines == null) return false;
       if (next !== prev) {
         this.loadMachines(this.machines.current_page);
