@@ -156,7 +156,7 @@
                   <span class="machine-content" v-else>sem coleta</span>
                 </div>
 
-                <div class="col-12 col-lg-2" v-if="machine.last_message">
+                <div class="col-12 col-lg-2" v-if="machine.operators">
                   <b-badge class="label">Operador(s)</b-badge><br />
                   <span
                     class="machine-content"
