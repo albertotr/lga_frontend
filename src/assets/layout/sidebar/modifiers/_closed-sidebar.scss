@@ -1,5 +1,7 @@
 // Closed Sidebar
 
+@use "sass:math";
+
 .closed-sidebar {
   .app-sidebar {
     width: $app-sidebar-width-collapsed;
@@ -21,7 +23,7 @@
     }
 
     .v-sidebar-menu {
-      padding: 0 ($layout-spacer-x / 3);
+      padding: 0 math.div($layout-spacer-x, 3);
 
       .vsm-dropdown {
         display: none;

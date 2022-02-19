@@ -1,6 +1,8 @@
 // Sidebar Base
 
 // Variables
+@use "sass:math";
+
 $primaryColor: #4285f4 !default;
 $baseBg: #2a2a2e !default;
 $darkenBg: darken($baseBg, 5%) !default;
@@ -212,12 +214,12 @@ $sidebar-box-shadow: 7px 0 60px rgba(0, 0, 0, 0.05);
     }
 
     .vsm-list {
-      padding: ($layout-spacer-x / 2) 0 ($layout-spacer-x / 2) $layout-spacer-x * 1.5;
+      padding: ($layout-spacer-x * 0.5) 0 ($layout-spacer-x * 0.5) $layout-spacer-x * 1.5;
     }
 
     .vsm-item {
       .vsm-link {
-        padding: 0 ($layout-spacer-x / 1.5);
+        padding: 0 math.div($layout-spacer-x, 1.5);
         height: 2.1rem;
         line-height: 2.1rem;
       }
@@ -255,7 +257,7 @@ $sidebar-box-shadow: 7px 0 60px rgba(0, 0, 0, 0.05);
   & .vsm-header {
     text-transform: uppercase;
     font-size: $font-size-xs;
-    margin: ($layout-spacer-x / 2) 0;
+    margin: ($layout-spacer-x * 0.5) 0;
     font-weight: bold;
     color: $primary;
     white-space: nowrap;
