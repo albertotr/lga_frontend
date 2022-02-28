@@ -13,7 +13,7 @@
             <transition name="fade" mode="out-in" appear>
                 <Footer/>
             </transition>
-        </div>        
+        </div>
     </div>
 </template>
 

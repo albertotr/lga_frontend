@@ -2,7 +2,7 @@
   <div>
     <div class="row" v-if="machine">
       <b-col sm="6">
-        <label class="">Maquina:&nbsp;</label
+        <label class="">Serial:&nbsp;</label
         ><span>{{ this.machine.serial }}</span>
       </b-col>
       <b-col sm="6">
@@ -10,14 +10,10 @@
         ><span>{{ this.machine.device.mac }}</span>
       </b-col>
       <b-col sm="6">
-        <label class="">Saldo Bruto:&nbsp;</label
-        ><span>{{ this.machine.total_balance | currency }}</span>
-      </b-col>
-      <b-col sm="6">
-        <label class="">Saldo:&nbsp;</label
+        <label class="">Valor em maquina:&nbsp;</label
         ><span>{{ this.machine.balance | currency }}</span>
       </b-col>
-
+      
       <div class="b-col">&nbsp;</div>
 
       <b-col
@@ -54,9 +50,19 @@
 
       <b-col sm="12">&nbsp;</b-col>
 
-      <b-col sm="6">
-        <label class="">Aluguel:&nbsp;</label
+      <b-col sm="6" v-if="this.totalRent > 0">
+        <label>Aluguel:&nbsp;</label
         ><span>{{ this.totalRent | currency }} / {{ rentalDays }} dias</span>
+      </b-col>
+
+      <b-col sm="6" v-if="this.totalGross > 0">
+        <label class="">{{ machine.gross_value }}% Bruto:&nbsp;</label
+        ><span>{{ this.totalGross | currency }}</span>
+      </b-col>
+
+      <b-col sm="6" v-if="this.totalNet > 0">
+        <label class="">{{ machine.net_value }}% Liquido:&nbsp;</label
+        ><span>{{ this.totalNet | currency }}</span>
       </b-col>
 
       <b-col sm="6">
@@ -107,25 +113,11 @@
         </div>
       </b-col>
 
-      <b-col sm="6">
-        <b-form-checkbox v-model="match" checked
-          >Valores correspondem ao real</b-form-checkbox
-        >
-      </b-col>
-
-      <b-col sm="6">
-        <b-form-checkbox v-model="zeroBalance" checked
-          >Zerar saldo</b-form-checkbox
-        >
-      </b-col>
     </div>
 
     <div class="w-100">
       <b-button-group>
-        <button
-          class="btn btn-primary"
-          @click.stop="onTransactionCreate"
-        >
+        <button class="btn btn-primary" @click.stop="onTransactionCreate">
           Sacar
         </button>
         <button
@@ -173,8 +165,6 @@ export default {
       },
       value: 0,
       comment: "",
-      match: true,
-      zeroBalance: true,
       invalidValue: false,
       invalidValueMessage: 0,
 
@@ -203,6 +193,17 @@ export default {
       let days = this.rentalDays;
       return (parseFloat(rent) / 30) * parseInt(days);
     },
+
+    totalGross() {
+      return this.machine.balance * (this.machine.gross_value / 100);
+    },
+
+    totalNet() {
+      return (
+        (this.machine.balance - this.totalCost) * (this.machine.net_value / 100)
+      );
+    },
+
     totalComission() {
       const operator = this.machine.operators.filter((operator) => {
         return operator.user_id == this.user.id;
@@ -217,11 +218,11 @@ export default {
       //usuario autenticado não é o operador
       if (operator.length == 0) {
         if (this.user.role.level < 4) {
-          return this.machine.balance - this.totalRent - custo;
+          return this.machine.balance - this.totalRent - this.totalNet - this.totalGross - custo;
         } else return totalComission;
       }
       totalComission =
-        (this.machine.balance - this.totalRent - custo) *
+        (this.machine.balance - this.totalRent - this.totalNet - this.totalGross - custo) *
         parseFloat(operator[0].pivot.participation / 100);
 
       return totalComission;
@@ -232,6 +233,9 @@ export default {
           acumulador + this.outItem(item.id) * item.pivot.price,
         0
       );
+    },
+    match() {
+      return this.machine.balance == this.value;
     },
   },
   filters: {
@@ -246,6 +250,12 @@ export default {
   },
   methods: {
     onTransactionCreate() {
+      if( (this.machine.balance != this.value) && ((this.commentlength === 0) || !this.comment.trim()) ){
+        alert('Insira um comentário, que justificando o valor sacado ser diferente ao valor apresentado.');
+        return false;
+      }
+
+
       var Options = {
         method: "post",
         data: {
@@ -253,13 +263,14 @@ export default {
           value: this.value,
           comment: this.comment,
           match: this.match,
-          zerobalance: this.zeroBalance,
+          zerobalance: true,
         },
         url: "/api/transaction/",
         headers: {
           Authorization: `Bearer ${this.token}`,
         },
       };
+
       axios(Options)
         .then(() => {
           let newBalance =

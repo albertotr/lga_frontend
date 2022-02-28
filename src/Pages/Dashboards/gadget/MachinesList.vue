@@ -5,13 +5,18 @@
         <div class="row mb-1">
           <div class="col-xs-12 col-sm-6 mb-1">
             <div class="row">
-              <div class="col">
+              <div class="col-12 col-md-6">
                 <h5 class="card-title">
                   <font-awesome-icon
                     icon="database"
                     size="1x"
                     class="text-info"
                   />&nbsp;Maquinas
+                  <template v-if="status"
+                    ><span class="text-info">{{ status.total }}</span
+                    >/<span class="text-success">{{ status.online }}</span
+                    >/<span class="text-danger">{{ status.offline }}</span></template
+                  >
                 </h5>
               </div>
 
@@ -55,40 +60,6 @@
               name="radiosOrderBy"
               buttons
             ></b-form-radio-group>
-          </div>
-        </div>
-
-        <div class="row mb-1" v-if="totals">
-          <div class="col-4 col-lg-3 mb-1">
-            <b-badge class="label-total" variant="info">Entradas</b-badge><br />
-            <span class="machine-content">{{ totals.inValue | currency }}</span>
-          </div>
-          <div class="col-4 col-lg-3 mb-1">
-            <b-badge class="label-total" variant="info">Saidas</b-badge><br />
-            <span class="machine-content"
-              >{{ totals.outValue | currency }} | {{ totals.outQtd }}</span
-            >
-          </div>
-          <div class="col-4 col-lg-3 mb-1">
-            <b-badge class="label-total" variant="info">Lucro</b-badge><br />
-            <span class="machine-content">{{
-              (totals.inValue - totals.outValue) | currency
-            }}</span>
-          </div>
-          <div class="col-12 col-lg-3 mb-1">
-            <b-badge class="label-total" variant="info">Melhor Maquina</b-badge
-            ><br />
-            <span class="machine-content"
-              >{{ totals.bestName }} &nbsp;{{ totals.bestValue | currency }} -
-              {{ totals.bestCost | currency }} ({{ totals.bestQtd }}) =
-              {{ (totals.bestValue - totals.bestCost) | currency }}
-            </span>
-          </div>
-        </div>
-        <div class="row mb-1" v-else>
-          <div class="text-center text-danger my-2">
-            <b-spinner class="align-middle"></b-spinner>
-            <strong>Carregando...</strong>
           </div>
         </div>
 
@@ -191,7 +162,7 @@
     <b-modal
       id="transactionModal"
       v-if="machine_selected"
-      :title="`Transação Maquina ${machine_selected.serial}`"
+      :title="`Transação Maquina ${machine_selected.name}`"
       hide-footer
     >
       <transaction :machine="machine_selected" />
@@ -250,11 +221,10 @@ export default {
         { value: "offline", text: "Offline" },
       ],
 
-      totals: null,
-
       machine_selected: null,
       operator_selected: "all",
       contributors: null,
+      status: null,
     };
   },
   methods: {
@@ -272,19 +242,6 @@ export default {
         this.machines = response.data;
       });
     },
-    loadMachineTotal() {
-      var Options = {
-        method: "get",
-        data: this.data,
-        url: `/api/machine/totals?status=${this.selectedStatus}&operator=${this.operator_selected}`,
-        headers: {
-          Authorization: `Bearer ${this.token}`,
-        },
-      };
-      axios(Options).then((response) => {
-        this.totals = response.data;
-      });
-    },
     loadContributors() {
       var Options = {
         method: "get",
@@ -295,6 +252,18 @@ export default {
       };
       axios(Options).then((response) => {
         this.contributors = response.data;
+      });
+    },
+    loadMachinesStatus() {
+      var Options = {
+        method: "get",
+        url: "/api/machine/status",
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+        },
+      };
+      axios(Options).then((response) => {
+        this.status = response.data;
       });
     },
     updatePage(value) {
@@ -320,9 +289,9 @@ export default {
   created() {
     this.token = localStorage.getItem("token");
     this.loadMachines(1);
-    this.loadMachineTotal();
     this.loadContributors();
     this.operator_selected = "all";
+    this.loadMachinesStatus();
   },
   computed: {
     ...mapGetters(["user", "permissions"]),
@@ -338,7 +307,6 @@ export default {
     selected(next, prev) {
       if (next !== prev) {
         this.loadMachines(1);
-        this.loadMachineTotal();
       }
     },
     selectedOrder(next, prev) {
@@ -350,14 +318,12 @@ export default {
       if (this.machines == null) return false;
       if (next !== prev) {
         this.loadMachines(this.machines.current_page);
-        this.loadMachineTotal();
       }
     },
     operator_selected(next, prev) {
       if (this.machines == null) return false;
       if (next !== prev) {
         this.loadMachines(this.machines.current_page);
-        this.loadMachineTotal();
       }
     },
   },
@@ -383,16 +349,10 @@ export default {
   padding: 0.75rem 1.25rem;
 }
 .label {
-  color: white;
-  font-size: 0.5em;
-  background-color: #ced4da;
+  font-size: 0.8em;
   line-height: 0.6em;
-}
-
-.label-total {
-  color: white;
-  font-size: 0.5em;
-  line-height: 0.6em;
+  border: 1px solid #999;
+  background-color: transparent;
 }
 
 .machine-name {

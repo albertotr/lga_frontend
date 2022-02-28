@@ -34,7 +34,7 @@
               >
                 <div
                   class="vertical-timeline-element"
-                  v-for="transaction in transactions"
+                  v-for="transaction in transactions.slice().reverse()"
                   :key="transaction.id"
                 >
                   <div>
@@ -51,11 +51,11 @@
                         </div>
                         <div class="col-xs-12 col-sm-6 col-lg-3">
                           <strong>Machina:</strong
-                          >{{ transaction.machine.serial }}
+                          >{{ transaction.machine.name }} | {{ transaction.machine.serial }}
                         </div>
                         <div class="col-xs-12 col-sm-6 col-lg-3">
                           <strong>Valor do Saque:</strong>
-                          {{ transaction.balance | currency }}
+                          {{ transaction.balance | currency }} / {{ transaction.amount | currency }}
                         </div>
                         <div class="col-xs-12 col-sm-6 col-lg-3">
                           <strong>Inventario:</strong>

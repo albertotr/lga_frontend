@@ -21,10 +21,7 @@
     </div>
     <div class="app-sidebar-content">
       <VuePerfectScrollbar class="app-sidebar-scroll" v-once v-if="user">
-        <sidebar-menu
-          :menu="getMenu()"
-          showOneChild
-        />
+        <sidebar-menu :menu="getMenu()" showOneChild />
       </VuePerfectScrollbar>
     </div>
   </div>
@@ -139,9 +136,35 @@ export default {
             title: "Localização",
             icon: "pe-7s-map-2",
             href: "/manage/location",
-          },          
+          },
+          {
+            title: "Relatorios",
+            icon: "pe-7s-display2",
+            child: [
+              {
+                href: "/manage/location",
+                title: "Financeiro",
+              },
+              {
+                href: "/manage/location",
+                title: "Operacional",
+              },
+            ],
+          }
         );
       }
+
+      menu.push(
+        {
+          header: true,
+          title: "Sistema",
+        },
+        {
+          title: "Sair",
+          icon: "pe-7s-door-lock",
+          href: "/logout",
+        }
+      );
 
       return menu;
     },
