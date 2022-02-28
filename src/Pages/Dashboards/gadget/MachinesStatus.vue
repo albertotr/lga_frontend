@@ -3,7 +3,7 @@
     <b-col xs-12>
       <b-card>
         <div class="row no-gutters">
-          <div class="col-4">
+          <div class="col-12 col-md-2">
             <h5 class="card-title">
               <font-awesome-icon
                 icon="lightbulb"
@@ -12,30 +12,40 @@
               />&nbsp;Status
             </h5>
           </div>
-          <div class="col-8">
-            <div class="row" v-if="machines">
-              <div class="col-4">
-                <div class="widget-numbers text-info" v-if="machines">
-                  Total {{ machines.total }}
-                </div>
-                <div class="widget-numbers text-info" v-else>*</div>
+          <div class="col-10">
+            <div class="row mb-1" v-if="totals">
+              <div class="col-4 col-lg-3 mb-1">
+                <b-badge class="label-total" variant="info">Entradas</b-badge
+                ><br />
+                <span class="machine-content">{{
+                  totals.inValue | currency
+                }}</span>
               </div>
-
-              <div class="col-4">
-                <div class="widget-numbers text-success">
-                  Online {{ machines.online }}
-                </div>
+              <div class="col-4 col-lg-3 mb-1">
+                <b-badge class="label-total" variant="info">Saidas</b-badge
+                ><br />
+                <span class="machine-content"
+                  >{{ totals.outValue | currency }} | {{ totals.outQtd }}</span
+                >
               </div>
-              <div class="col-4">
-                <div class="widget-numbers text-danger">
-                  Offline {{ machines.offline }}
-                </div>
+              <div class="col-4 col-lg-3 mb-1">
+                <b-badge class="label-total" variant="info">Lucro</b-badge
+                ><br />
+                <span class="machine-content">{{
+                  (totals.inValue - totals.outValue) | currency
+                }}</span>
               </div>
-            </div>
-            <div v-else>
-              <div class="text-center text-danger my-2">
-                <b-spinner class="align-middle"></b-spinner>
-                <strong>Carregando...</strong>
+              <div class="col-12 col-lg-3 mb-1">
+                <b-badge class="label-total" variant="info"
+                  >Melhor Maquina</b-badge
+                ><br />
+                <span class="machine-content"
+                  >{{ totals.bestName }} &nbsp;{{
+                    totals.bestValue | currency
+                  }}
+                  - {{ totals.bestCost | currency }} ({{ totals.bestQtd }}) =
+                  {{ (totals.bestValue - totals.bestCost) | currency }}
+                </span>
               </div>
             </div>
           </div>
@@ -62,29 +72,41 @@ export default {
   data() {
     return {
       token: null,
-      machines: null,
+      totals: null,
     };
   },
   methods: {
-    loadMachines() {
+    
+    loadMachineTotal() {
       var Options = {
         method: "get",
-        url: "/api/machine/status",
+        data: this.data,
+        url: `/api/machine/totals`,
         headers: {
           Authorization: `Bearer ${this.token}`,
         },
       };
       axios(Options).then((response) => {
-        this.machines = response.data;
+        this.totals = response.data;
       });
     },
   },
   created() {
     this.token = localStorage.getItem("token");
-    this.loadMachines();
+    this.loadMachineTotal();
   },
   computed: {
     ...mapGetters(["user", "permissions"]),
+  },
+  filters: {
+    currency(value) {
+      var formatter = new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+        minimumFractionDigits: 2,
+      });
+      return formatter.format(value);
+    },
   },
 };
 </script>

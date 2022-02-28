@@ -219,6 +219,12 @@ function configRoutes () {
       meta: { layout: "userpages" },
       component: () => import("../Pages/UserPages/ForgotPassword.vue"),
     },
+    {
+      path: "/logout",
+      name: "logout",
+      meta: { layout: "userpages" },
+      component: () => store.dispatch("signOut"),
+    },
 
     /* page not fount */
     { path: "*", component: PageNotFound },
