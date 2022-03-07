@@ -353,7 +353,7 @@ export default {
           now = new Date(Date.now()).setHours(0, 0, 1, 0);
           dt = new Date(this.machine.created_at).setHours(0, 0, 0, 0);
         }
-
+        
         let diffMs = now - dt;
         let diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
         this.rentalDays = diffDays - 1;

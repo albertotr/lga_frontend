@@ -84,7 +84,7 @@
                       'text-danger': !machine.online,
                     }"
                   />&nbsp;{{ machine.name }}
-                  <small style="color:#ced4da">{{
+                  <small class="text-secondary">{{
                     machine.location.name
                   }}</small></span
                 >
@@ -403,10 +403,10 @@ export default {
   padding: 0.75rem 1.25rem;
 }
 .label {
-  color: white;
-  font-size: 0.5em;
-  background-color: #ced4da;
+  font-size: 0.8em;
   line-height: 0.6em;
+  border: 1px solid #999;
+  background-color: transparent;
 }
 .machine-name {
   font-size: medium;
