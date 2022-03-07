@@ -28,6 +28,9 @@ import MachineTransactions from "../Pages/Manager/Machine/Transactions";
 import MachineEditForm from "../Pages/Manager/Machine/Machine";
 import ManageLocations from "../Pages/Manager/Location/Locations";
 import LocationEditForm from "../Pages/Manager/Location/Location";
+import Closures from "../Pages/Manager/Closure/Closures";
+import Closure from "../Pages/Manager/Closure/Closure";
+import ClosureTransactions from "../Pages/Manager/Closure/Transactions";
 
 Vue.use(Router);
 
@@ -187,7 +190,23 @@ function configRoutes () {
       path: "/manage/location/edit/:location",
       name: "managelocationedit",
       component: LocationEditForm,
-    },  
+    },
+    
+    {
+      path: "/manage/closure",
+      name: "manageclosure",
+      component: Closures,
+    },
+    {
+      path: "/manage/closure/add",
+      name: "manageclosureadd",
+      component: Closure,
+    },
+    {
+      path: "/manage/closure/transactions/:closure",
+      name: "manageclosuretransactions",
+      component: ClosureTransactions,
+    },
 
     // Sistem pages
     {

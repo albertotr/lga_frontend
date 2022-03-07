@@ -55,7 +55,7 @@
                         </div>
                         <div class="col-xs-12 col-sm-6 col-lg-3">
                           <strong>Valor do Saque:</strong>
-                          {{ transaction.balance | currency }} / {{ transaction.amount | currency }}
+                          {{ transaction.amount | currency }}<span v-if="transaction.amount != transaction.balance">*</span>
                         </div>
                         <div class="col-xs-12 col-sm-6 col-lg-3">
                           <strong>Inventario:</strong>

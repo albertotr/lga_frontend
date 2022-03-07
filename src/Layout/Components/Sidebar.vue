@@ -133,6 +133,11 @@ export default {
             href: "/manage/machine",
           },
           {
+            title: "Fechamentos",
+            icon: "pe-7s-culture",
+            href: "/manage/closure",
+          },
+          {
             title: "Localização",
             icon: "pe-7s-map-2",
             href: "/manage/location",
