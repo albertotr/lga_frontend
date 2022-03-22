@@ -156,7 +156,7 @@
             </div>
           </div>
 
-          <div class="form-row" v-if="user.role.level < 3">
+          <div class="form-row" v-if="user.role.level <= 3">
             <div class="col-md-6">
               <div class="position-relative form-group">
                 <label for="labelFormOperator" class="">Operador</label>
@@ -284,7 +284,7 @@ export default {
   created() {
     this.token = localStorage.getItem("token");
 
-    if (this.user.role.level >= 3) {
+    if (this.user.role.level > 3) {
       this.form.operator_id = this.user.operator.id;
     } else {      
       var OptionsOperators = {
