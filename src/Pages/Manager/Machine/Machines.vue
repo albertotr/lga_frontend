@@ -84,9 +84,13 @@
                       'text-danger': !machine.online,
                     }"
                   />&nbsp;{{ machine.name }}
-                  <small class="text-secondary">{{
+                  <small class="text-secondary" v-if="machine.location">{{
                     machine.location.name
-                  }}</small></span
+                  }}</small>
+                  <small class="text-secondary" v-else>
+                    Sem Localização
+                  </small>
+                  </span
                 >
               </div>
 
