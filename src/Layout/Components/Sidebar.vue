@@ -168,6 +168,11 @@ export default {
           title: "Sair",
           icon: "pe-7s-door-lock",
           href: "/logout",
+        },
+        {
+          title: "Configuração",
+          icon: "pe-7s-config",
+          href: "/settings",
         }
       );
 
