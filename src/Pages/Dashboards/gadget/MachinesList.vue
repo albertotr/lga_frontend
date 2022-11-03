@@ -81,7 +81,7 @@
                         'text-success': machine.online,
                         'text-danger': !machine.online,
                       }"
-                    />&nbsp;{{ machine.name }}
+                    />&nbsp;{{ machine.name }} {{machine.type.id}}
                     <small style="color:#ced4da" v-if="machine.location">{{
                       machine.location.name
                     }}</small>
@@ -90,45 +90,70 @@
                   >
                 </div>
 
-                <div class="col-6 col-lg-2">
+                <div class="col-6 col-lg-2" v-if="machine.type.id == 1">
                   <b-badge class="label">Entrada</b-badge><br />
                   <span class="machine-content"
                     >{{ machine.balance | currency }}
                     {{ inventario(machine) }}</span
                   >
                 </div>
-                <div class="col-6 col-lg-2">
-                  <b-badge class="label">Saida</b-badge><br />
-                  <span class="machine-content">
-                    {{ totalCostList(machine) | currency }}
-                    {{ getMachineItemOut(machine) }}
-                  </span>
+                <div class="col-6 col-lg-2" v-if="machine.type.id == 3">
+                  <b-badge class="label">Total Entrada</b-badge><br />
+                  <span class="machine-content"
+                    >{{ machine.balance | currency }}
+                    {{ inventario(machine) }}</span
+                  >
                 </div>
 
-                <div class="col-xs-6 col-sm-6 col-lg-2">
-                  <b-badge class="label">Aposta</b-badge><br />
-                  <span class="machine-content">{{
-                    machine.bet | currency
-                  }}</span>
+                <div class="col-6 col-lg-2" v-if="machine.type.id == 3">
+                  <b-badge class="label">Credito Atual</b-badge><br />
+                  <span class="machine-content">{{ machine.last_message.data[1].value | currency }}</span>
                 </div>
+
+
+                <div class="col-6 col-lg-2" v-if="machine.sample.slot >= 1 && machine.type.id == 3">
+                  <b-badge class="label">Baia #1</b-badge><br />
+                  <span class="machine-content">
+                    {{ machine.last_message.data[4].value | currency }}
+                    [{{ machine.last_message.data[5].value }}]
+                  </span>
+                </div>
+                <div class="col-6 col-lg-2" v-if="machine.sample.slot >= 2 && machine.type.id == 3">
+                  <b-badge class="label">Baia #2</b-badge><br />
+                  <span class="machine-content">
+                    {{ machine.last_message.data[6].value | currency }}
+                    [{{ machine.last_message.data[7].value }}]
+                  </span>
+                </div>
+                <div class="col-6 col-lg-2" v-if="machine.sample.slot >= 3 && machine.type.id == 3">
+                  <b-badge class="label">Baia #3</b-badge><br />
+                  <span class="machine-content">
+                    {{ machine.last_message.data[8].value | currency }}
+                    [{{ machine.last_message.data[9].value }}]
+                  </span>
+                </div>
+                <div class="col-6 col-lg-2" v-if="machine.sample.slot >= 4 && machine.type.id == 3">
+                  <b-badge class="label">Baia #4</b-badge><br />
+                  <span class="machine-content">
+                    {{ machine.last_message.data[10].value | currency }}
+                    [{{ machine.last_message.data[11].value }}]
+                  </span>
+                </div>
+                <div class="col-6 col-lg-2" v-if="machine.sample.slot >= 5 && machine.type.id == 3">
+                  <b-badge class="label">Baia #5</b-badge><br />
+                  <span class="machine-content">
+                    {{ machine.last_message.data[12].value | currency }}
+                    [{{ machine.last_message.data[13].value }}]
+                  </span>
+                </div>
+                
                 <div class="col-6 col-lg-2" v-if="machine.last_message">
                   <b-badge class="label">Ultima com.</b-badge><br />
                   <span class="machine-content">{{
                     machine.last_message.created_at | friendlyDate
                   }}</span>
                 </div>
-                <div class="col-6 col-lg-2">
-                  <b-badge class="label">Coleta</b-badge><br />
-                  <span
-                    class="machine-content"
-                    v-if="machine.last_transaction"
-                    >{{
-                      machine.last_transaction.created_at | friendlyDate
-                    }}</span
-                  >
-                  <span class="machine-content" v-else>sem coleta</span>
-                </div>
-
+                                
                 <div class="col-12 col-lg-2" v-if="machine.operators">
                   <b-badge class="label">Operador(s)</b-badge><br />
                   <span

@@ -142,20 +142,20 @@ export default {
             icon: "pe-7s-map-2",
             href: "/manage/location",
           },
-          {
-            title: "Relatorios",
-            icon: "pe-7s-display2",
-            child: [
-              {
-                href: "/manage/location",
-                title: "Financeiro",
-              },
-              {
-                href: "/manage/location",
-                title: "Operacional",
-              },
-            ],
-          }
+          // {
+          //   title: "Relatorios",
+          //   icon: "pe-7s-display2",
+          //   child: [
+          //     {
+          //       href: "/manage/location",
+          //       title: "Financeiro",
+          //     },
+          //     {
+          //       href: "/manage/location",
+          //       title: "Operacional",
+          //     },
+          //   ],
+          // }
         );
       }
 
