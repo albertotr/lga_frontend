@@ -2,7 +2,7 @@
 module.exports = {
   runtimeCompiler: true,
   productionSourceMap: false,
-  publicPath: process.env.NODE_ENV === "production" ? "/lga" : "/",
+  publicPath: process.env.NODE_ENV === "production" ? "/" : "/",
 };
 
 // lga.atr.dev.br
