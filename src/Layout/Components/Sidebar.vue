@@ -142,20 +142,20 @@ export default {
             icon: "pe-7s-map-2",
             href: "/manage/location",
           },
-          {
-            title: "Relatorios",
-            icon: "pe-7s-display2",
-            child: [
-              {
-                href: "/manage/location",
-                title: "Financeiro",
-              },
-              {
-                href: "/manage/location",
-                title: "Operacional",
-              },
-            ],
-          }
+          // {
+          //   title: "Relatorios",
+          //   icon: "pe-7s-display2",
+          //   child: [
+          //     {
+          //       href: "/manage/location",
+          //       title: "Financeiro",
+          //     },
+          //     {
+          //       href: "/manage/location",
+          //       title: "Operacional",
+          //     },
+          //   ],
+          // }
         );
       }
 
@@ -168,6 +168,11 @@ export default {
           title: "Sair",
           icon: "pe-7s-door-lock",
           href: "/logout",
+        },
+        {
+          title: "Configuração",
+          icon: "pe-7s-config",
+          href: "/settings",
         }
       );
 

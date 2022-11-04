@@ -9,7 +9,7 @@
                 icon="lightbulb"
                 size="1x"
                 class="text-info"
-              />&nbsp;Status
+              />&nbsp;Status Bichinhos
             </h5>
           </div>
           <div class="col-10">

@@ -31,6 +31,7 @@ import LocationEditForm from "../Pages/Manager/Location/Location";
 import Closures from "../Pages/Manager/Closure/Closures";
 import Closure from "../Pages/Manager/Closure/Closure";
 import ClosureTransactions from "../Pages/Manager/Closure/Transactions";
+import Settings from "../Pages/UserPages/Settings";
 
 Vue.use(Router);
 
@@ -243,6 +244,11 @@ function configRoutes () {
       name: "logout",
       meta: { layout: "userpages" },
       component: () => store.dispatch("signOut"),
+    },
+    {
+      path: "/settings",
+      name: "settings",
+      component: Settings,
     },
 
     /* page not fount */
