@@ -50,7 +50,7 @@
                           <strong>Operador:</strong> {{ transaction.user.name }}
                         </div>
                         <div class="col-xs-12 col-sm-6 col-lg-3">
-                          <strong>Machina:</strong
+                          <strong>Maquina:</strong
                           >{{ transaction.machine.name }} | {{ transaction.machine.serial }}
                         </div>
                         <div class="col-xs-12 col-sm-6 col-lg-3">

@@ -81,7 +81,7 @@
                         'text-success': machine.online,
                         'text-danger': !machine.online,
                       }"
-                    />&nbsp;{{ machine.name }} {{machine.type.id}}
+                    />&nbsp;{{ machine.name }}
                     <small style="color:#ced4da" v-if="machine.location">{{
                       machine.location.name
                     }}</small>
