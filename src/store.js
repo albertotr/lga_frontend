@@ -11,6 +11,7 @@ const state = {
   authenticated: false,
   token: null,
   user: null,
+  refresh_time: 10000, //tempo do refresh do dashboard em milisegundos
 };
 
 const getters = {
@@ -29,6 +30,10 @@ const getters = {
   permissions (state) {
     if (state.user) return state.user.role.permissions.map(permission => permission.name);
     else return [];
+  },
+
+  refresh_time (state){
+    return state.refresh_time;
   }
 
 };

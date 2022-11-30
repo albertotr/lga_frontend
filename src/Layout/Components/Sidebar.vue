@@ -55,6 +55,11 @@ export default {
           icon: "pe-7s-home",
           href: "/",
         },
+        {
+          title: "Dashboard",
+          icon: "pe-7s-display2",
+          href: "/dashboard",
+        },
       ];
 
       if (this.user.role.level == 0) {

@@ -224,6 +224,11 @@ function configRoutes () {
       name: "initial",
       component: () => import("../Pages/Dashboards/initial.vue"),
     },
+    {
+      path: "/dashboard",
+      name: "dashboard",
+      component: () => import("../Pages/Dashboards/dashboard.vue"),
+    },
 
     // Pages
 
