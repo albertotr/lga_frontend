@@ -1,10 +1,14 @@
 <template>
   <div class="content row mb-3">
     <b-col xs-12>
-      <b-card>        
+      <b-card>
         <div class="row" v-if="machines">
-          <div class="col-xs-12 col-sm-6 col-lg-3" v-for="machine in machines.data" :key="machine.id">
-            <device-info :machine="machine"/>
+          <div
+            class="col-xs-12 col-sm-6 col-lg-3"
+            v-for="machine in machines.data"
+            :key="machine.id"
+          >
+            <device-info :machine="machine" />
           </div>
         </div>
       </b-card>
@@ -14,18 +18,17 @@
   
   <script>
 import axios from "axios";
-import DeviceInfo from './gadget/DeviceInfo.vue';
+import DeviceInfo from "./gadget/DeviceInfo.vue";
 import { mapGetters } from "vuex";
 
 export default {
   components: {
     DeviceInfo,
   },
-  name: 
-    "dashboard",
+  name: "dashboard",
   data() {
     return {
-        machines:null
+      machines: null,
     };
   },
   methods: {
@@ -40,15 +43,15 @@ export default {
       };
       axios(Options).then((response) => {
         this.machines = response.data;
-        setTimeout(() => {
-          console.log('reload');
-          this.loadMachines(1);
-        }, this.refresh_time);
+        if (this.$route.name == "dashboard")
+          setTimeout(() => {
+            this.loadMachines(1);
+          }, this.refresh_time);
       });
-    }
+    },
   },
   created() {
-    this.loadMachines(1);    
+    this.loadMachines(1);
   },
   computed: {
     ...mapGetters(["refresh_time"]),
