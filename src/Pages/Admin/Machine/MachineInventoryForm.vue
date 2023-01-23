@@ -44,6 +44,10 @@
             {{ obj.item.pivot.price | currency }}
           </template>
 
+          <template #cell(pivot.cost)="obj">
+            {{ obj.item.pivot.cost | currency }}
+          </template>
+
           <template #cell(action)="obj">
             <div class="row">
               <div class="col btn">
@@ -180,6 +184,16 @@
             ></money>
           </div>
         </div>
+        <div class="col-md-6">
+          <div class="position-relative form-group">
+            <label for="labelFormPrice" class="">Custo</label>
+            <money
+              class="form-control"
+              v-model="selectedItem.pivot.cost"
+              v-bind="money"
+            ></money>
+          </div>
+        </div>
         <div class="col-md-12" v-if="editMsg">
           <b-alert variant="warning" show>{{ editMsg }}</b-alert>
         </div>
@@ -226,6 +240,7 @@ export default {
         { key: "pivot.quantity", label: "estoque" },
         { key: "pivot.code", label: "codigo" },
         { key: "pivot.price", label: "preço" },
+        { key: "pivot.cost", label: "custo" },
         { key: "action", label: "Ações" },
       ],
       action: null,
