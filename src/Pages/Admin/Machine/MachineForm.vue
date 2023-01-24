@@ -154,7 +154,7 @@
               </div>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-4" v-if="machine.type_id == 1">
               <div class="position-relative form-group">
                 <label for="labelFormLocations" class="">Aposta</label>
                 <money
