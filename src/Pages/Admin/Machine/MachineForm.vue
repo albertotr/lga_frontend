@@ -196,6 +196,29 @@
 
             <div class="col-md-4">
               <div class="position-relative form-group">
+                <label for="labelFormInitRentValue" class="">Inicio do Aluguel</label
+                ><input
+                  name="initFixedValue"
+                  id="formInitFixedValue"
+                  placeholder="Digite a date de inicio do aluguel"
+                  type="text"
+                  class="form-control"
+                  :class="{ 'is-invalid': invalidInitFixedValue }"
+                  v-model="form.init_fixed_value"
+                  :disabled="user.role.level >= 3"
+                />
+                <div class="invalid-feedback">
+                  <ul>
+                    <li v-for="msg in invalidInitFixedValueMessage" :key="msg">
+                      {{ msg }}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="position-relative form-group">
                 <label for="labelFormNetValue" class="">% do Liquido</label>
                 <input
                   name="netValue"
@@ -308,6 +331,7 @@ export default {
         slot: 0,
         bet: 0,
         fixed_value: 0,
+        init_fixed_value: null,
         net_value: 0,
         gross_value: 0,
       },
@@ -319,6 +343,7 @@ export default {
       invalidFixedValueMessage: null,
       invalidNetValueMessage: null,
       invalidGrossValueMessage: null,
+      invalidInitFixedValueMessage: null,
 
       money: {
         decimal: ",",
@@ -457,6 +482,7 @@ export default {
         location: this.machine.location_id,
         bet: this.machine.bet,
         fixed_value: this.machine.fixed_value,
+        init_fixed_value: this.machine.format_init_fixed_value,
         net_value: this.machine.net_value,
         gross_value: this.machine.gross_value,
       };
@@ -486,6 +512,11 @@ export default {
     invalidFixedValue() {
       if (this.error == undefined || this.error == null) return false;
       if (this.error["fixed_value"]) return true;
+      return false;
+    },
+    invalidInitFixedValue() {
+      if (this.error == undefined || this.error == null) return false;
+      if (this.error["init_fixed_value"]) return true;
       return false;
     },
     invalidNetValue() {

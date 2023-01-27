@@ -73,15 +73,29 @@
             <b-list-group-item>
               <div class="row">
                 <div class="col-12">
-                  <span class="machine-name"
-                    ><font-awesome-icon
-                      icon="database"
-                      size="1x"
-                      :class="{
-                        'text-success': machine.online,
+                  <span class="machine-name">                    
+                    <font-awesome-icon
+                      v-if="machine.type_id == 1"
+                      icon="dog"
+                      size="2x"
+                      class="text-info"
+                    />
+                    <font-awesome-icon
+                      v-if="machine.type_id == 2"
+                      icon="beer"
+                      size="2x"
+                      class="text-warning"
+                    />
+                    <font-awesome-icon
+                      v-if="machine.type_id == 3"
+                      icon="basketball-ball"
+                      size="2x"
+                      class="text-danger"
+                    />
+                    &nbsp;<span :class="{
+                        'text-normal': machine.online,
                         'text-danger': !machine.online,
-                      }"
-                    />&nbsp;{{ machine.name }}
+                      }">{{ machine.name }}</span>&nbsp;
                     <small style="color:#ced4da" v-if="machine.location">{{
                       machine.location.name
                     }}</small>
@@ -205,9 +219,12 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import {
   faDatabase,
   faHandHoldingUsd,
+  faBasketballBall,
+  faBeer,
+  faDog,
 } from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
-library.add(faDatabase, faHandHoldingUsd);
+library.add(faDatabase, faHandHoldingUsd,faBasketballBall, faBeer, faDog);
 
 import Transaction from "../../Manager/Machine/Transaction.vue";
 

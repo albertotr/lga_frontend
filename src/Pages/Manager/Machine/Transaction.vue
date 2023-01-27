@@ -26,17 +26,22 @@
             ><label class="">Item:&nbsp;</label
             ><span>{{ item.name }}</span></b-col
           >
-          <b-col class="col-xs-4 col-sm-4"
+          <b-col class="col-xs-3 col-sm-3"
             ><label class="">Estoque:&nbsp;</label
             ><span>{{ item.pivot.quantity }}</span></b-col
           >
 
-          <b-col class="col-xs-4 col-sm-4"
+          <b-col class="col-xs-3 col-sm-3"
             ><label class="">Saida:&nbsp;</label
             ><span>{{ outItem(item.id) }}</span></b-col
           >
 
-          <b-col class="col-xs-4 col-sm-4"
+          <b-col class="col-xs-3 col-sm-3"
+            ><label class="">Preço:&nbsp;</label
+            ><span>{{ priceItem(item.id) | currency }}</span></b-col
+          >
+
+          <b-col class="col-xs-3 col-sm-3" v-if="machine.type_id != 1"
             ><label class="">Custo:&nbsp;</label
             ><span>{{ costItem(item.id) | currency }}</span></b-col
           >
@@ -66,7 +71,7 @@
       </b-col>
 
       <b-col sm="6">
-        <label class="">Custo Total:&nbsp;</label
+        <label class="">Preço Total:&nbsp;</label
         ><span>{{ totalCost | currency }}</span>
       </b-col>
 
@@ -209,28 +214,43 @@ export default {
         return operator.user_id == this.user.id;
       });
       var totalComission = 0;
-      const custo = this.machine.inventory.items.reduce(
-        (acumulador, item) =>
-          acumulador + this.outItem(item.id) * item.pivot.price,
-        0
-      );
+      var custo = 0;
+
+      // calculo do custo se for máquina de bichinhos
+      if(this.machine.type_id == 1)
+      {
+        custo = this.machine.inventory.items.reduce(
+          (acumulador, item) =>
+            acumulador + this.outItem(item.id) * item.pivot.price,
+          0
+        );        
+      }
+      // calculo do custo se for máquina de chopp ou bolinhas
+      else
+      {
+        custo = this.machine.inventory.items.reduce(
+          (acumulador, item) =>
+            acumulador + this.outItem(item.id) * item.pivot.cost,
+          0
+        );       
+      }
 
       //usuario autenticado não é o operador
       if (operator.length == 0) {
-        if (this.user.role.level < 4) {
-          return this.machine.balance - this.totalRent - this.totalNet - this.totalGross - custo;
-        } else return totalComission;
-      }
-      totalComission =
+          if (this.user.role.level < 4) {
+            return this.machine.balance - this.totalRent - this.totalNet - this.totalGross - custo;
+          } else return totalComission;
+        }
+        
+      return totalComission =
         (this.machine.balance - this.totalRent - this.totalNet - this.totalGross - custo) *
         parseFloat(operator[0].pivot.participation / 100);
 
-      return totalComission;
     },
-    totalCost() {
+
+    totalCost() {      
       return this.machine.inventory.items.reduce(
-        (acumulador, item) =>
-          acumulador + this.outItem(item.id) * item.pivot.price,
+        (acumulador, item) => acumulador + this.outItem(item.id) * item.pivot.price,
         0
       );
     },
@@ -319,12 +339,20 @@ export default {
             itemAtual[0].pivot.quantity;
     },
 
-    costItem(itemId) {
+    priceItem(itemId) {
       let qtdItem = this.outItem(itemId);
       let item = this.machine.inventory.items.filter((item) => {
         return item.id == itemId;
       });
       return parseFloat(qtdItem * item[0].pivot.price);
+    },
+
+    costItem(itemId) {
+      let qtdItem = this.outItem(itemId);
+      let item = this.machine.inventory.items.filter((item) => {
+        return item.id == itemId;
+      });
+      return parseFloat(qtdItem * item[0].pivot.cost);
     },
   },
   mounted() {
@@ -348,10 +376,10 @@ export default {
             this.lastTransaction.inventory
           );
           now = new Date(Date.now()).setHours(0, 0, 1, 0);
-          dt = new Date(this.lastTransaction.created_at).setHours(0, 0, 0, 0);
+          dt = new Date(this.lastTransaction.init_fixed_value).setHours(0, 0, 0, 0);
         } else {
           now = new Date(Date.now()).setHours(0, 0, 1, 0);
-          dt = new Date(this.machine.created_at).setHours(0, 0, 0, 0);
+          dt = new Date(this.machine.init_fixed_value).setHours(0, 0, 0, 0);
         }
         
         let diffMs = now - dt;

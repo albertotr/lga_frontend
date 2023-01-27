@@ -44,8 +44,11 @@
             {{ obj.item.pivot.price | currency }}
           </template>
 
-          <template #cell(pivot.cost)="obj">
+          <template #cell(pivot.cost)="obj" v-if="machine.type_id != 1">
             {{ obj.item.pivot.cost | currency }}
+          </template>
+          <template #cell(pivot.cost)="obj" v-else>
+            ---
           </template>
 
           <template #cell(action)="obj">
@@ -184,7 +187,7 @@
             ></money>
           </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6" v-if="machine.type_id != 1">
           <div class="position-relative form-group">
             <label for="labelFormPrice" class="">Custo</label>
             <money
