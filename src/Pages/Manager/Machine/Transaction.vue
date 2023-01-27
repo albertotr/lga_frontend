@@ -193,6 +193,7 @@ export default {
         0
       );
     },
+
     totalRent() {
       let rent = this.machine.fixed_value;
       let days = this.rentalDays;
@@ -213,6 +214,7 @@ export default {
       const operator = this.machine.operators.filter((operator) => {
         return operator.user_id == this.user.id;
       });
+
       var totalComission = 0;
       var custo = 0;
 
@@ -241,7 +243,6 @@ export default {
             return this.machine.balance - this.totalRent - this.totalNet - this.totalGross - custo;
           } else return totalComission;
         }
-        
       return totalComission =
         (this.machine.balance - this.totalRent - this.totalNet - this.totalGross - custo) *
         parseFloat(operator[0].pivot.participation / 100);
@@ -321,7 +322,7 @@ export default {
           return item.id == itemId;
         });
 
-        if (this.lastTransaction.exchanges !== null) {
+       if (this.lastTransaction.exchanges !== null) {
           itemExchanges = this.lastTransaction.exchanges.filter((exchange) => {
             return exchange.item_id == itemId;
           });
@@ -332,7 +333,7 @@ export default {
         ? itemExchanges.reduce((soma, value) => soma + value.quantity, 0)
         : 0;
 
-      return itemTransaction == null
+      return (itemTransaction == null)
         ? itemAtual[0].pivot.base_quantity - itemAtual[0].pivot.quantity
         : itemTransaction[0].pivot.quantity +
             totalExchange -
@@ -371,12 +372,13 @@ export default {
         let now = null;
         let dt = null;
 
+        console.log([this.lastTransaction.init_fixed_value,this.machine.init_fixed_value]);
         if (this.lastTransaction !== null) {
           this.lastTransaction.inventory = JSON.parse(
             this.lastTransaction.inventory
           );
           now = new Date(Date.now()).setHours(0, 0, 1, 0);
-          dt = new Date(this.lastTransaction.init_fixed_value).setHours(0, 0, 0, 0);
+          dt = new Date(this.lastTransaction.created_at).setHours(0, 0, 0, 0);
         } else {
           now = new Date(Date.now()).setHours(0, 0, 1, 0);
           dt = new Date(this.machine.init_fixed_value).setHours(0, 0, 0, 0);
