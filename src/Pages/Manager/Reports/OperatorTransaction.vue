@@ -123,7 +123,7 @@ export default {
     const token = localStorage.getItem("token");
     var Options = {
       method: "get",
-      url: "/api/operator/",
+      url: "/api/operator/manager",
       headers: {
         Authorization: `Bearer ${token}`,
       },
