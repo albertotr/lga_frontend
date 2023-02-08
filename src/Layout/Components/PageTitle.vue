@@ -3,7 +3,7 @@
     <div class="page-title-wrapper">
       <div class="page-title-heading">
         <div class="page-title-icon">
-          <i :class="icon" />
+          <font-awesome-icon :icon="icon" class="text-info" />
         </div>
         <div>
           {{ heading }}
@@ -26,9 +26,9 @@
 
 <script>
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { faArrowCircleLeft } from "@fortawesome/free-solid-svg-icons";
+import { faArrowCircleLeft, faUsersCog } from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
-library.add(faArrowCircleLeft);
+library.add(faArrowCircleLeft, faUsersCog);
 
 export default {
   components: {

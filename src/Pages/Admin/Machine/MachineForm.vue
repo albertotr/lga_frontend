@@ -44,6 +44,7 @@
                 </div>
               </div>
             </div>
+            
             <div class="col-md-3">
               <div class="position-relative form-group">
                 <label for="labelFormDevice" class="">MacAddress</label>
@@ -64,6 +65,7 @@
                 </select>
               </div>
             </div>
+            
             <div class="col-md-2">
               <div class="position-relative form-group">
                 <label for="labelFormType" class="">Tipo</label>
@@ -91,6 +93,7 @@
                 </div>
               </div>
             </div>
+            
             <div class="col-md-3">
               <div class="position-relative form-group">
                 <label for="labelFormSample" class="">Modelo</label>
@@ -119,6 +122,7 @@
                 </div>
               </div>
             </div>
+
             <div class="col-md-2">
               <div class="position-relative form-group">
                 <label for="labelFormSlot" class="">Slots</label
@@ -154,7 +158,7 @@
               </div>
             </div>
 
-            <div class="col-md-4" v-if="machine.type_id == 1">
+            <div class="col-md-4" v-if="machine && machine.type_id == 1">
               <div class="position-relative form-group">
                 <label for="labelFormLocations" class="">Aposta</label>
                 <money

@@ -32,6 +32,7 @@ import Closures from "../Pages/Manager/Closure/Closures";
 import Closure from "../Pages/Manager/Closure/Closure";
 import ClosureTransactions from "../Pages/Manager/Closure/Transactions";
 import Settings from "../Pages/UserPages/Settings";
+import OperatorTransaction from "../Pages/Manager/Reports/OperatorTransaction";
 
 Vue.use(Router);
 
@@ -207,6 +208,11 @@ function configRoutes () {
       path: "/manage/closure/transactions/:closure",
       name: "manageclosuretransactions",
       component: ClosureTransactions,
+    },
+    {
+      path: "/manage/reports/operatortransaction",
+      name: "managereportoperatortransactions",
+      component: OperatorTransaction,
     },
 
     // Sistem pages
