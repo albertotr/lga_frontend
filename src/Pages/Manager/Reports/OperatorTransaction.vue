@@ -65,8 +65,8 @@
                       >
                         Ultima Transação: 
                         <span v-if="!machine.last_transaction" style="color:red;">Não existe</span>
-                        <span v-if="machine.last_transaction && !machine.last_transaction.closure_id">{{ machine.last_transaction.created_at | formatDate }}</span>
-                        <span v-if="machine.last_transaction && machine.last_transaction.closure_id" style="color:green;">{{ machine.last_transaction.created_at | formatDate }} (fechada)</span>
+                        <span v-if="machine.last_transaction && !machine.last_transaction.closure_id">{{ machine.last_transaction.created_at | formatDate }} {{ machine.last_transaction.amount | currency }}</span>
+                        <span v-if="machine.last_transaction && machine.last_transaction.closure_id" style="color:green;">{{ machine.last_transaction.created_at | formatDate }} {{ machine.last_transaction.amount | currency }} (fechada)</span>
                       </div>
 
                       <div
