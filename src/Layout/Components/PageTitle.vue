@@ -26,9 +26,9 @@
 
 <script>
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { faArrowCircleLeft, faUsersCog } from "@fortawesome/free-solid-svg-icons";
+import { faArrowCircleLeft, faUsersCog, faBook } from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
-library.add(faArrowCircleLeft, faUsersCog);
+library.add(faArrowCircleLeft, faUsersCog, faBook);
 
 export default {
   components: {

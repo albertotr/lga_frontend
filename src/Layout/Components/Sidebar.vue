@@ -84,16 +84,16 @@ export default {
             icon: "pe-7s-plugin",
             href: "/admin/device",
           },
-          {
-            title: "Tipos",
-            icon: "pe-7s-ticket",
-            href: "/admin/type",
-          },
-          {
-            title: "Modelos",
-            icon: "pe-7s-ribbon",
-            href: "/admin/sample",
-          },
+          // {
+          //   title: "Tipos",
+          //   icon: "pe-7s-ticket",
+          //   href: "/admin/type",
+          // },
+          // {
+          //   title: "Modelos",
+          //   icon: "pe-7s-ribbon",
+          //   href: "/admin/sample",
+          // },
           {
             title: "Parceiro",
             icon: "pe-7s-wristwatch",
@@ -113,6 +113,11 @@ export default {
             title: "Mensagens",
             icon: "pe-7s-mail",
             href: "/manage/message",
+          },
+          {
+            title: "Ajuda",
+            icon: "pe-7s-mail",
+            href: "/admin/ajuda",
           }
           /* {
             header: true,

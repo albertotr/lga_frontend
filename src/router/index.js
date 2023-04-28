@@ -13,10 +13,10 @@ import ManageMachines from "../Pages/Manager/Machine/Machines";
 import ManageMessages from "../Pages/Manager/Messages/Messages";
 import Devices from "../Pages/Admin/Device/Devices";
 import Device from "../Pages/Admin/Device/DeviceForm";
-import Types from "../Pages/Admin/Type/Types";
-import Type from "../Pages/Admin/Type/TypeForm";
-import Samples from "../Pages/Admin/Sample/Samples";
-import Sample from "../Pages/Admin/Sample/SampleForm";
+// import Types from "../Pages/Admin/Type/Types";
+// import Type from "../Pages/Admin/Type/TypeForm";
+// import Samples from "../Pages/Admin/Sample/Samples";
+// import Sample from "../Pages/Admin/Sample/SampleForm";
 import Partners from "../Pages/Admin/Partner/Partners";
 import Partner from "../Pages/Admin/Partner/PartnerForm";
 import Operators from "../Pages/Admin/Operator/Operators";
@@ -33,6 +33,16 @@ import Closure from "../Pages/Manager/Closure/Closure";
 import ClosureTransactions from "../Pages/Manager/Closure/Transactions";
 import Settings from "../Pages/UserPages/Settings";
 import OperatorTransaction from "../Pages/Manager/Reports/OperatorTransaction";
+import Help from "../Pages/Admin/Help/Help";
+import HelpUser from "../Pages/Admin/Help/HelpUser";
+import HelpOperador from "../Pages/Admin/Help/HelpOperador";
+import HelpLocation from "../Pages/Admin/Help/HelpLocation";
+import HelpDevice from "../Pages/Admin/Help/HelpDevice";
+import HelpPartner from "../Pages/Admin/Help/HelpPartner";
+import HelpMachine from "../Pages/Admin/Help/HelpMachine";
+import HelpMessage from "../Pages/Admin/Help/HelpMessage";
+import HelpBegin from "../Pages/Admin/Help/HelpBegin";
+import HelpDashboard from "../Pages/Admin/Help/HelpDashboard";
 
 Vue.use(Router);
 
@@ -96,27 +106,27 @@ function configRoutes () {
       component: Device,
     },
 
-    {
-      path: "/admin/type",
-      name: "types",
-      component: Types,
-    },
-    {
-      path: "/admin/type/edit/:type?",
-      name: "type",
-      component: Type,
-    },
+    // {
+    //   path: "/admin/type",
+    //   name: "types",
+    //   component: Types,
+    // },
+    // {
+    //   path: "/admin/type/edit/:type?",
+    //   name: "type",
+    //   component: Type,
+    // },
 
-    {
-      path: "/admin/sample",
-      name: "samples",
-      component: Samples
-    },
-    {
-      path: "/admin/sample/edit/:sample?",
-      name: "sample",
-      component: Sample,
-    },
+    // {
+    //   path: "/admin/sample",
+    //   name: "samples",
+    //   component: Samples
+    // },
+    // {
+    //   path: "/admin/sample/edit/:sample?",
+    //   name: "sample",
+    //   component: Sample,
+    // },
 
     {
       path: "/admin/parner",
@@ -149,6 +159,56 @@ function configRoutes () {
       path: "/admin/location/edit/:location?",
       name: "location",
       component: Location
+    },
+    {
+      path: "/admin/ajuda",
+      name: "help",
+      component: Help
+    },
+    {
+      path: "/admin/ajuda/user",
+      name: "help_user",
+      component: HelpUser
+    },
+    {
+      path: "/admin/ajuda/operador",
+      name: "help_operador",
+      component: HelpOperador
+    },
+    {
+      path: "/admin/ajuda/localizacao",
+      name: "help_location",
+      component: HelpLocation
+    },
+    {
+      path: "/admin/ajuda/dispositivo",
+      name: "help_device",
+      component: HelpDevice
+    },
+    {
+      path: "/admin/ajuda/parceiro",
+      name: "help_partner",
+      component: HelpPartner
+    },
+    {
+      path: "/admin/ajuda/maquina",
+      name: "help_machine",
+      component: HelpMachine
+    },
+    {
+      path: "/admin/ajuda/mensagem",
+      name: "help_mensagem",
+      component: HelpMessage
+    },
+    {
+      path: "/admin/ajuda/inicio",
+      name: "help_inicio",
+      component: HelpBegin
+    },
+    {
+      path: "/admin/ajuda/dashboard",
+      name: "help_dashboard",
+      component: HelpDashboard
     },
 
     // Manage pages

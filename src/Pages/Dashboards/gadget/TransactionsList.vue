@@ -37,7 +37,7 @@
                   v-for="transaction in transactions.slice().reverse()"
                   :key="transaction.id"
                 >
-                  <div>
+                  <div v-if="transaction.machine">
                     <span
                       class="vertical-timeline-element-icon bounce-in"
                     ></span>
