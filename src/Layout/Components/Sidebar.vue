@@ -165,6 +165,11 @@ export default {
               //   title: "Operacional",
               // },
             ],
+          },
+          {
+            title: "Ajuda",
+            icon: "pe-7s-mail",
+            href: "/manage/ajuda",
           }
         );
       }

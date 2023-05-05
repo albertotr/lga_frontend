@@ -470,6 +470,7 @@ export default {
       },
     };
     axios(OptionsLocations).then((response) => {
+      console.info(response.data);
       this.locations = response.data;
     });
 

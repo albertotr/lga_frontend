@@ -33,6 +33,7 @@ import Closure from "../Pages/Manager/Closure/Closure";
 import ClosureTransactions from "../Pages/Manager/Closure/Transactions";
 import Settings from "../Pages/UserPages/Settings";
 import OperatorTransaction from "../Pages/Manager/Reports/OperatorTransaction";
+
 import Help from "../Pages/Admin/Help/Help";
 import HelpUser from "../Pages/Admin/Help/HelpUser";
 import HelpOperador from "../Pages/Admin/Help/HelpOperador";
@@ -43,6 +44,13 @@ import HelpMachine from "../Pages/Admin/Help/HelpMachine";
 import HelpMessage from "../Pages/Admin/Help/HelpMessage";
 import HelpBegin from "../Pages/Admin/Help/HelpBegin";
 import HelpDashboard from "../Pages/Admin/Help/HelpDashboard";
+
+import HelpManager from "../Pages/Manager/Help/Help";
+import HelpManagerLocation from "../Pages/Manager/Help/HelpLocation";
+import HelpManagerMachine from "../Pages/Manager/Help/HelpMachine";
+import HelpManagerClosure from "../Pages/Manager/Help/HelpClosure";
+import HelpManagerBegin from "../Pages/Manager/Help/HelpBegin";
+import HelpManagerDashboard from "../Pages/Manager/Help/HelpDashboard";
 
 Vue.use(Router);
 
@@ -273,6 +281,36 @@ function configRoutes () {
       path: "/manage/reports/operatortransaction",
       name: "managereportoperatortransactions",
       component: OperatorTransaction,
+    },
+    {
+      path: "/manage/ajuda",
+      name: "helpManager",
+      component: HelpManager
+    },
+    {
+      path: "/manage/ajuda/localizacao",
+      name: "helpManagerLocation",
+      component: HelpManagerLocation
+    },
+    {
+      path: "/manage/ajuda/maquina",
+      name: "helpManagerMachine",
+      component: HelpManagerMachine
+    },
+    {
+      path: "/manage/ajuda/fechamento",
+      name: "helpManagerClosure",
+      component: HelpManagerClosure
+    },
+    {
+      path: "/manage/ajuda/inicio",
+      name: "helpManagerBegin",
+      component: HelpManagerBegin
+    },
+    {
+      path: "/manage/ajuda/dashboard",
+      name: "helpManagerDashboard",
+      component: HelpManagerDashboard
     },
 
     // Sistem pages

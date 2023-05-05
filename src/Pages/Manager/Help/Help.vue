@@ -18,97 +18,53 @@
               <div
                 class="vertical-time-simple vertical-without-time vertical-timeline vertical-timeline--animate vertical-timeline--one-column"
               >
+                
                 <div class="vertical-timeline-element">
                   <div>
                     <span
                       class="vertical-timeline-element-icon bounce-in"
                     ></span>
                     <div class="vertical-timeline-element-content bounce-in">
-                      <router-link :to="{ path: `/admin/ajuda/user` }">
-                        <h4 class="timeline-title">Usuario</h4>
-                      </router-link>
-                    </div>
-                  </div>
-                </div>
-                <div class="vertical-timeline-element">
-                  <div>
-                    <span
-                      class="vertical-timeline-element-icon bounce-in"
-                    ></span>
-                    <div class="vertical-timeline-element-content bounce-in">
-                      <router-link :to="{ path: `/admin/ajuda/operador` }">
-                        <h4 class="timeline-title">Operador</h4>
-                      </router-link>
-                    </div>
-                  </div>
-                </div>
-                <div class="vertical-timeline-element">
-                  <div>
-                    <span
-                      class="vertical-timeline-element-icon bounce-in"
-                    ></span>
-                    <div class="vertical-timeline-element-content bounce-in">
-                      <router-link :to="{ path: `/admin/ajuda/localizacao` }">
+                      <router-link :to="{ path: `/manage/ajuda/localizacao` }">
                         <h4 class="timeline-title">Localização</h4>
                       </router-link>
                     </div>
                   </div>
                 </div>
+                
                 <div class="vertical-timeline-element">
                   <div>
                     <span
                       class="vertical-timeline-element-icon bounce-in"
                     ></span>
                     <div class="vertical-timeline-element-content bounce-in">
-                      <router-link :to="{ path: `/admin/ajuda/dispositivo` }">
-                        <h4 class="timeline-title">Dispositivo</h4>
-                      </router-link>
-                    </div>
-                  </div>
-                </div>
-                <div class="vertical-timeline-element">
-                  <div>
-                    <span
-                      class="vertical-timeline-element-icon bounce-in"
-                    ></span>
-                    <div class="vertical-timeline-element-content bounce-in">
-                      <router-link :to="{ path: `/admin/ajuda/parceiro` }">
-                        <h4 class="timeline-title">Parceiro</h4>
-                      </router-link>
-                    </div>
-                  </div>
-                </div>
-                <div class="vertical-timeline-element">
-                  <div>
-                    <span
-                      class="vertical-timeline-element-icon bounce-in"
-                    ></span>
-                    <div class="vertical-timeline-element-content bounce-in">
-                      <router-link :to="{ path: `/admin/ajuda/maquina` }">
+                      <router-link :to="{ path: `/manage/ajuda/maquina` }">
                         <h4 class="timeline-title">Maquina</h4>
                       </router-link>
                     </div>
                   </div>
                 </div>
+
                 <div class="vertical-timeline-element">
                   <div>
                     <span
                       class="vertical-timeline-element-icon bounce-in"
                     ></span>
                     <div class="vertical-timeline-element-content bounce-in">
-                      <router-link :to="{ path: `/admin/ajuda/mensagem` }">
-                        <h4 class="timeline-title">Mensagens</h4>
+                      <router-link :to="{ path: `/manage/ajuda/fechamento` }">
+                        <h4 class="timeline-title">Fechamento</h4>
                       </router-link>
                     </div>
                   </div>
                 </div>
+                
                 <div class="vertical-timeline-element">
                   <div>
                     <span
                       class="vertical-timeline-element-icon bounce-in"
                     ></span>
                     <div class="vertical-timeline-element-content bounce-in">
-                      <router-link :to="{ path: `/admin/ajuda/inicio` }">
+                      <router-link :to="{ path: `/manage/ajuda/inicio` }">
                         <h4 class="timeline-title">Inicio</h4>
                       </router-link>
                     </div>
@@ -120,7 +76,7 @@
                       class="vertical-timeline-element-icon bounce-in"
                     ></span>
                     <div class="vertical-timeline-element-content bounce-in">
-                      <router-link :to="{ path: `/admin/ajuda/dashboard` }">
+                      <router-link :to="{ path: `/manage/ajuda/dashboard` }">
                         <h4 class="timeline-title">Dashboard</h4>
                       </router-link>
                     </div>
